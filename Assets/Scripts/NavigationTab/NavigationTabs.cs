@@ -9,8 +9,8 @@ namespace NavigationTab
         [Serializable]
         public class NavigationTab
         {
-            public Button Button;
-            public GameObject Screen;
+            public Button _button;
+            public GameObject _screen;
         }
 
         [SerializeField] private NavigationTab[] _tabs;
@@ -18,7 +18,7 @@ namespace NavigationTab
 
         private UiController _uiController;
         private int _currentTabIndex;
-        private NavigationTab _currentTab => _tabs[_currentTabIndex];
+        private NavigationTab CurrentTab => _tabs[_currentTabIndex];
 
         private void Awake()
         {
@@ -27,8 +27,8 @@ namespace NavigationTab
             for (int i = 0; i < _tabs.Length; i++)
             {
                 int tabIndex = i;
-                _tabs[i].Button.onClick.AddListener(() => OpenTab(tabIndex));
-                _tabs[i].Screen.SetActive(false);
+                _tabs[i]._button.onClick.AddListener(() => OpenTab(tabIndex));
+                _tabs[i]._screen.SetActive(false);
             }
             
             OpenTab(_initialTabIndex);
@@ -36,10 +36,10 @@ namespace NavigationTab
 
         private void OpenTab(int tabIndex)
         {
-            _currentTab.Button.interactable = true;
+            CurrentTab._button.interactable = true;
             _currentTabIndex = tabIndex;
-            _uiController.OpenScreen(_currentTab.Screen);
-            _currentTab.Button.interactable = false;
+            _uiController.OpenScreen(CurrentTab._screen);
+            CurrentTab._button.interactable = false;
         }
     }
 }
