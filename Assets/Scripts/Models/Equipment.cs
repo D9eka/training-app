@@ -1,19 +1,21 @@
 using System;
 
-[Serializable]
-public class Equipment
+namespace Models
 {
-    public string Name;
-    public bool HasQuantity;
-    public bool HasWeight;
-
-    protected bool Equals(Equipment other)
+    [Serializable]
+    public class Equipment
     {
-        return Name == other.Name && HasQuantity == other.HasQuantity && HasWeight == other.HasWeight;
-    }
+        public string Id;
+        public string Name;
+        public bool HasQuantity;
+        public bool HasWeight;
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Name, HasQuantity, HasWeight);
+        public Equipment(string name, bool hasQuantity, bool hasWeight)
+        {
+            Id = Guid.NewGuid().ToString();
+            Name = name;
+            HasQuantity = hasQuantity;
+            HasWeight = hasWeight;
+        }
     }
 }

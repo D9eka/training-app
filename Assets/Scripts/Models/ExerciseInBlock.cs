@@ -1,11 +1,22 @@
 using System;
+using System.Collections.Generic;
 
-[Serializable]
-public class ExerciseInBlock
+namespace Models
 {
-    public Exercise Exercise;
-    public float Weight; // В кг или % (храните как float, тип укажите отдельно)
-    public string WeightType; // "kg" или "%"
-    public int Repetitions;
-    public float Duration; // В секундах
+    [Serializable]
+    public class ExerciseInBlock
+    {
+        public Exercise Exercise;
+        public List<EquipmentInBlock>  EquipmentWeights;
+        public int Repetitions;
+        public float DurationSeconds;
+
+        public ExerciseInBlock(Exercise exercise, List<EquipmentInBlock> equipmentWeights, float weight, WeightType weightType, int repetitions, float durationSeconds)
+        {
+            Exercise = exercise;
+            EquipmentWeights = equipmentWeights;
+            Repetitions = repetitions;
+            DurationSeconds = durationSeconds;
+        }
+    }
 }

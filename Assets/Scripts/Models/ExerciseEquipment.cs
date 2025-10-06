@@ -1,8 +1,17 @@
 using System;
 
-[Serializable]
-public class ExerciseEquipment
+namespace Models
 {
-    public Equipment Equipment;
-    public int Quantity; // Если HasQuantity
+    [Serializable]
+    public class ExerciseEquipment
+    {
+        public Equipment Equipment;
+        public int Quantity;
+
+        public ExerciseEquipment(Equipment equipment, int quantity)
+        {
+            Equipment = equipment;
+            Quantity = quantity;
+        }
+    }
 }
