@@ -1,33 +1,37 @@
-using UnityEngine;
-using UnityEngine.UI;
 using System;
 using System.Text;
+using Models;
 using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
-public class ExerciseItem : MonoBehaviour
+namespace Views.Components.Exercise
 {
-    [SerializeField] private Button _itemButton;
-    [SerializeField] private TextMeshProUGUI _nameText;
-    [SerializeField] private TextMeshProUGUI _requiredEqText;
-
-    private Exercise _exercise;
-
-    public void Setup(Exercise exercise, Action<Exercise> onClick)
+    public class ExerciseItem : MonoBehaviour
     {
-        _exercise = exercise;
+        [SerializeField] private Button _itemButton;
+        [SerializeField] private TextMeshProUGUI _nameText;
+        [SerializeField] private TextMeshProUGUI _requiredEqText;
 
-        _nameText.text = exercise.Name;
+        private Models.Exercise _exercise;
 
-        StringBuilder sb = new StringBuilder("Нужно: ");
-        foreach (var req in exercise.RequiredEquipment)
+        public void Setup(Models.Exercise exercise, Action<Models.Exercise> onClick)
         {
-            sb.Append(req.Equipment.Name);
-            if (req.Equipment.HasQuantity) sb.Append($" ({req.Quantity})");
-            sb.Append(", ");
-        }
-        if (exercise.RequiredEquipment.Count > 0) sb.Length -= 2; // Убрать последнюю запятую
-        _requiredEqText.text = sb.ToString();
+            _exercise = exercise;
 
-        _itemButton.onClick.AddListener(() => onClick?.Invoke(_exercise));
+            _nameText.text = exercise.Name;
+
+            StringBuilder sb = new StringBuilder("Нужно: ");
+            foreach (ExerciseEquipment req in exercise.RequiredEquipment)
+            {
+                sb.Append(req.Equipment.Name);
+                if (req.Equipment.HasQuantity) sb.Append($" ({req.Quantity})");
+                sb.Append(", ");
+            }
+            if (exercise.RequiredEquipment.Count > 0) sb.Length -= 2; // Убрать последнюю запятую
+            _requiredEqText.text = sb.ToString();
+
+            _itemButton.onClick.AddListener(() => onClick?.Invoke(_exercise));
+        }
     }
 }

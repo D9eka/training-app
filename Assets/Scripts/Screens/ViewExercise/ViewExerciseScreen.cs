@@ -1,52 +1,71 @@
-using UnityEngine.UI;
-using UnityEngine;
-using System.Threading.Tasks;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Models;
+using TMPro;
+using UnityEngine;
+using Views.Components.Equipment;
 
-public class ViewExerciseScreen : ScreenBase
+namespace Screens.ViewExercise
 {
-    [SerializeField] private Text _nameText;
-    [SerializeField] private Text _descText;
-    [SerializeField] private Transform _equipmentListParent;
-    [SerializeField] private EquipmentItem _equipmentItemPrefab;
-
-    private ViewExerciseViewModel _vm;
-    private List<EquipmentItem> _spawnedItems = new List<EquipmentItem>();
-
-    public override async Task InitializeAsync(object parameter = null)
+    public class ViewExerciseScreen : ScreenBase
     {
-        _vm = new ViewExerciseViewModel();
-        _vm.ExerciseChanged += RefreshUI;
+        [SerializeField] private TextMeshProUGUI _nameText;
+        [SerializeField] private TextMeshProUGUI _descText;
+        [SerializeField] private Transform _equipmentListParent;
+        [SerializeField] private EquipmentItem _equipmentItemPrefab;
 
-        if (parameter is Exercise ex)
+        private ViewExerciseViewModel _vm;
+        private List<EquipmentItem> _spawnedItems = new();
+
+        public override async Task InitializeAsync(object parameter = null)
         {
-            _vm.SetExercise(ex);
+            _vm = new ViewExerciseViewModel();
+            _vm.ExerciseChanged += RefreshUI;
+
+            if (parameter is Exercise ex)
+            {
+                _vm.SetExercise(ex);
+            }
+
+            await Task.CompletedTask;
         }
 
-        await Task.CompletedTask;
-    }
-
-    private void OnDestroy()
-    {
-        _vm.ExerciseChanged -= RefreshUI;
-    }
-
-    private void RefreshUI()
-    {
-        _nameText.text = _vm.CurrentExercise.Name;
-        _descText.text = _vm.CurrentExercise.Description;
-
-        foreach (var item in _spawnedItems)
+        private void OnEnable()
         {
-            Destroy(item.gameObject);
+            if (_vm == null) return;
+            _vm.ExerciseChanged += RefreshUI;
+            RefreshUI();
         }
-        _spawnedItems.Clear();
 
-        foreach (var reqEq in _vm.CurrentExercise.RequiredEquipment)
+        private void OnDisable()
         {
-            var item = Instantiate(_equipmentItemPrefab, _equipmentListParent);
-            item.Setup(reqEq.Equipment, EquipmentItem.Mode.View, reqEq.Quantity, null);
-            _spawnedItems.Add(item);
+            _vm.ExerciseChanged -= RefreshUI;
+        }
+
+        private void RefreshUI()
+        {
+            _nameText.text = _vm.CurrentExercise.Name;
+            _descText.text = $"Описание: {_vm.CurrentExercise.Description}";
+
+            foreach (EquipmentItem item in _spawnedItems)
+            {
+                Destroy(item.gameObject);
+            }
+            _spawnedItems.Clear();
+
+            foreach (ExerciseEquipment reqEq in _vm.CurrentExercise.RequiredEquipment)
+            {
+                EquipmentItem item = Instantiate(_equipmentItemPrefab, _equipmentListParent);
+                item.Setup(reqEq.Equipment, EquipmentItem.Mode.View, reqEq.Quantity, null);
+                _spawnedItems.Add(item);
+            }
+        }
+
+        protected override void OnEditClicked()
+        {
+            ServiceLocator.Instance.SetScreenParameter(_vm.CurrentExercise.Id);
+            UiController.OpenScreen(ServiceLocator.Instance.EditExerciseScreen.gameObject, true, false);
         }
     }
 }

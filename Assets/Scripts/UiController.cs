@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Screens;
 using UnityEngine;
 
 public class UiController : MonoBehaviour
@@ -29,7 +30,7 @@ public class UiController : MonoBehaviour
         });
         _navigationBar.SetActive(navBarActiveState);
 
-        var screenBase = screen.GetComponent<ScreenBase>();
+        ScreenBase screenBase = screen.GetComponent<ScreenBase>();
         if (screenBase != null)
         {
             await screenBase.InitializeAsync(ServiceLocator.Instance.GetScreenParameter());
@@ -40,12 +41,12 @@ public class UiController : MonoBehaviour
     {
         if (_screensStack.Count > 0)
         {
-            var closingState = _screensStack.Pop();
+            ScreenState closingState = _screensStack.Pop();
             closingState.Screen.SetActive(false);
 
             if (_screensStack.Count > 0)
             {
-                var previousState = _screensStack.Peek();
+                ScreenState previousState = _screensStack.Peek();
                 previousState.Screen.SetActive(true);
                 _navigationBar.SetActive(previousState.NavBarActiveState); // Восстановить состояние панели
             }

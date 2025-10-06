@@ -1,24 +1,29 @@
 using System;
 using System.Collections.Generic;
+using Data;
+using Models;
 
-public class ViewExercisesViewModel
+namespace Screens.ViewExercises
 {
-    public event Action ExercisesChanged;
-
-    public List<Exercise> Exercises { get; private set; }
-
-    private readonly DataService _dataService;
-
-    public ViewExercisesViewModel(DataService dataService)
+    public class ViewExercisesViewModel
     {
-        _dataService = dataService;
-        Load();
-    }
+        public event Action ExercisesChanged;
 
-    public void Load()
-    {
-        var data = _dataService.Load();
-        Exercises = data.Exercises;
-        ExercisesChanged?.Invoke();
+        public List<Exercise> Exercises { get; private set; }
+
+        private readonly DataService _dataService;
+
+        public ViewExercisesViewModel(DataService dataService)
+        {
+            _dataService = dataService;
+            Load();
+        }
+
+        public void Load()
+        {
+            AppData data = _dataService.Load();
+            Exercises = data.Exercises;
+            ExercisesChanged?.Invoke();
+        }
     }
 }

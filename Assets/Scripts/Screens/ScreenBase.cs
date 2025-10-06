@@ -2,31 +2,34 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-public abstract class ScreenBase : MonoBehaviour
+namespace Screens
 {
-    [Header("UI Common Buttons (Optional)")]
-    [SerializeField] protected Button _backButton;
-    [SerializeField] protected Button _saveButton;
-    [SerializeField] protected Button _editButton;
-
-    protected UiController UiController => ServiceLocator.Instance.UiController;
-
-    protected virtual void Awake()
+    public abstract class ScreenBase : MonoBehaviour
     {
-        if (_backButton != null)
-            _backButton.onClick.AddListener(OnBackClicked);
+        [Header("UI Common Buttons (Optional)")]
+        [SerializeField] protected Button _backButton;
+        [SerializeField] protected Button _saveButton;
+        [SerializeField] protected Button _editButton;
 
-        if (_saveButton != null)
-            _saveButton.onClick.AddListener(OnSaveClicked);
+        protected UiController UiController => ServiceLocator.Instance.UiController;
 
-        if (_editButton != null)
-            _editButton.onClick.AddListener(OnEditClicked);
+        protected virtual void Awake()
+        {
+            if (_backButton != null)
+                _backButton.onClick.AddListener(OnBackClicked);
+
+            if (_saveButton != null)
+                _saveButton.onClick.AddListener(OnSaveClicked);
+
+            if (_editButton != null)
+                _editButton.onClick.AddListener(OnEditClicked);
+        }
+
+        public virtual async Task InitializeAsync(object parameter = null) 
+            => await Task.CompletedTask;
+
+        protected virtual void OnBackClicked() => UiController.CloseScreen();
+        protected virtual void OnSaveClicked() { }
+        protected virtual void OnEditClicked() { }
     }
-
-    public virtual async Task InitializeAsync(object parameter = null) 
-        => await Task.CompletedTask;
-
-    protected virtual void OnBackClicked() => UiController.CloseScreen();
-    protected virtual void OnSaveClicked() { }
-    protected virtual void OnEditClicked() { }
 }

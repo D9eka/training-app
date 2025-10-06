@@ -1,14 +1,18 @@
 using System;
+using Models;
 
-public class ViewExerciseViewModel
+namespace Screens.ViewExercise
 {
-    public event Action ExerciseChanged;
-
-    public Exercise CurrentExercise { get; private set; }
-
-    public void SetExercise(Exercise exercise)
+    public class ViewExerciseViewModel
     {
-        CurrentExercise = exercise;
-        ExerciseChanged?.Invoke();
+        public event Action ExerciseChanged;
+
+        public Exercise CurrentExercise { get; private set; }
+
+        public void SetExercise(Exercise exercise)
+        {
+            CurrentExercise = exercise;
+            ExerciseChanged?.Invoke();
+        }
     }
 }

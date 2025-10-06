@@ -1,45 +1,57 @@
-using UnityEngine.UI;
+using System;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class CreateEquipmentScreen : ScreenBase
+namespace Screens.CreateEquipment
 {
-    [SerializeField] private TMP_InputField _nameInput;
-    [SerializeField] private Toggle _quantityToggle;
-    [SerializeField] private Toggle _weightToggle;
-
-    private CreateEquipmentViewModel _vm;
-
-    public override async Task InitializeAsync(object parameter = null)
+    public class CreateEquipmentScreen : ScreenBase
     {
-        _vm = new CreateEquipmentViewModel(ServiceLocator.Instance.DataService);
+        [SerializeField] private TMP_InputField _nameInput;
+        [SerializeField] private Toggle _quantityToggle;
+        [SerializeField] private Toggle _weightToggle;
 
-        _nameInput.text = _vm.Name;
-        _quantityToggle.isOn = _vm.HasQuantity;
-        _weightToggle.isOn = _vm.HasWeight;
+        private CreateEquipmentViewModel _vm;
 
-        _nameInput.onValueChanged.AddListener(value => 
+        public override async Task InitializeAsync(object parameter = null)
         {
-            _vm.Name = value;
-            UpdateSaveButton(!string.IsNullOrEmpty(value));
-        });
-        _quantityToggle.onValueChanged.AddListener(value => _vm.HasQuantity = value);
-        _weightToggle.onValueChanged.AddListener(value => _vm.HasWeight = value);
+            _vm = new CreateEquipmentViewModel(ServiceLocator.Instance.DataService);
+            _vm.CanSaveChanged += UpdateSaveButton;
 
-        UpdateSaveButton(!string.IsNullOrEmpty(_vm.Name));
+            _nameInput.text = _vm.Name;
+            _quantityToggle.isOn = _vm.HasQuantity;
+            _weightToggle.isOn = _vm.HasWeight;
 
-        await Task.CompletedTask;
-    }
+            _nameInput.onValueChanged.AddListener(value =>  _vm.Name = value);
+            _quantityToggle.onValueChanged.AddListener(value => _vm.HasQuantity = value);
+            _weightToggle.onValueChanged.AddListener(value => _vm.HasWeight = value);
 
-    private void UpdateSaveButton(bool canSave)
-    {
-        _saveButton.interactable = canSave;
-    }
+            UpdateSaveButton(!string.IsNullOrEmpty(_vm.Name));
 
-    protected override void OnSaveClicked()
-    {
-        _vm.Save();
-        UiController.CloseScreen();
+            await Task.CompletedTask;
+        }
+
+        private void OnEnable()
+        {
+            if (_vm == null) return;
+            _vm.CanSaveChanged += UpdateSaveButton;
+        }
+
+        private void OnDisable()
+        {
+            _vm.CanSaveChanged -= UpdateSaveButton;
+        }
+
+        private void UpdateSaveButton(bool canSave)
+        {
+            _saveButton.interactable = canSave;
+        }
+
+        protected override void OnSaveClicked()
+        {
+            _vm.Save();
+            UiController.CloseScreen();
+        }
     }
 }
