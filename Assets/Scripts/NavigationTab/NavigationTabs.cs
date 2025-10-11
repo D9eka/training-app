@@ -46,14 +46,14 @@ namespace NavigationTab
                     throw new InvalidOperationException($"Duplicate tab key: {tab.Type}");
             }
 
-            _uiController = ServiceLocator.Instance.Resolve<UiController>()
+            _uiController = DiContainer.Instance.Resolve<UiController>()
                 ?? throw new InvalidOperationException("UiController not resolved");
 
             for (int i = 0; i < _tabs.Length; i++)
             {
                 int tabIndex = i;
                 _tabs[i].Button.onClick.AddListener(() => OpenTab(tabIndex));
-                ServiceLocator.Instance.ResolveNamed(_tabs[i].Type.ToString()).SetActive(false);
+                DiContainer.Instance.ResolveNamed(_tabs[i].Type.ToString()).SetActive(false);
             }
             
             OpenTab(_initialTabIndex);
@@ -73,7 +73,7 @@ namespace NavigationTab
                 _currentTabIndex = tabIndex;
                 CurrentTab.Button.interactable = false;
                 foreach (NavigationTab tab in _tabs)
-                    ServiceLocator.Instance.ResolveNamed(tab.Type.ToString()).SetActive(tab == CurrentTab);
+                    DiContainer.Instance.ResolveNamed(tab.Type.ToString()).SetActive(tab == CurrentTab);
 
                 _uiController.OpenScreen(CurrentTab.Type);
             }

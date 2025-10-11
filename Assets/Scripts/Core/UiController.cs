@@ -16,7 +16,7 @@ namespace Core
         {
             try
             {
-                GameObject screenGo = ServiceLocator.Instance.ResolveNamed(type.ToString());
+                GameObject screenGo = DiContainer.Instance.ResolveNamed(type.ToString());
                 if (screenGo == null) throw new ArgumentNullException(nameof(screenGo));
             
                 Screen screen = screenGo.GetComponent<Screen>();

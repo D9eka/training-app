@@ -16,7 +16,7 @@ namespace Core
         }
         [SerializeField] private List<ScreenEntry> _screens = new();
 
-        public void Install(ServiceLocator serviceLocator)
+        public void Install(DiContainer diContainer)
         {
             foreach (ScreenEntry entry in _screens)
             {
@@ -25,7 +25,7 @@ namespace Core
                     Debug.LogError($"Invalid screen entry: Key={entry.Type}, Screen={entry.Screen}");
                     continue;
                 }
-                serviceLocator.RegisterNamed(entry.Type.ToString(), entry.Screen.gameObject);
+                diContainer.RegisterNamed(entry.Type.ToString(), entry.Screen.gameObject);
                 entry.Screen.gameObject.SetActive(false);
             }
         }
