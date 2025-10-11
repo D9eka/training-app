@@ -1,79 +1,81 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Core;
+using Data;
 using Models;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 using Views.Components.Exercise;
 
 namespace Screens.ViewExercises
 {
-    public class ViewExercisesScreen : ScreenBase
+    /// <summary>
+    /// Экран списка упражнений.
+    /// </summary>
+    public class ViewExercisesScreen : ReactiveScreen
     {
-        [SerializeField] private Button _addNewExerciseButton;
-        [SerializeField] private Transform _exerciseListParent;
+        [SerializeField] private Transform _contentParent;
         [SerializeField] private ExerciseItem _exerciseItemPrefab;
+        [SerializeField] private Button _createButton;
 
         private ViewExercisesViewModel _vm;
-        private List<ExerciseItem> _spawnedItems = new List<ExerciseItem>();
+        private IDataService _dataService;
+        private int _lastExercisesHash;
 
         public override async Task InitializeAsync(object parameter = null)
         {
-            _addNewExerciseButton.onClick.AddListener(() => UiController.OpenScreen(
-                ServiceLocator.Instance.CreateExerciseScreen.gameObject, true, false));
-        
-            _vm = new ViewExercisesViewModel(ServiceLocator.Instance.DataService);
-            _vm.ExercisesChanged += RefreshList;
-            ServiceLocator.Instance.DataService.DataChanged += OnDataChanged;
+            _dataService = DiContainer.Instance.Resolve<IDataService>() ?? throw new InvalidOperationException("IDataService not resolved");
+            ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
+            _vm = factory.Create<ViewExercisesViewModel>();
 
-            RefreshList();
-            await Task.CompletedTask;
+            Subscribe(() => _vm.ExercisesChanged -= MarkDirtyOrRefresh);
+            _vm.ExercisesChanged += MarkDirtyOrRefresh;
+
+            _createButton.onClick.RemoveAllListeners();
+            _createButton.onClick.AddListener(() =>
+                DiContainer.Instance.Resolve<UiController>().OpenScreen(ScreenType.CreateExercise));
+
+            Refresh();
+            await base.InitializeAsync(parameter);
         }
 
-        private void OnEnable()
+        protected override void Refresh()
         {
-            if (_vm == null) return;
-            _vm.ExercisesChanged += RefreshList;
-            ServiceLocator.Instance.DataService.DataChanged += OnDataChanged;
-            RefreshList();
-        }
-
-        private void OnDisable()
-        {
-            _vm.ExercisesChanged -= RefreshList;
-            ServiceLocator.Instance.DataService.DataChanged -= OnDataChanged;
-        }
-
-        private void OnDataChanged()
-        {
-            _vm.Load();
-            RefreshList();
-        }
-
-        private void RefreshList()
-        {
-            foreach (ExerciseItem item in _spawnedItems)
+            _isRefreshing = true;
+            try
             {
-                Destroy(item.gameObject);
+                if (_initialized && !isDirty) return;
+
+                foreach (Transform t in _contentParent)
+                {
+                    SimplePool.Return(t.gameObject, _exerciseItemPrefab.gameObject);
+                }
+
+                foreach (Exercise ex in _vm.Exercises)
+                {
+                    GameObject go = SimplePool.Get(_exerciseItemPrefab.gameObject, _contentParent);
+                    ExerciseItem item = go.GetComponent<ExerciseItem>();
+                    List<(string Id, string Name, int Quantity)> exEquipment = GetEquipmentViewData(ex);
+                    item.Setup(ex, exEquipment, OnExerciseClicked);
+                }
             }
-            _spawnedItems.Clear();
-
-            foreach (Exercise ex in _vm.Exercises)
+            finally
             {
-                ExerciseItem item = Instantiate(_exerciseItemPrefab, _exerciseListParent);
-                item.Setup(ex, OnExerciseClicked);
-                _spawnedItems.Add(item);
+                _isRefreshing = false;
             }
         }
 
-        private void OnExerciseClicked(Exercise ex)
+        private List<(string Id, string Name, int Quantity)> GetEquipmentViewData(Exercise ex)
         {
-            ServiceLocator.Instance.SetScreenParameter(ex);
-            UiController.OpenScreen(
-                ServiceLocator.Instance.ViewExerciseScreen.gameObject,
-                true,
-                true
-            );
+            return ex.RequiredEquipment.Select(r =>
+                (Id: r.EquipmentId, Name: _dataService.GetEquipmentById(r.EquipmentId)?.Name, r.Quantity)).ToList();
         }
+
+        private void OnExerciseClicked(Exercise ex) =>
+            DiContainer.Instance.Resolve<UiController>().OpenScreen(ScreenType.ViewExercise, ex.Id);
     }
 }

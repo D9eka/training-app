@@ -428,13 +428,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2a5ba43c9184fed81a5230d1cd85fc1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _nameButton: {fileID: 2756821781040725451}
   _nameText: {fileID: 2640454772212887929}
-  _addQtyButton: {fileID: 7266189400697128599}
-  _removeQtyButton: {fileID: 8686302336605846625}
   _quantityText: {fileID: 4797835542883489564}
-  _weightInput: {fileID: 5380685802110906758}
+  _addButton: {fileID: 7266189400697128599}
+  _removeButton: {fileID: 8686302336605846625}
   _deleteButton: {fileID: 6586631832920416489}
+  _weightInput: {fileID: 5380685802110906758}
 --- !u!114 &1999441911754106908
 MonoBehaviour:
   m_ObjectHideFlags: 0

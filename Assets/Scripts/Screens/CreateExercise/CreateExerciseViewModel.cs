@@ -7,136 +7,98 @@ namespace Screens.CreateExercise
 {
     public class CreateExerciseViewModel
     {
-        public event Action ExerciseChanged;
+        private readonly IDataService _dataService;
+        private string _name = string.Empty;
+    
+        private Exercise _currentExercise;
+        private bool _editMode;
+
+        public event Action<bool> EditModeChanged;
         public event Action<bool> CanSaveChanged;
+        public event Action EquipmentsChanged;
 
         public string Name
         {
             get => _name;
-            set
+            set { _name = value ?? string.Empty; CanSaveChanged?.Invoke(CanSave); }
+        }
+
+        public string Description { get; set; }
+
+        public bool CanSave => !string.IsNullOrWhiteSpace(Name);
+
+        // Всё оборудование и выбранное пользователем
+        public IReadOnlyList<Equipment> AllEquipments { get; private set; } = new List<Equipment>();
+        public List<ExerciseEquipmentRef> RequiredEquipment { get; private set; } = new List<ExerciseEquipmentRef>();
+
+        public CreateExerciseViewModel(IDataService dataService, string exerciseId)
+        {
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+            FindExerciseById(exerciseId); // изменить, чтобы view успел подписаться
+            LoadEquipments();
+            _dataService.EquipmentsUpdated += LoadEquipments;
+        }
+
+        private void FindExerciseById(string exerciseId)
+        {
+            _currentExercise = _dataService.GetExerciseById(exerciseId);
+            _editMode = _currentExercise != null;
+            EditModeChanged?.Invoke(_editMode);
+            if (_currentExercise == null) return;
+            
+            Name = _currentExercise.Name;
+            Description = _currentExercise.Description;
+            foreach (var equipmentRef in _currentExercise.RequiredEquipment)
             {
-                _name = value;
-                CanSaveChanged?.Invoke(!string.IsNullOrWhiteSpace(_name));
+                RequiredEquipment.Add(equipmentRef);
             }
         }
-        public string Description { get; set; }
-        public List<ExerciseEquipment> RequiredEquipment { get; } = new List<ExerciseEquipment>();
-        public List<Equipment> AllEquipments { get; private set; } = new List<Equipment>();
 
-        private readonly DataService _dataService;
-        private string _name;
-
-        public CreateExerciseViewModel(DataService dataService)
+        private void LoadEquipments()
         {
-            _dataService = dataService;
-            _dataService.DataChanged += Load;
-            Load();
-        }
-
-        public void Save()
-        {
-            if (string.IsNullOrEmpty(Name)) return;
-            Exercise exercise = new Exercise(Name, Description, RequiredEquipment);
-            AppData data = _dataService.Load();
-            data.Exercises.Add(exercise);
-            _dataService.Save(data);
-        }
-
-        public void Load()
-        {
-            AppData data = _dataService.Load();
-            AllEquipments.Clear();
-            AllEquipments.AddRange(data.Equipments);
-            ExerciseChanged?.Invoke();
+            AllEquipments = _dataService.GetAllEquipments();
+            EquipmentsChanged?.Invoke();
         }
 
         public void UpdateEquipmentQuantity(Equipment eq, int quantity)
         {
-            ExerciseEquipment existing = RequiredEquipment.Find(r => r.Equipment == eq);
-            if (quantity > 0)
+            if (eq == null) return;
+            var existing = RequiredEquipment.Find(r => r.EquipmentId == eq.Id);
+            if (quantity <= 0)
             {
-                if (existing != null)
-                {
-                    existing.Quantity = quantity;
-                }
-                else
-                {
-                    RequiredEquipment.Add(new ExerciseEquipment(eq, quantity));
-                }
+                if (existing != null) RequiredEquipment.Remove(existing);
             }
-            else if (existing != null)
+            else
             {
-                RequiredEquipment.Remove(existing);
+                if (existing != null) existing.Quantity = quantity;
+                else RequiredEquipment.Add(new ExerciseEquipmentRef(eq.Id, quantity));
             }
-            ExerciseChanged?.Invoke();
-        }
-        
-        public void AddEquipmentToExercise(Exercise exercise, Equipment equipment, int quantity)
-        {
-            AppData data = _dataService.Load();
-            int oldExerciseIndex = data.Exercises.FindIndex(e => e.Id == exercise.Id);
-            
-            exercise.RequiredEquipment.Add(new ExerciseEquipment(equipment, quantity));
-            data.Exercises[oldExerciseIndex] = exercise;
-            
-            foreach (Training training in data.Trainings)
-            {
-                foreach (TrainingBlock block in training.Blocks)
-                {
-                    List<ExerciseInBlock> exercisesToEdit = block.Exercises.FindAll(e => e.Exercise.Id == exercise.Id);
-                    if (exercisesToEdit.Count == 0) 
-                        continue;
-                    foreach (ExerciseInBlock exerciseToEdit in exercisesToEdit)
-                    {
-                        exerciseToEdit.EquipmentWeights.Add(new EquipmentInBlock(equipment));
-                    }
-                }
-            }
-            
-            ExerciseChanged?.Invoke();
+            EquipmentsChanged?.Invoke();
         }
 
         public void RemoveEquipment(Equipment eq)
         {
-            AppData data = _dataService.Load();
-            foreach (Exercise exercise in data.Exercises)
-            {
-                ExerciseEquipment existing = exercise.RequiredEquipment.Find(r => r.Equipment.Id == eq.Id);
-                if (existing == null) 
-                    continue;
-                
-                RequiredEquipment.Remove(existing);
-                foreach (Training training in data.Trainings)
-                {
-                    foreach (TrainingBlock block in training.Blocks)
-                    {
-                        foreach (ExerciseInBlock exerciseInBlock in block.Exercises)
-                        {
-                            if (exerciseInBlock.Exercise.Id != exercise.Id) 
-                                continue;
-                            EquipmentInBlock exerciseToDelete = exerciseInBlock.EquipmentWeights.Find(r => r.Equipment.Id == eq.Id);
-                            if (exerciseToDelete != null)
-                            {
-                                exerciseInBlock.EquipmentWeights.Remove(exerciseToDelete);
-                            }
-                        }
-                    }
-                }
-            }
-        
-            Equipment itemToDelete = data.Equipments.Find(r=> r.Id == eq.Id);
-            if (itemToDelete != null)
-            {
-                data.Equipments.Remove(itemToDelete);
-            }
-            _dataService.Save(data);
-        
-            ExerciseChanged?.Invoke();
+            if (eq == null) return;
+            RequiredEquipment.RemoveAll(r => r.EquipmentId == eq.Id);
+            _dataService.RemoveEquipment(eq.Id);
         }
 
-        public void Dispose()
+        public void Save()
         {
-            _dataService.DataChanged -= Load;
+            if (!CanSave) return;
+            _currentExercise.Name = Name;
+            _currentExercise.Description = Description;
+            foreach (var r in RequiredEquipment)
+                _currentExercise.AddOrUpdateEquipment(r.EquipmentId, r.Quantity);
+
+            if (_editMode)
+            {
+                _dataService.UpdateExercise(_currentExercise);
+            }
+            else
+            {
+                _dataService.AddExercise(_currentExercise);
+            }
         }
     }
 }

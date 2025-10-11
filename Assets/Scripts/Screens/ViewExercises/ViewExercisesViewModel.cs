@@ -5,24 +5,27 @@ using Models;
 
 namespace Screens.ViewExercises
 {
+    /// <summary>
+    /// ViewModel для списка упражнений.
+    /// </summary>
     public class ViewExercisesViewModel
     {
+        private readonly IDataService _dataService;
+        private IReadOnlyList<Exercise> _exercises;
+
+        public IReadOnlyList<Exercise> Exercises => _exercises;
         public event Action ExercisesChanged;
 
-        public List<Exercise> Exercises { get; private set; }
-
-        private readonly DataService _dataService;
-
-        public ViewExercisesViewModel(DataService dataService)
+        public ViewExercisesViewModel(IDataService dataService)
         {
-            _dataService = dataService;
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
             Load();
+            _dataService.ExercisesUpdated += Load;
         }
 
         public void Load()
         {
-            AppData data = _dataService.Load();
-            Exercises = data.Exercises;
+            _exercises = _dataService.GetAllExercises() ?? new List<Exercise>().AsReadOnly();
             ExercisesChanged?.Invoke();
         }
     }

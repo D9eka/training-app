@@ -1,71 +1,102 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Core;
+using Data;
 using Models;
 using TMPro;
 using UnityEngine;
-using Views.Components.Equipment;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseScreen : ScreenBase
+    /// <summary>
+    /// Экран просмотра упражнения.
+    /// </summary>
+    public class ViewExerciseScreen : ReactiveScreen
     {
-        [SerializeField] private TextMeshProUGUI _nameText;
-        [SerializeField] private TextMeshProUGUI _descText;
-        [SerializeField] private Transform _equipmentListParent;
-        [SerializeField] private EquipmentItem _equipmentItemPrefab;
+        [SerializeField] private TMP_Text _nameText;
+        [SerializeField] private TMP_Text _descriptionText;
+        [SerializeField] private TMP_Text _equipmentsText;
+        [SerializeField] private Button _editButton;
+        [SerializeField] private Button _backButton;
+        [SerializeField] private Button _deleteButton;
 
         private ViewExerciseViewModel _vm;
-        private List<EquipmentItem> _spawnedItems = new();
+        private IDataService _dataService;
+        private UiController _uiController;
+        private string _exerciseId;
 
         public override async Task InitializeAsync(object parameter = null)
         {
-            _vm = new ViewExerciseViewModel();
-            _vm.ExerciseChanged += RefreshUI;
+            _exerciseId = parameter as string ?? throw new ArgumentException("Exercise ID required");
+            _dataService = DiContainer.Instance.Resolve<IDataService>() ?? throw new InvalidOperationException("IDataService not resolved");
+            _uiController =  DiContainer.Instance.Resolve<UiController>() ?? throw new InvalidOperationException("UiController not resolved");
+            ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
+            _vm = factory.Create<ViewExerciseViewModel>(_exerciseId);
 
-            if (parameter is Exercise ex)
+            Subscribe(() => _vm.ExerciseChanged -= MarkDirtyOrRefresh);
+            _vm.ExerciseChanged += MarkDirtyOrRefresh;
+
+            _editButton.onClick.RemoveAllListeners();
+            _editButton.onClick.AddListener(() =>
+                _uiController.OpenScreen(ScreenType.CreateExercise, _exerciseId));
+
+            _backButton.onClick.RemoveAllListeners();
+            _backButton.onClick.AddListener(() => _uiController.CloseScreen());
+            
+            _deleteButton.onClick.RemoveAllListeners();
+            _deleteButton.onClick.AddListener(DeleteExercise);
+
+            Refresh();
+            await base.InitializeAsync(parameter);
+        }
+
+        protected override void Refresh()
+        {
+            _isRefreshing = true;
+            try
             {
-                _vm.SetExercise(ex);
+                if (_initialized && !isDirty) return;
+                
+                Exercise ex = _vm.CurrentExercise;
+                if (ex == null)
+                {
+                    _nameText.text = "Упражнение не найдено";
+                    _descriptionText.text = "";
+                    _equipmentsText.text = "";
+                    return;
+                }
+
+                _nameText.text = ex.Name;
+                _descriptionText.text = $"Описание: {ex.Description}";
+
+                if (ex.RequiredEquipment == null || ex.RequiredEquipment.Count == 0)
+                {
+                    _equipmentsText.text = "Без оборудования";
+                    return;
+                }
+
+                List<(string Id, string Name, int Quantity)> equipmentData = ex.RequiredEquipment.Select(r =>
+                {
+                    Equipment eq = _dataService.GetEquipmentById(r.EquipmentId);
+                    return (Id: r.EquipmentId, Name: eq?.Name ?? "??", r.Quantity);
+                }).ToList();
+
+                _equipmentsText.text = $"Нужно: {string.Join(", ", equipmentData.Select(r => $"{r.Name} x{r.Quantity}"))}";
             }
-
-            await Task.CompletedTask;
-        }
-
-        private void OnEnable()
-        {
-            if (_vm == null) return;
-            _vm.ExerciseChanged += RefreshUI;
-            RefreshUI();
-        }
-
-        private void OnDisable()
-        {
-            _vm.ExerciseChanged -= RefreshUI;
-        }
-
-        private void RefreshUI()
-        {
-            _nameText.text = _vm.CurrentExercise.Name;
-            _descText.text = $"Описание: {_vm.CurrentExercise.Description}";
-
-            foreach (EquipmentItem item in _spawnedItems)
+            finally
             {
-                Destroy(item.gameObject);
-            }
-            _spawnedItems.Clear();
-
-            foreach (ExerciseEquipment reqEq in _vm.CurrentExercise.RequiredEquipment)
-            {
-                EquipmentItem item = Instantiate(_equipmentItemPrefab, _equipmentListParent);
-                item.Setup(reqEq.Equipment, EquipmentItem.Mode.View, reqEq.Quantity, null);
-                _spawnedItems.Add(item);
+                _isRefreshing = false;
             }
         }
 
-        protected override void OnEditClicked()
+        private void DeleteExercise()
         {
-            ServiceLocator.Instance.SetScreenParameter(_vm.CurrentExercise.Id);
-            UiController.OpenScreen(ServiceLocator.Instance.EditExerciseScreen.gameObject, true, false);
+            _vm.DeleteExercise();
+            _uiController.CloseScreen();
         }
     }
 }

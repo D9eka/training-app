@@ -4,8 +4,16 @@ using Models;
 
 namespace Screens.CreateEquipment
 {
+    /// <summary>
+    /// ViewModel для создания нового оборудования.
+    /// </summary>
     public class CreateEquipmentViewModel
     {
+        private readonly IDataService _dataService;
+        private string _name = string.Empty;
+        private bool _hasQuantity;
+        private bool _hasWeight;
+
         public event Action<bool> CanSaveChanged;
 
         public string Name
@@ -13,28 +21,43 @@ namespace Screens.CreateEquipment
             get => _name;
             set
             {
-                _name = value;
-                CanSaveChanged?.Invoke(!string.IsNullOrWhiteSpace(_name));
+                _name = value ?? string.Empty;
+                CanSaveChanged?.Invoke(CanSave);
             }
         }
-        public bool HasQuantity { get; set; }
-        public bool HasWeight { get; set; }
 
-        private readonly DataService _dataService;
-        private string _name;
-
-        public CreateEquipmentViewModel(DataService dataService)
+        public bool HasQuantity
         {
-            _dataService = dataService;
+            get => _hasQuantity;
+            set
+            {
+                _hasQuantity = value;
+                CanSaveChanged?.Invoke(CanSave);
+            }
+        }
+
+        public bool HasWeight
+        {
+            get => _hasWeight;
+            set
+            {
+                _hasWeight = value;
+                CanSaveChanged?.Invoke(CanSave);
+            }
+        }
+
+        public bool CanSave => !string.IsNullOrWhiteSpace(_name);
+
+        public CreateEquipmentViewModel(IDataService dataService)
+        {
+            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
         }
 
         public void Save()
         {
-            if (string.IsNullOrEmpty(Name)) return;
-            Equipment equipment = new Equipment(Name, HasQuantity, HasWeight);
-            AppData data = _dataService.Load();
-            data.Equipments.Add(equipment);
-            _dataService.Save(data);
+            if (!CanSave) return;
+            Equipment eq = new Equipment(Name.Trim(), HasQuantity, HasWeight);
+            _dataService.AddEquipment(eq);
         }
     }
 }

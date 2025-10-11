@@ -1,37 +1,52 @@
 using System;
-using System.Text;
-using Models;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Views.Components.Exercise
 {
+    /// <summary>
+    /// UI-компонент для отображения упражнения в списке.
+    /// </summary>
     public class ExerciseItem : MonoBehaviour
     {
-        [SerializeField] private Button _itemButton;
-        [SerializeField] private TextMeshProUGUI _nameText;
-        [SerializeField] private TextMeshProUGUI _requiredEqText;
+        [SerializeField] private TMP_Text _nameText;
+        [SerializeField] private TMP_Text _equipmentsText;
+        [SerializeField] private Button _button;
 
         private Models.Exercise _exercise;
+        private Action<Models.Exercise> _onClick;
 
-        public void Setup(Models.Exercise exercise, Action<Models.Exercise> onClick)
+        private void Awake()
         {
-            _exercise = exercise;
+            if (_nameText == null) throw new MissingComponentException("NameText is not assigned");
+            if (_equipmentsText == null) throw new MissingComponentException("EquipmentsText is not assigned");
+            if (_button == null) throw new MissingComponentException("Button is not assigned");
+        }
+
+        /// <summary>
+        /// Настраивает элемент.
+        /// </summary>
+        public void Setup(Models.Exercise exercise, IReadOnlyList<(string Id, string Name, int Quantity)> equipmentData, Action<Models.Exercise> onClick)
+        {
+            _exercise = exercise ?? throw new ArgumentNullException(nameof(exercise));
+            _onClick = onClick;
 
             _nameText.text = exercise.Name;
-
-            StringBuilder sb = new StringBuilder("Нужно: ");
-            foreach (ExerciseEquipment req in exercise.RequiredEquipment)
+            if (equipmentData != null && equipmentData.Count > 0)
             {
-                sb.Append(req.Equipment.Name);
-                if (req.Equipment.HasQuantity) sb.Append($" ({req.Quantity})");
-                sb.Append(", ");
+                IEnumerable<string> parts = equipmentData.Select(r => $"{r.Name} x{r.Quantity}");
+                _equipmentsText.text = $"Нужно: {string.Join(", ", parts)}";
             }
-            if (exercise.RequiredEquipment.Count > 0) sb.Length -= 2; // Убрать последнюю запятую
-            _requiredEqText.text = sb.ToString();
+            else
+            {
+                _equipmentsText.text = "Без оборудования";
+            }
 
-            _itemButton.onClick.AddListener(() => onClick?.Invoke(_exercise));
+            _button.onClick.RemoveAllListeners();
+            _button.onClick.AddListener(() => _onClick?.Invoke(_exercise));
         }
     }
 }

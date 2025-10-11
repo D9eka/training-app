@@ -5,86 +5,82 @@ using UnityEngine.UI;
 
 namespace Views.Components.Equipment
 {
+    /// <summary>
+    /// UI-компонент для отображения оборудования.
+    /// </summary>
     public class EquipmentItem : MonoBehaviour
     {
-        [SerializeField] private Button _nameButton;
-        [SerializeField] private TMP_Text _nameText;
-        [SerializeField] private Button _addQtyButton;
-        [SerializeField] private Button _removeQtyButton;
-        [SerializeField] private TMP_Text _quantityText;
-        [SerializeField] private TMP_InputField _weightInput;
-        [SerializeField] private Button _deleteButton;
+        public enum Mode { View, Edit, WorkoutView, WorkoutEdit }
 
-        public enum Mode { View, Create, TrainingView, CreateTraining }
+        [SerializeField] private TMP_Text _nameText;
+        [SerializeField] private TMP_Text _quantityText;
+        [SerializeField] private Button _addButton;
+        [SerializeField] private Button _removeButton;
+        [SerializeField] private Button _deleteButton;
+        [SerializeField] private TMP_InputField _weightInput;
 
         private Models.Equipment _equipment;
-        private int _quantity;
-        private bool _isQuantityVisible => _quantity > 0;
         private Action<Models.Equipment> _onDelete;
         private Action<Models.Equipment, int> _onQuantityChanged;
+        private int _quantity;
 
-        public void Setup(Models.Equipment equipment, Mode mode, int quantity, Action<Models.Equipment> onDelete, Action<Models.Equipment, int> onQuantityChanged = null)
+        private void Awake()
         {
-            _equipment = equipment;
-            _quantity = quantity;
+            if (_nameText == null) throw new MissingComponentException("NameText is not assigned");
+            if (_quantityText == null) throw new MissingComponentException("QuantityText is not assigned");
+            if (_addButton == null) throw new MissingComponentException("AddButton is not assigned");
+            if (_removeButton == null) throw new MissingComponentException("RemoveButton is not assigned");
+            if (_deleteButton == null) throw new MissingComponentException("DeleteButton is not assigned");
+            if (_weightInput == null) throw new MissingComponentException("WeightInput is not assigned");
+        }
+
+        /// <summary>
+        /// Настраивает элемент.
+        /// </summary>
+        public void Setup(Models.Equipment eq, Mode mode, int quantity = 0,
+            Action<Models.Equipment> onDelete = null,
+            Action<Models.Equipment, int> onQuantityChanged = null)
+        {
+            _equipment = eq ?? throw new ArgumentNullException(nameof(eq));
             _onDelete = onDelete;
             _onQuantityChanged = onQuantityChanged;
+            _quantity = Math.Clamp(quantity, 0, 100);
 
-            _nameText.text = equipment.Name;
-            _quantityText.text = $"x{quantity.ToString()}";
-        
-            _nameButton.onClick.AddListener(OnNameClicked);
-            _addQtyButton.onClick.AddListener(OnAddQty);
-            _removeQtyButton.onClick.AddListener(OnRemoveQty);
-            _deleteButton.onClick.AddListener(OnDelete);
-            
-            _removeQtyButton.gameObject.SetActive(_isQuantityVisible && mode == Mode.Create);
-            _quantityText.gameObject.SetActive(_isQuantityVisible);
-            _addQtyButton.gameObject.SetActive(_isQuantityVisible && _equipment.HasQuantity && mode == Mode.Create);
-        
-            bool showWeight = equipment.HasWeight && mode == Mode.CreateTraining;
+            _nameText.text = eq.Name;
+            UpdateQuantityText();
+
+            _addButton.onClick.RemoveAllListeners();
+            _removeButton.onClick.RemoveAllListeners();
+            _deleteButton.onClick.RemoveAllListeners();
+
+            _addButton.onClick.AddListener(() => ChangeQuantity(1));
+            _removeButton.onClick.AddListener(() => ChangeQuantity(-1));
+            _deleteButton.onClick.AddListener(() => _onDelete?.Invoke(_equipment));
+
+            ConfigureMode(mode);
+        }
+
+        private void ConfigureMode(Mode mode)
+        {
+            bool canEdit = mode == Mode.Edit || mode == Mode.WorkoutEdit;
+            bool showWeight = mode == Mode.WorkoutView || mode == Mode.WorkoutEdit;
+            bool showDelete = mode == Mode.Edit;
+
+            _addButton.gameObject.SetActive(canEdit && _equipment.HasQuantity);
+            _removeButton.gameObject.SetActive(canEdit);
+            _deleteButton.gameObject.SetActive(showDelete);
             _weightInput.gameObject.SetActive(showWeight);
-            _weightInput.interactable = showWeight;
-        
-            _deleteButton.gameObject.SetActive(mode == Mode.Create);
+            _quantityText.gameObject.SetActive(true);
         }
 
-        private void OnNameClicked()
+        private void ChangeQuantity(int delta)
         {
-            if (_quantity == 0)
-            {
-                _quantity = 1;
-                UpdateQuantityUI();
-                _onQuantityChanged?.Invoke(_equipment, _quantity);
-            }
-        }
-
-        private void OnAddQty()
-        {
-            _quantity++;
-            UpdateQuantityUI();
+            _quantity = Math.Clamp(_quantity + delta, 0, 100);
+            UpdateQuantityText();
             _onQuantityChanged?.Invoke(_equipment, _quantity);
         }
 
-        private void OnRemoveQty()
-        {
-            if (_quantity > 0) _quantity--;
-            UpdateQuantityUI();
-            _onQuantityChanged?.Invoke(_equipment, _quantity);
-        }
-
-        private void OnDelete()
-        {
-            _onDelete?.Invoke(_equipment);
-            Destroy(gameObject);
-        }
-
-        private void UpdateQuantityUI()
-        {
-            _quantityText.text = _quantity.ToString();
-            _removeQtyButton.gameObject.SetActive(_isQuantityVisible);
-            _quantityText.gameObject.SetActive(_isQuantityVisible);
-            _addQtyButton.gameObject.SetActive(_isQuantityVisible && _equipment.HasQuantity);
-        }
+        private void UpdateQuantityText() =>
+            _quantityText.text = _quantity > 0 ? $"x{_quantity}" : "-";
     }
 }

@@ -1,111 +1,115 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core;
 using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 using Views.Components.Equipment;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseScreen : ScreenBase
+    public class CreateExerciseScreen : ReactiveScreen
     {
+        [SerializeField] private TMP_Text _header;
+        
+        [Header("Exercise Fields")]
         [SerializeField] private TMP_InputField _nameInput;
         [SerializeField] private TMP_InputField _descInput;
+
+        [Header("Equipments")]
         [SerializeField] private Transform _equipmentListParent;
-        [SerializeField] private EquipmentItem _equipmentItemPrefab;
+        [SerializeField] private EquipmentItem _equipmentPrefab;
+
+        [Header("Buttons")]
+        [SerializeField] private Button _createButton;
+        [SerializeField] private TMP_Text _createButtonText;
+        [SerializeField] private Button _backButton;
         [SerializeField] private Button _addEquipmentButton;
 
         private CreateExerciseViewModel _vm;
-        private List<EquipmentItem> _spawnedItems = new List<EquipmentItem>();
+        private readonly List<GameObject> _spawnedItems = new();
+
+        private UiController _uiController;
+
+        private void Awake()
+        {
+            _uiController = DiContainer.Instance.Resolve<UiController>();
+        }
 
         public override async Task InitializeAsync(object parameter = null)
         {
-            _vm = new CreateExerciseViewModel(ServiceLocator.Instance.DataService);
-            _vm.ExerciseChanged += RefreshEquipmentList;
-            _vm.CanSaveChanged += UpdateSaveButton;
-            ServiceLocator.Instance.DataService.DataChanged += OnDataChanged;
+            var factory = DiContainer.Instance.Resolve<ViewModelFactory>();
+            _vm = factory.Create<CreateExerciseViewModel>(parameter);
+
+            Subscribe(() => _vm.EditModeChanged -= OnEditModeChanged);
+            Subscribe(() => _vm.CanSaveChanged -= OnCanSaveChanged);
+            Subscribe(() => _vm.EquipmentsChanged -= MarkDirtyOrRefresh);
+
+            _vm.EditModeChanged += OnEditModeChanged;
+            _vm.CanSaveChanged += OnCanSaveChanged;
+            _vm.EquipmentsChanged += MarkDirtyOrRefresh;
 
             _nameInput.text = _vm.Name;
             _descInput.text = _vm.Description;
-            _nameInput.onValueChanged.AddListener(value => _vm.Name = value);
-            _descInput.onValueChanged.AddListener(value => _vm.Description = value);
+            _nameInput.onValueChanged.AddListener(v => _vm.Name = v);
+            _descInput.onValueChanged.AddListener(v => _vm.Description = v);
 
-            _addEquipmentButton.onClick.AddListener(OnAddEquipment);
+            _createButton.onClick.AddListener(OnCreate);
+            _backButton.onClick.AddListener(() => _uiController.CloseScreen());
+            _addEquipmentButton.onClick.AddListener(() => _uiController.OpenScreen(ScreenType.CreateEquipment));
 
-            UpdateSaveButton(!string.IsNullOrEmpty(_vm.Name));
-            RefreshEquipmentList();
-            await Task.CompletedTask;
-        }
-        
-        
-
-        private void OnEnable()
-        {
-            if (_vm == null) return;
-            _vm.ExerciseChanged += RefreshEquipmentList;
-            _vm.CanSaveChanged += UpdateSaveButton;
-            ServiceLocator.Instance.DataService.DataChanged += OnDataChanged;
-            RefreshEquipmentList();
+            RefreshEquipments();
+            OnCanSaveChanged(_vm.CanSave);
+            await base.InitializeAsync(parameter);
         }
 
-        private void OnDisable()
+        protected override void Refresh()
         {
-            _vm.ExerciseChanged -= RefreshEquipmentList;
-            _vm.CanSaveChanged -= UpdateSaveButton;
-            ServiceLocator.Instance.DataService.DataChanged -= OnDataChanged;
-        }
-
-        private void OnDataChanged()
-        {
-            _vm.Load();
-        }
-
-        private void UpdateSaveButton(bool canSave)
-        {
-            _saveButton.interactable = canSave;
-        }
-
-        private void RefreshEquipmentList()
-        {
-            // Очистка старых префабов
-            foreach (EquipmentItem item in _spawnedItems)
+            _isRefreshing =  true;
+            try
             {
-                Destroy(item.gameObject);
+                RefreshEquipments();
             }
-            _spawnedItems.Clear();
-        
-            // Спавн префабов для всех AllEquipments
-            foreach (Equipment eq in _vm.AllEquipments)
+            finally
             {
-                ExerciseEquipment reqEq = _vm.RequiredEquipment.Find(r => r.Equipment == eq);
-                int quantity = reqEq != null ? reqEq.Quantity : 0;
-
-                EquipmentItem item = Instantiate(_equipmentItemPrefab, _equipmentListParent);
-                item.Setup(eq, EquipmentItem.Mode.Create, quantity, OnRemoveEquipment, OnQuantityChanged);
-                _spawnedItems.Add(item);
+                _isRefreshing = false;
             }
         }
 
-        private void OnAddEquipment()
+        private void RefreshEquipments()
         {
-            UiController.OpenScreen(ServiceLocator.Instance.CreateEquipmentScreen.gameObject, false, false);
+            if (_initialized && !isDirty) return;
+            
+            foreach (Transform child in _equipmentListParent)
+                if (child.TryGetComponent(out EquipmentItem _))
+                    SimplePool.Return(child.gameObject, _equipmentPrefab.gameObject);
+
+            foreach (var eq in _vm.AllEquipments)
+            {
+                int quantity = _vm.RequiredEquipment.Find(r => r.EquipmentId == eq.Id)?.Quantity ?? 0;
+                var go = SimplePool.Get(_equipmentPrefab.gameObject, _equipmentListParent);
+                var item = go.GetComponent<EquipmentItem>();
+                item.Setup(eq, EquipmentItem.Mode.Edit, quantity, _vm.RemoveEquipment, _vm.UpdateEquipmentQuantity);
+                _spawnedItems.Add(go);
+            }
         }
 
-        private void OnRemoveEquipment(Equipment eq)
-        {
-            _vm.RemoveEquipment(eq);
-        }
-
-        private void OnQuantityChanged(Equipment eq, int quantity)
-        {
-            _vm.UpdateEquipmentQuantity(eq, quantity);
-        }
-
-        protected override void OnSaveClicked()
+        private void OnCreate()
         {
             _vm.Save();
-            UiController.CloseScreen();
+            _uiController.CloseScreen();
         }
+
+        private void OnEditModeChanged(bool editMode)
+        {
+            _header.text = editMode ? "Изменить упражнение" : "Создать упражнение";
+            _createButtonText.text = editMode ? "Изменить" : "Создать"; 
+        }
+
+        private void OnCanSaveChanged(bool canSave) =>
+            _createButton.interactable = canSave;
     }
 }
