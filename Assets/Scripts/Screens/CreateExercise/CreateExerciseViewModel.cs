@@ -7,11 +7,12 @@ namespace Screens.CreateExercise
 {
     public class CreateExerciseViewModel
     {
+        public bool IsEditMode { get; private set; }
+        
         private readonly IDataService _dataService;
         private string _name = string.Empty;
     
         private Exercise _currentExercise;
-        private bool _editMode;
 
         public event Action<bool> EditModeChanged;
         public event Action<bool> CanSaveChanged;
@@ -27,14 +28,13 @@ namespace Screens.CreateExercise
 
         public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
-        // Всё оборудование и выбранное пользователем
         public IReadOnlyList<Equipment> AllEquipments { get; private set; } = new List<Equipment>();
         public List<ExerciseEquipmentRef> RequiredEquipment { get; private set; } = new List<ExerciseEquipmentRef>();
 
         public CreateExerciseViewModel(IDataService dataService, string exerciseId)
         {
             _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
-            FindExerciseById(exerciseId); // изменить, чтобы view успел подписаться
+            FindExerciseById(exerciseId);
             LoadEquipments();
             _dataService.EquipmentsUpdated += LoadEquipments;
         }
@@ -42,8 +42,8 @@ namespace Screens.CreateExercise
         private void FindExerciseById(string exerciseId)
         {
             _currentExercise = _dataService.GetExerciseById(exerciseId);
-            _editMode = _currentExercise != null;
-            EditModeChanged?.Invoke(_editMode);
+            IsEditMode = _currentExercise != null;
+            EditModeChanged?.Invoke(IsEditMode);
             if (_currentExercise == null) return;
             
             Name = _currentExercise.Name;
@@ -91,7 +91,7 @@ namespace Screens.CreateExercise
             foreach (var r in RequiredEquipment)
                 _currentExercise.AddOrUpdateEquipment(r.EquipmentId, r.Quantity);
 
-            if (_editMode)
+            if (IsEditMode)
             {
                 _dataService.UpdateExercise(_currentExercise);
             }

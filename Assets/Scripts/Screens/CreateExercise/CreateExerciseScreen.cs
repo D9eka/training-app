@@ -41,6 +41,7 @@ namespace Screens.CreateExercise
         {
             var factory = DiContainer.Instance.Resolve<ViewModelFactory>();
             _vm = factory.Create<CreateExerciseViewModel>(parameter);
+            OnEditModeChanged(_vm.IsEditMode);
 
             Subscribe(() => _vm.EditModeChanged -= OnEditModeChanged);
             Subscribe(() => _vm.CanSaveChanged -= OnCanSaveChanged);
