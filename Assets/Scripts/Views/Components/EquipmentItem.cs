@@ -6,9 +6,6 @@ using UnityEngine.UI;
 
 namespace Views.Components
 {
-    /// <summary>
-    /// UI-компонент для отображения оборудования.
-    /// </summary>
     public class EquipmentItem : MonoBehaviour
     {
         public enum Mode { View, Edit, WorkoutView, WorkoutEdit }

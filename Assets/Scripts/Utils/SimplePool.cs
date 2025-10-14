@@ -5,16 +5,10 @@ using Object = UnityEngine.Object;
 
 namespace Utils
 {
-    /// <summary>
-    /// Простой пул префабов для оптимизации Instantiate/Destroy.
-    /// </summary>
     public static class SimplePool
     {
         private static readonly Dictionary<GameObject, Stack<GameObject>> _pools = new();
-
-        /// <summary>
-        /// Получает объект из пула или создаёт новый.
-        /// </summary>
+        
         public static GameObject Get(GameObject prefab, Transform parent)
         {
             if (prefab == null) throw new ArgumentNullException(nameof(prefab));
@@ -31,10 +25,7 @@ namespace Utils
             obj.SetActive(true);
             return obj;
         }
-
-        /// <summary>
-        /// Возвращает объект в пул.
-        /// </summary>
+        
         public static void Return(GameObject obj, GameObject prefab)
         {
             if (obj == null || prefab == null) return;
@@ -46,10 +37,7 @@ namespace Utils
             }
             stack.Push(obj);
         }
-
-        /// <summary>
-        /// Очищает пул (вызывать при смене сцены).
-        /// </summary>
+        
         public static void Clear()
         {
             foreach (Stack<GameObject> stack in _pools.Values)

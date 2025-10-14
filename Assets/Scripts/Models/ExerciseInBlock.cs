@@ -11,7 +11,7 @@ namespace Models
         public int Repetitions;
         public float DurationSeconds;
 
-        public ExerciseInBlock(Exercise exercise, List<EquipmentInBlock> equipmentWeights, float weight, WeightType weightType, int repetitions, float durationSeconds)
+        public ExerciseInBlock(Exercise exercise, List<EquipmentInBlock> equipmentWeights, int repetitions, float durationSeconds)
         {
             Exercise = exercise;
             EquipmentWeights = equipmentWeights;
