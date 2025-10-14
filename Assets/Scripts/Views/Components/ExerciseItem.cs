@@ -1,35 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Views.Components.Exercise
+namespace Views.Components
 {
-    /// <summary>
-    /// UI-компонент для отображения упражнения в списке.
-    /// </summary>
     public class ExerciseItem : MonoBehaviour
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _equipmentsText;
         [SerializeField] private Button _button;
 
-        private Models.Exercise _exercise;
-        private Action<Models.Exercise> _onClick;
-
-        private void Awake()
-        {
-            if (_nameText == null) throw new MissingComponentException("NameText is not assigned");
-            if (_equipmentsText == null) throw new MissingComponentException("EquipmentsText is not assigned");
-            if (_button == null) throw new MissingComponentException("Button is not assigned");
-        }
-
-        /// <summary>
-        /// Настраивает элемент.
-        /// </summary>
-        public void Setup(Models.Exercise exercise, IReadOnlyList<(string Id, string Name, int Quantity)> equipmentData, Action<Models.Exercise> onClick)
+        private Exercise _exercise;
+        private Action<Exercise> _onClick;
+        
+        public void Setup(Exercise exercise, IReadOnlyList<(string Id, string Name, int Quantity)> equipmentData, Action<Exercise> onClick)
         {
             _exercise = exercise ?? throw new ArgumentNullException(nameof(exercise));
             _onClick = onClick;

@@ -8,14 +8,17 @@ namespace Models
     {
         public List<ExerciseInBlock> Exercises = new();
         public int Approaches;
+        public int ApproachesTimeSeconds;
         public int Sets;
         public float RestAfterApproachSeconds;
         public float RestAfterSetSeconds;
         public float RestAfterBlockSeconds;
 
-        public TrainingBlock(int approaches, int sets, float restAfterApproachSeconds, float restAfterSetSeconds, float restAfterBlockSeconds)
+        public TrainingBlock(int approaches, int approachesTimeSeconds, int sets, 
+            float restAfterApproachSeconds, float restAfterSetSeconds, float restAfterBlockSeconds)
         {
             Approaches = approaches;
+            ApproachesTimeSeconds = approachesTimeSeconds;
             Sets = sets;
             RestAfterApproachSeconds = restAfterApproachSeconds;
             RestAfterSetSeconds = restAfterSetSeconds;

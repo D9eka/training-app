@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Core;
@@ -9,7 +8,7 @@ using Models;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
-using Views.Components.Exercise;
+using Views.Components;
 
 namespace Screens.ViewExercises
 {
@@ -72,7 +71,7 @@ namespace Screens.ViewExercises
         private List<(string Id, string Name, int Quantity)> GetEquipmentViewData(Exercise ex)
         {
             return ex.RequiredEquipment.Select(r =>
-                (Id: r.EquipmentId, Name: _dataService.GetEquipmentById(r.EquipmentId)?.Name, r.Quantity)).ToList();
+                (Id: r.EquipmentId, _dataService.GetEquipmentById(r.EquipmentId)?.Name, r.Quantity)).ToList();
         }
 
         private void OnExerciseClicked(Exercise ex) =>

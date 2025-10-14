@@ -7,7 +7,6 @@ using Data;
 using Models;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Screens.ViewExercise

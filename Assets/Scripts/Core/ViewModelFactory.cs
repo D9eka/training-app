@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using Data;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;

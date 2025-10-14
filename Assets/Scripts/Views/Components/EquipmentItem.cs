@@ -1,9 +1,10 @@
 using System;
+using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Views.Components.Equipment
+namespace Views.Components
 {
     /// <summary>
     /// UI-компонент для отображения оборудования.
@@ -19,27 +20,14 @@ namespace Views.Components.Equipment
         [SerializeField] private Button _deleteButton;
         [SerializeField] private TMP_InputField _weightInput;
 
-        private Models.Equipment _equipment;
-        private Action<Models.Equipment> _onDelete;
-        private Action<Models.Equipment, int> _onQuantityChanged;
+        private Equipment _equipment;
+        private Action<Equipment> _onDelete;
+        private Action<Equipment, int> _onQuantityChanged;
         private int _quantity;
-
-        private void Awake()
-        {
-            if (_nameText == null) throw new MissingComponentException("NameText is not assigned");
-            if (_quantityText == null) throw new MissingComponentException("QuantityText is not assigned");
-            if (_addButton == null) throw new MissingComponentException("AddButton is not assigned");
-            if (_removeButton == null) throw new MissingComponentException("RemoveButton is not assigned");
-            if (_deleteButton == null) throw new MissingComponentException("DeleteButton is not assigned");
-            if (_weightInput == null) throw new MissingComponentException("WeightInput is not assigned");
-        }
-
-        /// <summary>
-        /// Настраивает элемент.
-        /// </summary>
-        public void Setup(Models.Equipment eq, Mode mode, int quantity = 0,
-            Action<Models.Equipment> onDelete = null,
-            Action<Models.Equipment, int> onQuantityChanged = null)
+        
+        public void Setup(Equipment eq, Mode mode, int quantity = 0,
+            Action<Equipment> onDelete = null,
+            Action<Equipment, int> onQuantityChanged = null)
         {
             _equipment = eq ?? throw new ArgumentNullException(nameof(eq));
             _onDelete = onDelete;

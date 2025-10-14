@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
-using Models;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
-using Views.Components.Equipment;
+using Views.Components;
 
 namespace Screens.CreateExercise
 {
