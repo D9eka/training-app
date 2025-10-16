@@ -4,9 +4,6 @@ using Models;
 
 namespace Screens.CreateEquipment
 {
-    /// <summary>
-    /// ViewModel для создания нового оборудования.
-    /// </summary>
     public class CreateEquipmentViewModel
     {
         private readonly IDataService _dataService;

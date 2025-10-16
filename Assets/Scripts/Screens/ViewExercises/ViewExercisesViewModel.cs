@@ -5,9 +5,6 @@ using Models;
 
 namespace Screens.ViewExercises
 {
-    /// <summary>
-    /// ViewModel для списка упражнений.
-    /// </summary>
     public class ViewExercisesViewModel
     {
         private readonly IDataService _dataService;

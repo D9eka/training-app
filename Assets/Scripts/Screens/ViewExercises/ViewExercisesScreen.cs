@@ -12,9 +12,6 @@ using Views.Components;
 
 namespace Screens.ViewExercises
 {
-    /// <summary>
-    /// Экран списка упражнений.
-    /// </summary>
     public class ViewExercisesScreen : ReactiveScreen
     {
         [SerializeField] private Transform _contentParent;

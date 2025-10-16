@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 namespace Screens.CreateEquipment
 {
-    /// <summary>
-    /// Экран создания оборудования.
-    /// </summary>
     public class CreateEquipmentScreen : Screen
     {
         [SerializeField] private TMP_InputField _nameInput;

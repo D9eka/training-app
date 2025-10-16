@@ -8,9 +8,6 @@ using Screens.ViewExercises;
 
 namespace Core
 {
-    /// <summary>
-    /// Фабрика для создания ViewModel'ов. Поддерживает кастомные создатели.
-    /// </summary>
     public class ViewModelFactory
     {
         private readonly IDataService _dataService;
@@ -20,9 +17,6 @@ namespace Core
             _dataService = ds ?? throw new ArgumentNullException(nameof(ds));
         }
 
-        /// <summary>
-        /// Создаёт ViewModel указанного типа.
-        /// </summary>
         public T? Create<T>(object parameter = null) where T : class
         {
             if (typeof(T) == typeof(ViewExercisesViewModel))

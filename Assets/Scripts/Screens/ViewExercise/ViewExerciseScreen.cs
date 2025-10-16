@@ -11,9 +11,6 @@ using UnityEngine.UI;
 
 namespace Screens.ViewExercise
 {
-    /// <summary>
-    /// Экран просмотра упражнения.
-    /// </summary>
     public class ViewExerciseScreen : ReactiveScreen
     {
         [SerializeField] private TMP_Text _nameText;

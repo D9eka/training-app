@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 namespace NavigationTab
 {
-    /// <summary>
-    /// Компонент для управления вкладками навигации.
-    /// </summary>
     public class NavigationTabs : MonoBehaviour
     {
         [Serializable]
