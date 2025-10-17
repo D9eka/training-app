@@ -51,7 +51,7 @@ namespace Views.Components
             bool showWeight = mode == Mode.WorkoutView || mode == Mode.WorkoutEdit;
             bool showDelete = mode == Mode.Edit;
 
-            _addButton.gameObject.SetActive(canEdit && _equipment.HasQuantity);
+            _addButton.gameObject.SetActive(canEdit && (_quantity == 0 || _equipment.HasQuantity));
             _removeButton.gameObject.SetActive(canEdit);
             _deleteButton.gameObject.SetActive(showDelete);
             _weightInput.gameObject.SetActive(showWeight);
@@ -66,6 +66,6 @@ namespace Views.Components
         }
 
         private void UpdateQuantityText() =>
-            _quantityText.text = _quantity > 0 ? $"x{_quantity}" : "-";
+            _quantityText.text = _quantity > 0 ? $"x{_quantity}" : "";
     }
 }
