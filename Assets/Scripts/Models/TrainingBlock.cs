@@ -24,5 +24,10 @@ namespace Models
             RestAfterSetSeconds = restAfterSetSeconds;
             RestAfterBlockSeconds = restAfterBlockSeconds;
         }
+
+        public void RemoveExercise(string exerciseId)
+        {
+            Exercises.RemoveAll(r => r.Exercise.Id == exerciseId);
+        }
     }
 }

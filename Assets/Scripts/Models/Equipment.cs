@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Models
 {
     [Serializable]
-    public class Equipment
+    public class Equipment : IModel
     {
         [SerializeField] private string _id;
         [SerializeField] private string _name;

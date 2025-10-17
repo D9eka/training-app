@@ -7,22 +7,22 @@ namespace Screens.ViewExercises
 {
     public class ViewExercisesViewModel
     {
-        private readonly IDataService _dataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
         private IReadOnlyList<Exercise> _exercises;
 
         public IReadOnlyList<Exercise> Exercises => _exercises;
         public event Action ExercisesChanged;
 
-        public ViewExercisesViewModel(IDataService dataService)
+        public ViewExercisesViewModel(IDataService<Exercise> exerciseDataService)
         {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
-            Load();
-            _dataService.ExercisesUpdated += Load;
+            _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
+            Load(_exerciseDataService.Cache);
+            _exerciseDataService.DataUpdated += Load;
         }
 
-        public void Load()
+        private void Load(IReadOnlyList<Exercise> allExercises)
         {
-            _exercises = _dataService.GetAllExercises() ?? new List<Exercise>().AsReadOnly();
+            _exercises = allExercises;
             ExercisesChanged?.Invoke();
         }
     }

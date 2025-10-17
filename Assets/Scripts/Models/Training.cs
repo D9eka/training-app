@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace Models
 {
     [Serializable]
-    public class Training
+    public class Training : IModel
     {
-        public string Id;
+        public string Id { get; private set; }
         public string Name;
         public string Description;
         public float PrepTimeSeconds;

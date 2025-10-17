@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Models
 {
     [Serializable]
-    public class Exercise
+    public class Exercise : IModel
     {
         [SerializeField] private string _id;
         [SerializeField] private string _name;
@@ -34,15 +34,14 @@ namespace Models
 
         public Exercise()
         {
+            _id = Guid.NewGuid().ToString();
             _requiredEquipment = new List<ExerciseEquipmentRef>();
         }
 
-        public Exercise(string name, string description = "")
+        public Exercise(string name, string description = "") : this()
         {
-            _id = Guid.NewGuid().ToString();
             _name = name;
             _description = description ?? string.Empty;
-            _requiredEquipment = new List<ExerciseEquipmentRef>();
         }
 
         public void AddOrUpdateEquipment(string equipmentId, int quantity)

@@ -19,12 +19,12 @@ namespace Screens.ViewExercises
         [SerializeField] private Button _createButton;
 
         private ViewExercisesViewModel _vm;
-        private IDataService _dataService;
+        private IDataService<Exercise> _exerciseDataService;
         private int _lastExercisesHash;
 
         public override async Task InitializeAsync(object parameter = null)
         {
-            _dataService = DiContainer.Instance.Resolve<IDataService>() ?? throw new InvalidOperationException("IDataService not resolved");
+            _exerciseDataService = DiContainer.Instance.Resolve<IDataService<Exercise>>() ?? throw new InvalidOperationException("IDataService not resolved");
             ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
             _vm = factory.Create<ViewExercisesViewModel>();
 
@@ -68,7 +68,7 @@ namespace Screens.ViewExercises
         private List<(string Id, string Name, int Quantity)> GetEquipmentViewData(Exercise ex)
         {
             return ex.RequiredEquipment.Select(r =>
-                (Id: r.EquipmentId, _dataService.GetEquipmentById(r.EquipmentId)?.Name, r.Quantity)).ToList();
+                (Id: r.EquipmentId, _exerciseDataService.GetDataById(r.EquipmentId)?.Name, r.Quantity)).ToList();
         }
 
         private void OnExerciseClicked(Exercise ex) =>

@@ -4,37 +4,22 @@ using Models;
 
 namespace Data
 {
-    public interface IDataService
+    public interface IDataService<T>
+        where T: IModel
     {
-        AppData GetCache();
+        event Action<IReadOnlyList<T>> DataUpdated;
+        event Action<string> DataRemoved;
 
-        void LoadFromDisk();
+        void ForceUpdate();
+        
+        IReadOnlyList<T> Cache { get; }
 
-        void SaveToDisk();
+        T GetDataById(string id);
 
-        void Commit();
+        void AddData(T data);
 
-        IReadOnlyList<Exercise> GetAllExercises();
+        void UpdateData(T data);
 
-        Exercise GetExerciseById(string id);
-
-        void AddExercise(Exercise exercise);
-
-        void UpdateExercise(Exercise exercise);
-
-        void RemoveExercise(string id);
-
-        IReadOnlyList<Equipment> GetAllEquipments();
-
-        Equipment GetEquipmentById(string id);
-
-        void AddEquipment(Equipment equipment);
-
-        void UpdateEquipment(Equipment equipment);
-
-        void RemoveEquipment(string id);
-
-        event Action ExercisesUpdated;
-        event Action EquipmentsUpdated;
+        void RemoveData(string id);
     }
 }

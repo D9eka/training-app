@@ -9,7 +9,8 @@ namespace Screens.CreateExercise
     {
         public bool IsEditMode { get; private set; }
         
-        private readonly IDataService _dataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
+        private readonly IDataService<Equipment> _equipmentDataService;
         private string _name = string.Empty;
     
         private Exercise _currentExercise;
@@ -31,20 +32,23 @@ namespace Screens.CreateExercise
         public IReadOnlyList<Equipment> AllEquipments { get; private set; } = new List<Equipment>();
         public List<ExerciseEquipmentRef> RequiredEquipment { get; private set; } = new List<ExerciseEquipmentRef>();
 
-        public CreateExerciseViewModel(IDataService dataService, string exerciseId)
+        public CreateExerciseViewModel(IDataService<Exercise> exerciseDataService, 
+            IDataService<Equipment> equipmentDataService, string exerciseId)
         {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
-            FindExerciseById(exerciseId);
+            _exerciseDataService =  exerciseDataService;
+            _equipmentDataService = equipmentDataService;
+            _currentExercise = GetExerciseById(exerciseId);
             LoadEquipments();
-            _dataService.EquipmentsUpdated += LoadEquipments;
+            _equipmentDataService.DataUpdated += EquipmentDataServiceOnDataUpdated;
         }
 
-        private void FindExerciseById(string exerciseId)
+        private Exercise GetExerciseById(string exerciseId)
         {
-            _currentExercise = _dataService.GetExerciseById(exerciseId);
-            IsEditMode = _currentExercise != null;
+            Exercise exercise = _exerciseDataService.GetDataById(exerciseId);
+            IsEditMode = exercise != null;
             EditModeChanged?.Invoke(IsEditMode);
-            if (_currentExercise == null) return;
+            if (exercise == null) 
+                return new Exercise();
             
             Name = _currentExercise.Name;
             Description = _currentExercise.Description;
@@ -52,11 +56,17 @@ namespace Screens.CreateExercise
             {
                 RequiredEquipment.Add(equipmentRef);
             }
+            return exercise;
         }
 
         private void LoadEquipments()
         {
-            AllEquipments = _dataService.GetAllEquipments();
+            AllEquipments = _equipmentDataService.Cache;
+            EquipmentsChanged?.Invoke();
+        }
+
+        private void EquipmentDataServiceOnDataUpdated(IReadOnlyList<Equipment> cache)
+        {
             EquipmentsChanged?.Invoke();
         }
 
@@ -80,7 +90,7 @@ namespace Screens.CreateExercise
         {
             if (eq == null) return;
             RequiredEquipment.RemoveAll(r => r.EquipmentId == eq.Id);
-            _dataService.RemoveEquipment(eq.Id);
+            _equipmentDataService.RemoveData(eq.Id);
         }
 
         public void Save()
@@ -93,11 +103,11 @@ namespace Screens.CreateExercise
 
             if (IsEditMode)
             {
-                _dataService.UpdateExercise(_currentExercise);
+                _exerciseDataService.UpdateData(_currentExercise);
             }
             else
             {
-                _dataService.AddExercise(_currentExercise);
+                _exerciseDataService.AddData(_currentExercise);
             }
         }
     }

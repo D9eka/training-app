@@ -6,7 +6,7 @@ namespace Screens.CreateEquipment
 {
     public class CreateEquipmentViewModel
     {
-        private readonly IDataService _dataService;
+        private readonly IDataService<Equipment> _equipmentDataService;
         private string _name = string.Empty;
         private bool _hasQuantity;
         private bool _hasWeight;
@@ -45,16 +45,16 @@ namespace Screens.CreateEquipment
 
         public bool CanSave => !string.IsNullOrWhiteSpace(_name);
 
-        public CreateEquipmentViewModel(IDataService dataService)
+        public CreateEquipmentViewModel(IDataService<Equipment> equipmentDataService)
         {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+            _equipmentDataService = equipmentDataService;
         }
 
         public void Save()
         {
             if (!CanSave) return;
             Equipment eq = new Equipment(Name.Trim(), HasQuantity, HasWeight);
-            _dataService.AddEquipment(eq);
+            _equipmentDataService.AddData(eq);
         }
     }
 }

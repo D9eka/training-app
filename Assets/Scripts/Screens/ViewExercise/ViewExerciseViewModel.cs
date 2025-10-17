@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Data;
 using Models;
 
@@ -6,30 +7,41 @@ namespace Screens.ViewExercise
 {
     public class ViewExerciseViewModel
     {
-        private readonly IDataService _dataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
         private readonly string _exerciseId;
         private Exercise _currentExercise;
 
         public Exercise CurrentExercise => _currentExercise;
         public event Action ExerciseChanged;
 
-        public ViewExerciseViewModel(IDataService dataService, string exerciseId)
+        public ViewExerciseViewModel(IDataService<Exercise> exerciseDataService, string exerciseId)
         {
-            _dataService = dataService ?? throw new ArgumentNullException(nameof(dataService));
+            _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
             _exerciseId = exerciseId ?? throw new ArgumentException("Exercise ID cannot be null or empty", nameof(exerciseId));
             Load();
-            _dataService.ExercisesUpdated += Load;
+            _exerciseDataService.DataUpdated += Load;
+        }
+
+        private void Load(IReadOnlyList<Exercise> allExercises)
+        {
+            foreach (var exercise in allExercises)
+            {
+                if (exercise.Id == _exerciseId)
+                {
+                    _currentExercise = exercise;
+                }
+            }
         }
 
         private void Load()
         {
-            _currentExercise = _dataService.GetExerciseById(_exerciseId);
+            _currentExercise = _exerciseDataService.GetDataById(_exerciseId);
             ExerciseChanged?.Invoke();
         }
 
         public void DeleteExercise()
         {
-            _dataService.RemoveExercise(_exerciseId);
+            _exerciseDataService.RemoveData(_exerciseId);
         }
     }
 }

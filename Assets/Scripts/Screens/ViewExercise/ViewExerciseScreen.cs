@@ -21,14 +21,14 @@ namespace Screens.ViewExercise
         [SerializeField] private Button _deleteButton;
 
         private ViewExerciseViewModel _vm;
-        private IDataService _dataService;
+        private IDataService<Equipment> _equipmentDataService;
         private UiController _uiController;
         private string _exerciseId;
 
         public override async Task InitializeAsync(object parameter = null)
         {
             _exerciseId = parameter as string ?? throw new ArgumentException("Exercise ID required");
-            _dataService = DiContainer.Instance.Resolve<IDataService>() ?? throw new InvalidOperationException("IDataService not resolved");
+            _equipmentDataService = DiContainer.Instance.Resolve<IDataService<Equipment>>() ?? throw new InvalidOperationException("IDataService not resolved");
             _uiController =  DiContainer.Instance.Resolve<UiController>() ?? throw new InvalidOperationException("UiController not resolved");
             ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
             _vm = factory.Create<ViewExerciseViewModel>(_exerciseId);
@@ -77,7 +77,7 @@ namespace Screens.ViewExercise
 
                 List<(string Id, string Name, int Quantity)> equipmentData = ex.RequiredEquipment.Select(r =>
                 {
-                    Equipment eq = _dataService.GetEquipmentById(r.EquipmentId);
+                    Equipment eq = _equipmentDataService.GetDataById(r.EquipmentId);
                     return (Id: r.EquipmentId, Name: eq?.Name ?? "??", r.Quantity);
                 }).ToList();
 
