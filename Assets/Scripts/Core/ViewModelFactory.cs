@@ -7,6 +7,7 @@ using Screens.CreateEquipment;
 using Screens.CreateExercise;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
+using Screens.ViewTrainings;
 
 namespace Core
 {
@@ -32,6 +33,7 @@ namespace Core
                 ScreenType.ViewExercise => Create<ViewExerciseViewModel>(parameter),
                 ScreenType.CreateExercise => Create<CreateExerciseViewModel>(parameter),
                 ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(),
+                ScreenType.ViewTrainings => Create<ViewTrainingsViewModel>(),
                 _ => throw new InvalidOperationException($"Unknown screen type {type}")
             };
         }
@@ -50,6 +52,10 @@ namespace Core
             }
             if (typeof(T) == typeof(CreateEquipmentViewModel))
                 return new CreateEquipmentViewModel(_equipmentDataService) as T;
+            if (typeof(T) == typeof(ViewTrainingsViewModel))
+            {
+                return new ViewTrainingsViewModel(_trainingDataService) as T;
+            }
             throw new InvalidOperationException($"Unknown ViewModel type {typeof(T).Name}");
         }
 

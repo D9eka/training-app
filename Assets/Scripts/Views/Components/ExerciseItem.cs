@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Screens.ViewExercises;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,15 +17,16 @@ namespace Views.Components
         private string _id;
         private Action<string> _onClickById;
 
-        public void Setup(string id, string exerciseName, IReadOnlyList<(string EquipmentName, int Quantity)> equipmentData, Action<string> onClickById)
+        public void Setup(ExerciseViewData exerciseViewData, Action<string> onClickById)
         {
-            _id = id ?? throw new ArgumentNullException(nameof(id));
+            _id = exerciseViewData.Id ?? throw new ArgumentNullException(nameof(exerciseViewData.Id));
             _onClickById = onClickById;
 
-            _nameText.text = exerciseName ?? string.Empty;
-            if (equipmentData != null && equipmentData.Count > 0)
+            _nameText.text = exerciseViewData.Name;
+            if (exerciseViewData.Equipments != null && exerciseViewData.Equipments.Count > 0)
             {
-                var parts = equipmentData.Select(r => $"{r.EquipmentName} x{r.Quantity}");
+                var parts = exerciseViewData.Equipments.Select(
+                    r => $"{r.EquipmentName} x{r.Quantity}");
                 _equipmentsText.text = $"Нужно: {string.Join(", ", parts)}";
             }
             else

@@ -9,6 +9,10 @@ namespace Screens
         ViewExercise,
         CreateExercise,
         CreateEquipment,
-        ViewStats
+        ViewStats,
+        CreateTraining,
+        CreateBlock,
+        ViewTraining,
+        ViewBlock
     }
 }

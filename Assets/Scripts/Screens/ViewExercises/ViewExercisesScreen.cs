@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Core;
 using UnityEngine;
@@ -37,7 +36,7 @@ namespace Screens.ViewExercises
                 {
                     GameObject go = SimplePool.Get(_exerciseItemPrefab.gameObject, _contentParent);
                     var item = go.GetComponent<ExerciseItem>();
-                    item.Setup(ex.Id, ex.Name, ex.Equipments, OnExerciseClicked);
+                    item.Setup(ex, OnExerciseClicked);
                 }
             }
             finally
