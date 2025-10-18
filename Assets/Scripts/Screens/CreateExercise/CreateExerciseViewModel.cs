@@ -39,7 +39,7 @@ namespace Screens.CreateExercise
             _exerciseDataService =  exerciseDataService;
             _equipmentDataService = equipmentDataService;
             _currentExercise = GetExerciseById(exerciseId);
-            LoadEquipments();
+            Load();
             _equipmentDataService.DataUpdated += EquipmentDataServiceOnDataUpdated;
         }
 
@@ -50,14 +50,14 @@ namespace Screens.CreateExercise
             EditModeChanged?.Invoke(IsEditMode);
             if (exercise == null) 
                 return new Exercise();
-            
+            return exercise;
+        }
+
+        private void Load()
+        {
             Name = _currentExercise.Name;
             Description = _currentExercise.Description;
-            foreach (var equipmentRef in _currentExercise.RequiredEquipment)
-            {
-                RequiredEquipment.Add(equipmentRef);
-            }
-            return exercise;
+            LoadEquipments();
         }
 
         private void LoadEquipments()
