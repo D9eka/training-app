@@ -1,28 +1,45 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Data;
 using Models;
+using Screens.ViewModels;
 
 namespace Screens.ViewExercises
 {
-    public class ViewExercisesViewModel
+    public class ViewExercisesViewModel : IViewModel
     {
         private readonly IDataService<Exercise> _exerciseDataService;
-        private IReadOnlyList<Exercise> _exercises;
+        private readonly IDataService<Equipment> _equipmentDataService;
 
-        public IReadOnlyList<Exercise> Exercises => _exercises;
+        private IReadOnlyList<ExerciseViewData> _exercisesView;
+
+        public IReadOnlyList<ExerciseViewData> Exercises => _exercisesView;
         public event Action ExercisesChanged;
 
-        public ViewExercisesViewModel(IDataService<Exercise> exerciseDataService)
+        public ViewExercisesViewModel(IDataService<Exercise> exerciseDataService, IDataService<Equipment> equipmentDataService)
         {
             _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
+            _equipmentDataService = equipmentDataService ?? throw new ArgumentNullException(nameof(equipmentDataService));
+
             Load(_exerciseDataService.Cache);
             _exerciseDataService.DataUpdated += Load;
         }
 
         private void Load(IReadOnlyList<Exercise> allExercises)
         {
-            _exercises = allExercises;
+            _exercisesView = allExercises
+                .Select(ex => new ExerciseViewData
+                {
+                    Id = ex.Id,
+                    Name = ex.Name,
+                    Description = ex.Description,
+                    Equipments = ex.RequiredEquipment.Select(req =>
+                        (_equipmentDataService.GetDataById(req.EquipmentId)?.Name ?? "???", req.Quantity)
+                    ).ToList()
+                })
+                .ToList();
+
             ExercisesChanged?.Invoke();
         }
     }

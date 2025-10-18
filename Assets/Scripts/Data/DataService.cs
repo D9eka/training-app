@@ -15,15 +15,15 @@ namespace Data
             _saveService = saveService;
             
             _equipmentDataService = equipmentDataService;
-            _equipmentDataService.DataUpdated += list => _saveService.ScheduleSave();
+            _equipmentDataService.DataUpdated += list => _saveService.Commit();
             _equipmentDataService.DataRemoved += TryDeleteEquipmentInExercises;
             
             _exerciseDataService = exerciseDataService;
-            _exerciseDataService.DataUpdated += list => _saveService.ScheduleSave();
+            _exerciseDataService.DataUpdated += list => _saveService.Commit();
             _exerciseDataService.DataRemoved += TryDeleteExerciseInTrainings;
             
             _trainingDataService = trainingDataService;
-            _trainingDataService.DataUpdated += list => _saveService.ScheduleSave();
+            _trainingDataService.DataUpdated += list => _saveService.Commit();
         }
         
         

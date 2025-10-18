@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.Installers;
 using Data;
 using Models;
 using UnityEngine;
@@ -26,18 +27,19 @@ namespace Core
             }
             Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            ISaveService saveService = new SaveService(deferSave: true);
-            IDataService<Equipment> equipmentDataService = new EquipmentDataService(saveService.EquipmentsCache);
-            IDataService<Exercise> exerciseDataService = new ExerciseDataService(saveService.ExercisesCache);
-            IDataService<Training> trainingDataService = new TrainingDataService(saveService.TrainingsCache);
-            DataService data = new DataService(saveService, equipmentDataService, exerciseDataService, trainingDataService);
-            Register(new ViewModelFactory(equipmentDataService, exerciseDataService, trainingDataService));
-            Register<ISaveService>(saveService);
-            Register<IDataService<Equipment>>(equipmentDataService);
-            Register<IDataService<Exercise>>(exerciseDataService);
-            Register<IDataService<Training>>(trainingDataService);
+            
             _screensInstaller.Install(this);
+            new DataServiceInstaller().Install(this);
+            
+            ViewModelFactory viewModelFactory = new ViewModelFactory
+            (
+                Resolve<IDataService<Equipment>>(),  
+                Resolve<IDataService<Exercise>>(),  
+                Resolve<IDataService<Training>>()
+            );
+            Register(viewModelFactory);
+            
+            _uiController.Initialize(viewModelFactory);
             Register(_uiController);
         }
 

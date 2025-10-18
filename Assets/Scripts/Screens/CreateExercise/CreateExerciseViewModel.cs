@@ -2,10 +2,11 @@ using System;
 using System.Collections.Generic;
 using Data;
 using Models;
+using Screens.ViewModels;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseViewModel
+    public class CreateExerciseViewModel: IViewModel
     {
         public bool IsEditMode { get; private set; }
         

@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Core;
-using Data;
-using Models;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -12,31 +8,21 @@ using Views.Components;
 
 namespace Screens.ViewExercises
 {
-    public class ViewExercisesScreen : ReactiveScreen
+    public class ViewExercisesScreen : ScreenWithViewModel<ViewExercisesViewModel>
     {
         [SerializeField] private Transform _contentParent;
         [SerializeField] private ExerciseItem _exerciseItemPrefab;
         [SerializeField] private Button _createButton;
 
-        private ViewExercisesViewModel _vm;
-        private IDataService<Exercise> _exerciseDataService;
-        private int _lastExercisesHash;
-
-        public override async Task InitializeAsync(object parameter = null)
+        public override async Task InitializeAsync(ViewExercisesViewModel viewModel, UiController uiController, object parameter = null)
         {
-            _exerciseDataService = DiContainer.Instance.Resolve<IDataService<Exercise>>() ?? throw new InvalidOperationException("IDataService not resolved");
-            ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
-            _vm = factory.Create<ViewExercisesViewModel>();
+            await base.InitializeAsync(viewModel, uiController, parameter);
 
-            Subscribe(() => _vm.ExercisesChanged -= MarkDirtyOrRefresh);
-            _vm.ExercisesChanged += MarkDirtyOrRefresh;
+            Subscribe(() => Vm.ExercisesChanged -= MarkDirtyOrRefresh);
+            Vm.ExercisesChanged += MarkDirtyOrRefresh;
 
             _createButton.onClick.RemoveAllListeners();
-            _createButton.onClick.AddListener(() =>
-                DiContainer.Instance.Resolve<UiController>().OpenScreen(ScreenType.CreateExercise));
-
-            Refresh();
-            await base.InitializeAsync(parameter);
+            _createButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateExercise));
         }
 
         protected override void Refresh()
@@ -44,19 +30,14 @@ namespace Screens.ViewExercises
             _isRefreshing = true;
             try
             {
-                if (_initialized && !isDirty) return;
-
                 foreach (Transform t in _contentParent)
-                {
                     SimplePool.Return(t.gameObject, _exerciseItemPrefab.gameObject);
-                }
 
-                foreach (Exercise ex in _vm.Exercises)
+                foreach (var ex in Vm.Exercises)
                 {
                     GameObject go = SimplePool.Get(_exerciseItemPrefab.gameObject, _contentParent);
-                    ExerciseItem item = go.GetComponent<ExerciseItem>();
-                    List<(string Id, string Name, int Quantity)> exEquipment = GetEquipmentViewData(ex);
-                    item.Setup(ex, exEquipment, OnExerciseClicked);
+                    var item = go.GetComponent<ExerciseItem>();
+                    item.Setup(ex.Id, ex.Name, ex.Equipments, OnExerciseClicked);
                 }
             }
             finally
@@ -65,13 +46,9 @@ namespace Screens.ViewExercises
             }
         }
 
-        private List<(string Id, string Name, int Quantity)> GetEquipmentViewData(Exercise ex)
+        private void OnExerciseClicked(string exerciseId)
         {
-            return ex.RequiredEquipment.Select(r =>
-                (Id: r.EquipmentId, _exerciseDataService.GetDataById(r.EquipmentId)?.Name, r.Quantity)).ToList();
+            UIController.OpenScreen(ScreenType.ViewExercise, exerciseId);
         }
-
-        private void OnExerciseClicked(Exercise ex) =>
-            DiContainer.Instance.Resolve<UiController>().OpenScreen(ScreenType.ViewExercise, ex.Id);
     }
 }

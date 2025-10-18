@@ -1,17 +1,16 @@
 using System;
 using Data;
 using Models;
+using Screens.ViewModels;
 
 namespace Screens.CreateEquipment
 {
-    public class CreateEquipmentViewModel
+    public class CreateEquipmentViewModel: IViewModel
     {
         private readonly IDataService<Equipment> _equipmentDataService;
         private string _name = string.Empty;
-        private bool _hasQuantity;
-        private bool _hasWeight;
 
-        public event Action<bool> CanSaveChanged;
+        public event Action CanSaveChanged;
 
         public string Name
         {
@@ -19,29 +18,13 @@ namespace Screens.CreateEquipment
             set
             {
                 _name = value ?? string.Empty;
-                CanSaveChanged?.Invoke(CanSave);
+                CanSaveChanged?.Invoke();
             }
         }
 
-        public bool HasQuantity
-        {
-            get => _hasQuantity;
-            set
-            {
-                _hasQuantity = value;
-                CanSaveChanged?.Invoke(CanSave);
-            }
-        }
+        public bool HasQuantity { get; set; }
 
-        public bool HasWeight
-        {
-            get => _hasWeight;
-            set
-            {
-                _hasWeight = value;
-                CanSaveChanged?.Invoke(CanSave);
-            }
-        }
+        public bool HasWeight { get; set; }
 
         public bool CanSave => !string.IsNullOrWhiteSpace(_name);
 

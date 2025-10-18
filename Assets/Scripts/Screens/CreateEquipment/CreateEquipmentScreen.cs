@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Screens.CreateEquipment
 {
-    public class CreateEquipmentScreen : Screen
+    public class CreateEquipmentScreen : ScreenWithViewModel<CreateEquipmentViewModel>
     {
         [SerializeField] private TMP_InputField _nameInput;
         [SerializeField] private Toggle _hasQuantity;
@@ -15,46 +15,47 @@ namespace Screens.CreateEquipment
         [SerializeField] private Button _saveButton;
         [SerializeField] private Button _backButton;
 
-        private CreateEquipmentViewModel _vm;
-
-        public override async Task InitializeAsync(object parameter = null)
+        public override async Task InitializeAsync(CreateEquipmentViewModel viewModel, UiController uiController, object parameter = null)
         {
-            ViewModelFactory factory = DiContainer.Instance.Resolve<ViewModelFactory>() ?? throw new InvalidOperationException("ViewModelFactory not resolved");
-            _vm = factory.Create<CreateEquipmentViewModel>(parameter);
+            await base.InitializeAsync(viewModel, uiController, parameter);
 
-            Subscribe(() => _vm.CanSaveChanged -= OnCanSaveChanged);
-            _vm.CanSaveChanged += OnCanSaveChanged;
-
-            _nameInput.text = _vm.Name;
-            _hasQuantity.isOn = _vm.HasQuantity;
-            _hasWeight.isOn = _vm.HasWeight;
+            Vm.CanSaveChanged += MarkDirtyOrRefresh;
+            
+            _nameInput.text = Vm.Name;
+            _hasQuantity.isOn = Vm.HasQuantity;
+            _hasWeight.isOn = Vm.HasWeight;
 
             _nameInput.onValueChanged.RemoveAllListeners();
-            _nameInput.onValueChanged.AddListener(value => _vm.Name = value);
+            _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
             _hasQuantity.onValueChanged.RemoveAllListeners();
-            _hasQuantity.onValueChanged.AddListener(value => _vm.HasQuantity = value);
+            _hasQuantity.onValueChanged.AddListener(v => Vm.HasQuantity = v);
             _hasWeight.onValueChanged.RemoveAllListeners();
-            _hasWeight.onValueChanged.AddListener(value => _vm.HasWeight = value);
+            _hasWeight.onValueChanged.AddListener(v => Vm.HasWeight = v);
 
             _saveButton.onClick.RemoveAllListeners();
             _saveButton.onClick.AddListener(OnSave);
 
             _backButton.onClick.RemoveAllListeners();
-            _backButton.onClick.AddListener(() => DiContainer.Instance.Resolve<UiController>().CloseScreen());
+            _backButton.onClick.AddListener(() => UIController.CloseScreen());
+        }
 
-            OnCanSaveChanged(_vm.CanSave);
-            await base.InitializeAsync(parameter);
+        protected override void Refresh()
+        {
+            _isRefreshing = true;
+            try
+            {
+                _saveButton.interactable = Vm.CanSave;
+            }
+            finally
+            {
+                _isRefreshing = false;
+            }
         }
 
         private void OnSave()
         {
-            _vm.Save();
-            DiContainer.Instance.Resolve<UiController>().CloseScreen();
-        }
-
-        private void OnCanSaveChanged(bool canSave)
-        {
-            _saveButton.interactable = canSave;
+            Vm.Save();
+            UIController.CloseScreen();
         }
     }
 }

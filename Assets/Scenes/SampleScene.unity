@@ -254,7 +254,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 377775769}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c29302eba24f40aa8ca6a33b93ee40f1, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d8dcdd0ac9a4991908ddc72a165fb08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _screens:
@@ -264,10 +264,10 @@ MonoBehaviour:
     Screen: {fileID: 398094572}
   - Type: 3
     Screen: {fileID: 2065551372}
-  - Type: 5
-    Screen: {fileID: 1219157094}
   - Type: 4
     Screen: {fileID: 927091742}
+  - Type: 5
+    Screen: {fileID: 1219157094}
   - Type: 6
     Screen: {fileID: 638129888}
   - Type: 7
@@ -1086,13 +1086,13 @@ RectTransform:
   - {fileID: 1653618345}
   - {fileID: 1927944895}
   - {fileID: 398094570}
-  - {fileID: 2065551371}
-  - {fileID: 1219157092}
-  - {fileID: 927091740}
-  - {fileID: 638129887}
   - {fileID: 6096328485867481695}
   - {fileID: 2140885096094490458}
   - {fileID: 3413724615853497315}
+  - {fileID: 2065551371}
+  - {fileID: 927091740}
+  - {fileID: 1219157092}
+  - {fileID: 638129887}
   - {fileID: 1397529924}
   - {fileID: 2057391670}
   m_Father: {fileID: 0}

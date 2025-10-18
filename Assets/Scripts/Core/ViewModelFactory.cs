@@ -2,6 +2,7 @@
 using System;
 using Data;
 using Models;
+using Screens;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;
 using Screens.ViewExercise;
@@ -23,13 +24,25 @@ namespace Core
             _trainingDataService = trainingsDataService;
         }
 
+        public object CreateForScreen(ScreenType type, object parameter = null)
+        {
+            return type switch
+            {
+                ScreenType.ViewExercises => Create<ViewExercisesViewModel>(),
+                ScreenType.ViewExercise => Create<ViewExerciseViewModel>(parameter),
+                ScreenType.CreateExercise => Create<CreateExerciseViewModel>(parameter),
+                ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(),
+                _ => throw new InvalidOperationException($"Unknown screen type {type}")
+            };
+        }
+
         public T? Create<T>(object parameter = null) where T : class
         {
             if (typeof(T) == typeof(ViewExercisesViewModel))
-                return new ViewExercisesViewModel(_exerciseDataService) as T;
+                return new ViewExercisesViewModel(_exerciseDataService, _equipmentDataService) as T;
             if (typeof(T) == typeof(ViewExerciseViewModel))
             {
-                return new ViewExerciseViewModel(_exerciseDataService, GetId(parameter)) as T;
+                return new ViewExerciseViewModel(_exerciseDataService, _equipmentDataService, GetId(parameter)) as T;
             }
             if (typeof(T) == typeof(CreateExerciseViewModel))
             {

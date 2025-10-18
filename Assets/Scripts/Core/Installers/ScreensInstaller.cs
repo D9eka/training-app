@@ -4,9 +4,9 @@ using Screens;
 using UnityEngine;
 using Screen = Screens.Screen;
 
-namespace Core
+namespace Core.Installers
 {
-    public class ScreensInstaller : MonoBehaviour
+    public class ScreensInstaller : MonoBehaviour, IInstaller
     {
         [Serializable]
         private class ScreenEntry
