@@ -63,12 +63,5 @@ namespace Models
         {
             _requiredEquipment.RemoveAll(r => r.EquipmentId == equipmentId);
         }
-
-        public int GetQuantity(string equipmentId)
-        {
-            if (string.IsNullOrEmpty(equipmentId)) return 0;
-            ExerciseEquipmentRef r = _requiredEquipment.Find(x => x.EquipmentId == equipmentId);
-            return r?.Quantity ?? 0;
-        }
     }
 }

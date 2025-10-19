@@ -1,6 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
-using Models;
+using Screens.CreateTraining;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,33 +16,54 @@ namespace Views.Components
         [SerializeField] private TMP_Text _setsText;
         [SerializeField] private TMP_Text _restText;
         [SerializeField] private Button _button;
+        [SerializeField] private Button _changeButton;
+        [SerializeField] private Button _deleteButton;
 
-        private TrainingBlock _trainingBlock;
+        private string _id;
+        private Action<string> _onClickById;
+        private Action<string> _onClickEditById;
+        private Action<string> _onClickDeleteById;
         
-        public void Setup(TrainingBlock trainingBlock, Action<TrainingBlock> onClick)
+        public void Setup(TrainingBlockViewData trainingBlockViewData, bool isEditMode,
+            Action<string> onClick, Action<string> onClickEdit = null, Action<string> onClickDelete = null)
         {
-            _trainingBlock = trainingBlock;
+            _id = trainingBlockViewData.Id;
+            _onClickById = onClick;
+            _onClickEditById = onClickEdit;
+            _onClickDeleteById = onClickDelete;
 
             _nameText.text = $"Блок {transform.GetSiblingIndex()}";
-            _exercisesText.text = GetExercisesText();
-            _approachesText.text = $"{_trainingBlock.Approaches} подходов по {_trainingBlock.ApproachesTimeSeconds}," +
-                                   $" отдых {_trainingBlock.RestAfterApproachSeconds} секунд";
-            _setsText.text = $"{_trainingBlock.Sets} сета, отдых после сета {_trainingBlock.RestAfterSetSeconds} секунд";
-            _restText.text = $"Отдых после блока {_trainingBlock.RestAfterBlockSeconds} секунд";
+            _exercisesText.text = GetExercisesText(trainingBlockViewData.ExercisesInBlockViewData);
+            _approachesText.text = $"{trainingBlockViewData.Approaches} подходов по " +
+                                   $"{trainingBlockViewData.ApproachesTimeSpan.ToRussianFormattedString()}," +
+                                   $" отдых {trainingBlockViewData.RestAfterApproachTimeSpan.ToRussianFormattedString()}";
+            _setsText.text = $"{trainingBlockViewData.Sets} сета, отдых после сета " +
+                             $"{trainingBlockViewData.RestAfterSetsTimeSpan.ToRussianFormattedString()}";
+            _restText.text = $"Отдых после блока " +
+                             $"{trainingBlockViewData.RestAfterBlockTimeSpan.ToRussianFormattedString()}";
             
             _button.onClick.RemoveAllListeners();
-            _button.onClick.AddListener(() => onClick?.Invoke(_trainingBlock));
+            _button.onClick.AddListener(() => _onClickById?.Invoke(_id));
+            
+            _changeButton.gameObject.SetActive(isEditMode);
+            _deleteButton.gameObject.SetActive(isEditMode);
+            if (isEditMode)
+            {
+                _changeButton.onClick.RemoveAllListeners();
+                _changeButton.onClick.AddListener(() => _onClickEditById?.Invoke(_id));
+                
+                _deleteButton.onClick.RemoveAllListeners();
+                _deleteButton.onClick.AddListener(() => _onClickDeleteById?.Invoke(_id));
+            }
         }
 
-        private string GetExercisesText()
+        private string GetExercisesText(List<ExerciseInBlockViewData> exercisesInBlockViewData)
         {
             StringBuilder exercisesText = new();
-            for (int i = 0; i < _trainingBlock.Exercises.Count; i++)
+            for (int i = 0; i < exercisesInBlockViewData.Count; i++)
             {
-                Models.ExerciseInBlock trainingBlockExercise = _trainingBlock.Exercises[i];
-                exercisesText.Append(trainingBlockExercise.Exercise.Name);
-                exercisesText.Append($"{trainingBlockExercise.Repetitions} раз");
-                if (i < _trainingBlock.Exercises.Count - 1)
+                exercisesText.Append($"{exercisesInBlockViewData[i].Name} {exercisesInBlockViewData[i].Repetitions} раз");
+                if (i < exercisesInBlockViewData.Count - 1)
                 {
                     exercisesText.Append("+");
                 }

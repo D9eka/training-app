@@ -48,9 +48,7 @@ namespace Screens.CreateExercise
             Exercise exercise = _exerciseDataService.GetDataById(exerciseId);
             IsEditMode = exercise != null;
             EditModeChanged?.Invoke(IsEditMode);
-            if (exercise == null) 
-                return new Exercise();
-            return exercise;
+            return exercise ?? new Exercise();
         }
 
         private void Load()
@@ -110,6 +108,11 @@ namespace Screens.CreateExercise
             {
                 _exerciseDataService.AddData(_currentExercise);
             }
+        }
+
+        public int GetQuantity(string eqId)
+        {
+            return RequiredEquipment.Find(r => r.EquipmentId == eqId)?.Quantity ?? 0;
         }
     }
 }

@@ -6,23 +6,30 @@ namespace Models
     [Serializable]
     public class TrainingBlock
     {
-        public List<ExerciseInBlock> Exercises = new();
+        public string Id { get; private set; }
+        public List<ExerciseInBlock> Exercises;
         public int Approaches;
-        public int ApproachesTimeSeconds;
+        public TimeSpan ApproachesTimeSpan;
         public int Sets;
-        public float RestAfterApproachSeconds;
-        public float RestAfterSetSeconds;
-        public float RestAfterBlockSeconds;
+        public TimeSpan RestAfterApproachTimeSpan;
+        public TimeSpan RestAfterSetTimeSpan;
+        public TimeSpan RestAfterBlockTimeSpan;
 
-        public TrainingBlock(int approaches, int approachesTimeSeconds, int sets, 
-            float restAfterApproachSeconds, float restAfterSetSeconds, float restAfterBlockSeconds)
+        public TrainingBlock()
+        {
+            Id = Guid.NewGuid().ToString();
+            Exercises =  new List<ExerciseInBlock>();
+        }
+
+    public TrainingBlock(List<ExerciseInBlock> Exercises, int approaches, TimeSpan approachesTimeSpan, int sets, 
+        TimeSpan restAfterApproachTimeSpan, TimeSpan restAfterSetTimeSpan, TimeSpan restAfterBlockTimeSpan) : this()
         {
             Approaches = approaches;
-            ApproachesTimeSeconds = approachesTimeSeconds;
+            ApproachesTimeSpan = approachesTimeSpan;
             Sets = sets;
-            RestAfterApproachSeconds = restAfterApproachSeconds;
-            RestAfterSetSeconds = restAfterSetSeconds;
-            RestAfterBlockSeconds = restAfterBlockSeconds;
+            RestAfterApproachTimeSpan = restAfterApproachTimeSpan;
+            RestAfterSetTimeSpan = restAfterSetTimeSpan;
+            RestAfterBlockTimeSpan = restAfterBlockTimeSpan;
         }
 
         public void RemoveExercise(string exerciseId)

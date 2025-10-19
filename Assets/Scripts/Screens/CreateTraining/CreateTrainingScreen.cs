@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Core;
 using TMPro;
@@ -7,43 +8,45 @@ using UnityEngine.UI;
 using Utils;
 using Views.Components;
 
-namespace Screens.CreateExercise
+namespace Screens.CreateTraining
 {
-    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>
+    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
         [SerializeField] private TMP_InputField _descInput;
-        [SerializeField] private Transform _equipmentListParent;
-        [SerializeField] private EquipmentItem _equipmentPrefab;
+        [SerializeField] private TMP_InputField _prepTimeInput;
+        [SerializeField] private Transform _blockListParent;
+        [SerializeField] private TrainingBlockItem _trainingBlockPrefab;
         [SerializeField] private Button _createButton;
         [SerializeField] private TMP_Text _createButtonText;
         [SerializeField] private Button _backButton;
-        [SerializeField] private Button _addEquipmentButton;
+        [SerializeField] private Button _addBlockButton;
 
         private readonly List<GameObject> _spawnedItems = new();
 
-        public override async Task InitializeAsync(CreateExerciseViewModel viewModel, UiController uiController, object parameter = null)
+        public override async Task InitializeAsync(CreateTrainingViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 
             Vm.EditModeChanged += OnEditModeChanged;
             Vm.CanSaveChanged += OnCanSaveChanged;
-            Vm.EquipmentsChanged += MarkDirtyOrRefresh;
+            Vm.TrainingChanged += MarkDirtyOrRefresh;
 
             Subscribe(() => Vm.EditModeChanged -= OnEditModeChanged);
             Subscribe(() => Vm.CanSaveChanged -= OnCanSaveChanged);
-            Subscribe(() => Vm.EquipmentsChanged -= MarkDirtyOrRefresh);
+            Subscribe(() => Vm.TrainingChanged -= MarkDirtyOrRefresh);
 
             _nameInput.text = Vm.Name;
             _descInput.text = Vm.Description;
+            _prepTimeInput.text = Vm.PrepTimeSeconds.ToString(CultureInfo.CurrentCulture);
 
             _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
             _descInput.onValueChanged.AddListener(v => Vm.Description = v);
 
             _createButton.onClick.AddListener(OnCreate);
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
-            _addEquipmentButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateEquipment));
+            _addBlockButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateBlock));
 
             OnEditModeChanged(Vm.IsEditMode);
             OnCanSaveChanged(Vm.CanSave);
@@ -56,16 +59,15 @@ namespace Screens.CreateExercise
             _isRefreshing = true;
             try
             {
-                foreach (Transform child in _equipmentListParent)
+                foreach (Transform child in _blockListParent)
                     if (child.TryGetComponent(out EquipmentItem _))
-                        SimplePool.Return(child.gameObject, _equipmentPrefab.gameObject);
+                        SimplePool.Return(child.gameObject, _trainingBlockPrefab.gameObject);
 
-                foreach (var eq in Vm.AllEquipments)
+                foreach (var eq in Vm.TrainingBlocks)
                 {
-                    int quantity = Vm.GetQuantity(eq.Id);
-                    var go = SimplePool.Get(_equipmentPrefab.gameObject, _equipmentListParent);
-                    var item = go.GetComponent<EquipmentItem>();
-                    item.Setup(eq, EquipmentItem.Mode.Edit, quantity, Vm.RemoveEquipment, Vm.UpdateEquipmentQuantity);
+                    var go = SimplePool.Get(_trainingBlockPrefab.gameObject, _blockListParent);
+                    var item = go.GetComponent<TrainingBlockItem>();
+                    item.Setup(eq, Vm.IsEditMode, OnBlockClicked,OnBlockClicked, Vm.RemoveBlock);
                     _spawnedItems.Add(go);
                 }
             }
@@ -89,5 +91,10 @@ namespace Screens.CreateExercise
 
         private void OnCanSaveChanged(bool canSave) =>
             _createButton.interactable = canSave;
+
+        private void OnBlockClicked(string blockId)
+        {
+            UIController.OpenScreen(ScreenType.CreateBlock, blockId);
+        }
     }
 }
