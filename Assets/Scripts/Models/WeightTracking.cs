@@ -1,20 +1,33 @@
 using System;
 using System.Globalization;
+using UnityEngine;
 
 namespace Models
 {
     [Serializable]
     public class WeightTracking : IModel
     {
-        public DateTime Time;
-        public float Weight;
-        
-        public string Id => Time.ToString(CultureInfo.InvariantCulture);
+        [SerializeField] private DateTime _time;
+        [SerializeField] private float _weight;
+
+        public DateTime Time
+        {
+            get => _time;
+            set => _time = value;
+        }
+
+        public float Weight
+        {
+            get => _weight;
+            set => _weight = value;
+        }
+
+        public string Id => _time.ToString(CultureInfo.InvariantCulture);
 
         public WeightTracking(DateTime time, float weight)
         {
-            Time = time;
-            Weight = weight;
+            _time = time;
+            _weight = weight;
         }
     }
 }

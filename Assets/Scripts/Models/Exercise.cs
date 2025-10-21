@@ -12,6 +12,10 @@ namespace Models
         [SerializeField] private string _description;
         [SerializeField] private List<ExerciseEquipmentRef> _requiredEquipment;
 
+        // TODO: Функция для упражнений с одной рукой: добавить тип повторения:
+        // ПО (кол-во левой, кол-во правой; сделать указанное значение левой, сделать указанное значение правой),
+        // ПЧ (один левой, один правой; пока не дойдет до значения)
+        
         public string Id
         {
             get => _id;
@@ -30,7 +34,7 @@ namespace Models
             set => _description = value ?? string.Empty;
         }
 
-        public IReadOnlyList<ExerciseEquipmentRef> RequiredEquipment => _requiredEquipment.AsReadOnly();
+        public List<ExerciseEquipmentRef> RequiredEquipment => _requiredEquipment;
 
         public Exercise()
         {
@@ -44,24 +48,24 @@ namespace Models
             _description = description ?? string.Empty;
         }
 
-        public void AddOrUpdateEquipment(string equipmentId, int quantity)
+        public void AddOrUpdateEquipment(Equipment equipment, int quantity)
         {
-            if (string.IsNullOrEmpty(equipmentId)) return;
+            if (equipment == null) return;
             if (quantity <= 0)
             {
-                _requiredEquipment.RemoveAll(r => r.EquipmentId == equipmentId);
+                _requiredEquipment.RemoveAll(r => r.Equipment.Id == equipment.Id);
                 return;
             }
-            ExerciseEquipmentRef existing = _requiredEquipment.Find(r => r.EquipmentId == equipmentId);
+            ExerciseEquipmentRef existing = _requiredEquipment.Find(r => r.Equipment.Id == equipment.Id);
             if (existing != null)
                 existing.Quantity = quantity;
             else
-                _requiredEquipment.Add(new ExerciseEquipmentRef(equipmentId, quantity));
+                _requiredEquipment.Add(new ExerciseEquipmentRef(equipment, quantity));
         }
 
         public void RemoveEquipment(string equipmentId)
         {
-            _requiredEquipment.RemoveAll(r => r.EquipmentId == equipmentId);
+            _requiredEquipment.RemoveAll(r => r.Equipment.Id == equipmentId);
         }
     }
 }

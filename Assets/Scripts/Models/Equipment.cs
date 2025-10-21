@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 namespace Models
-{
+{ 
     [Serializable]
     public class Equipment : IModel
     {
@@ -20,7 +20,7 @@ namespace Models
         public string Name
         {
             get => _name;
-            set => _name = value ?? throw new ArgumentNullException(nameof(value));
+            set => _name = value ?? throw new ArgumentException("Name cannot be empty", nameof(value));
         }
 
         public bool HasQuantity
@@ -34,8 +34,6 @@ namespace Models
             get => _hasWeight;
             set => _hasWeight = value;
         }
-
-        public Equipment() { }
 
         public Equipment(string name, bool hasQuantity = false, bool hasWeight = false)
         {

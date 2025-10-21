@@ -6,13 +6,13 @@ namespace Models
     [Serializable]
     public class ExerciseEquipmentRef
     {
-        [SerializeField] private string _equipmentId;
+        [SerializeField] private Equipment _equipment;
         [SerializeField] private int _quantity;
 
-        public string EquipmentId
+        public Equipment Equipment
         {
-            get => _equipmentId;
-            private set => _equipmentId = value;
+            get => _equipment;
+            private set => _equipment = value;
         }
 
         public int Quantity
@@ -23,11 +23,10 @@ namespace Models
 
         public ExerciseEquipmentRef() { }
 
-        public ExerciseEquipmentRef(string equipmentId, int quantity)
+        public ExerciseEquipmentRef(Equipment equipment, int quantity)
         {
-            if (string.IsNullOrEmpty(equipmentId)) throw new ArgumentException("EquipmentId cannot be empty", nameof(equipmentId));
-            _equipmentId = equipmentId;
-            _quantity = Math.Max(0, quantity);
+            _equipment = equipment;
+            _quantity = quantity;
         }
     }
 }
