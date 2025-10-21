@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Models;
 
 namespace Data
@@ -25,8 +26,6 @@ namespace Data
             _trainingDataService = trainingDataService;
             _trainingDataService.DataUpdated += list => _saveService.Commit();
         }
-        
-        
 
         private void TryDeleteEquipmentInExercises(string equipmentId)
         {

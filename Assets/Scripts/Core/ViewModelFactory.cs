@@ -3,12 +3,15 @@ using System;
 using Data;
 using Models;
 using Screens;
+using Screens.CreateBlock;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;
 using Screens.CreateTraining;
+using Screens.SelectExercise;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
 using Screens.ViewTrainings;
+using Utils;
 
 namespace Core
 {
@@ -16,10 +19,10 @@ namespace Core
     {
         private readonly IDataService<Equipment> _equipmentDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
-        private readonly IDataService<Training> _trainingDataService;
+        private readonly TrainingDataService _trainingDataService;
 
         public ViewModelFactory(IDataService<Equipment> equipmentDataService, 
-            IDataService<Exercise> exerciseDataService, IDataService<Training> trainingsDataService)
+            IDataService<Exercise> exerciseDataService, TrainingDataService trainingsDataService)
         {
             _equipmentDataService = equipmentDataService;
             _exerciseDataService = exerciseDataService;
@@ -30,12 +33,14 @@ namespace Core
         {
             return type switch
             {
-                ScreenType.ViewExercises => Create<ViewExercisesViewModel>(),
+                ScreenType.ViewExercises => Create<ViewExercisesViewModel>(parameter),
                 ScreenType.ViewExercise => Create<ViewExerciseViewModel>(parameter),
                 ScreenType.CreateExercise => Create<CreateExerciseViewModel>(parameter),
-                ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(),
-                ScreenType.ViewTrainings => Create<ViewTrainingsViewModel>(),
-                ScreenType.CreateTraining => Create<CreateTrainingViewModel>(),
+                ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(parameter),
+                ScreenType.ViewTrainings => Create<ViewTrainingsViewModel>(parameter),
+                ScreenType.CreateTraining => Create<CreateTrainingViewModel>(parameter),
+                ScreenType.CreateBlock => Create<CreateTrainingBlockViewModel>(parameter),
+                ScreenType.SelectExercise => Create<SelectExerciseViewModel>(parameter),
                 _ => throw new InvalidOperationException($"Unknown screen type {type}")
             };
         }
@@ -46,11 +51,12 @@ namespace Core
                 return new ViewExercisesViewModel(_exerciseDataService, _equipmentDataService) as T;
             if (typeof(T) == typeof(ViewExerciseViewModel))
             {
-                return new ViewExerciseViewModel(_exerciseDataService, _equipmentDataService, GetId(parameter)) as T;
+                return new ViewExerciseViewModel(_exerciseDataService, parameter.GetId()) as T;
             }
             if (typeof(T) == typeof(CreateExerciseViewModel))
             {
-                return new CreateExerciseViewModel(_exerciseDataService, _equipmentDataService, GetId(parameter, false)) as T;
+                return new CreateExerciseViewModel(_exerciseDataService, _equipmentDataService, 
+                    parameter.GetId(false)) as T;
             }
             if (typeof(T) == typeof(CreateEquipmentViewModel))
                 return new CreateEquipmentViewModel(_equipmentDataService) as T;
@@ -60,20 +66,18 @@ namespace Core
             }
             if (typeof(T) == typeof(CreateTrainingViewModel))
             {
-                return new CreateTrainingViewModel(_trainingDataService, GetId(parameter, false)) as T;
+                return new CreateTrainingViewModel(_trainingDataService, parameter.GetId(false)) as T;
+            }
+            if (typeof(T) == typeof(CreateTrainingBlockViewModel))
+            {
+                return new CreateTrainingBlockViewModel(_trainingDataService, parameter.GetId(false)) as T;
+            }
+            if (typeof(T) == typeof(SelectExerciseViewModel))
+            {
+                return new SelectExerciseViewModel(_exerciseDataService, _trainingDataService, 
+                    parameter.GetId(false)) as T;
             }
             throw new InvalidOperationException($"Unknown ViewModel type {typeof(T).Name}");
-        }
-
-        private string GetId(object parameter, bool needNonEmpty = true)
-        {
-            if (parameter is string id)
-            {
-                if (needNonEmpty && string.IsNullOrEmpty(id))
-                    throw new ArgumentException("Requires a non-empty string ID", nameof(parameter));
-                return id;
-            }
-            return !needNonEmpty ? String.Empty : throw new ArgumentException("Parameter must be a string", nameof(parameter));
         }
     }
 }

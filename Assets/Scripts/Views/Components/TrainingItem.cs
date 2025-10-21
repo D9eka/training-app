@@ -25,7 +25,7 @@ namespace Views.Components
             
             _nameText.text = trainingViewData.Name;
             _exerciseCountText.text = $"{trainingViewData.ExerciseCount} упражнений";
-            _timeDurationText.text = $"{trainingViewData.Duration.TotalMinutes} минут";
+            _timeDurationText.text = $"{trainingViewData.Duration.ToRussianFormattedString()}";
             _lastTimeStartText.text = $"Последний раз: {trainingViewData.LastTime.Date.ToShortDateString()}";
             
             _button.onClick.RemoveAllListeners();

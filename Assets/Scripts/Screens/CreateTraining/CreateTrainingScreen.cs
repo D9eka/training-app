@@ -10,7 +10,7 @@ using Views.Components;
 
 namespace Screens.CreateTraining
 {
-    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>
+    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>, INeedUpdateId
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -37,21 +37,34 @@ namespace Screens.CreateTraining
             Subscribe(() => Vm.CanSaveChanged -= OnCanSaveChanged);
             Subscribe(() => Vm.TrainingChanged -= MarkDirtyOrRefresh);
 
-            _nameInput.text = Vm.Name;
-            _descInput.text = Vm.Description;
-            _prepTimeInput.text = Vm.PrepTimeSeconds.ToString(CultureInfo.CurrentCulture);
-
+            _nameInput.onValueChanged.RemoveAllListeners();
             _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
+            
+            _descInput.onValueChanged.RemoveAllListeners();
             _descInput.onValueChanged.AddListener(v => Vm.Description = v);
+            
+            _prepTimeInput.onValueChanged.RemoveAllListeners();
+            _prepTimeInput.onValueChanged.AddListener(v => Vm.PrepTimeSeconds = int.Parse(v));
 
+            _createButton.onClick.RemoveAllListeners();
             _createButton.onClick.AddListener(OnCreate);
+            
+            _backButton.onClick.RemoveAllListeners();
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
-            _addBlockButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateBlock));
+            
+            _addBlockButton.onClick.RemoveAllListeners();
+            _addBlockButton.onClick.AddListener(OnAddBlockClicked);
 
             OnEditModeChanged(Vm.IsEditMode);
             OnCanSaveChanged(Vm.CanSave);
 
             Refresh();
+        }
+        
+
+        public void UpdateId(string id)
+        {
+            Vm.UpdateId(id);
         }
 
         protected override void Refresh()
@@ -59,15 +72,19 @@ namespace Screens.CreateTraining
             _isRefreshing = true;
             try
             {
+                _nameInput.text = Vm.Name;
+                _descInput.text = Vm.Description;
+                _prepTimeInput.text = Vm.PrepTimeSeconds.ToString(CultureInfo.CurrentCulture);
+                
                 foreach (Transform child in _blockListParent)
-                    if (child.TryGetComponent(out EquipmentItem _))
+                    if (child.TryGetComponent(out TrainingBlockItem _))
                         SimplePool.Return(child.gameObject, _trainingBlockPrefab.gameObject);
 
-                foreach (var eq in Vm.TrainingBlocks)
+                foreach (var block in Vm.TrainingBlocks)
                 {
                     var go = SimplePool.Get(_trainingBlockPrefab.gameObject, _blockListParent);
                     var item = go.GetComponent<TrainingBlockItem>();
-                    item.Setup(eq, Vm.IsEditMode, OnBlockClicked,OnBlockClicked, Vm.RemoveBlock);
+                    item.Setup(block, Vm.IsEditMode, OnBlockClicked,OnBlockClicked, Vm.RemoveBlock);
                     _spawnedItems.Add(go);
                 }
             }
@@ -85,16 +102,26 @@ namespace Screens.CreateTraining
 
         private void OnEditModeChanged(bool editMode)
         {
-            _header.text = editMode ? "Изменить упражнение" : "Создать упражнение";
+            _header.text = editMode ? "Изменить тренировку" : "Создать тренировку";
             _createButtonText.text = editMode ? "Изменить" : "Создать";
         }
 
-        private void OnCanSaveChanged(bool canSave) =>
+        private void OnCanSaveChanged(bool canSave)
+        {
             _createButton.interactable = canSave;
+            _addBlockButton.interactable = canSave;
+        }
+
+        private void OnAddBlockClicked()
+        {
+            Vm.Save();
+            UIController.OpenScreen(ScreenType.CreateBlock, Vm.TrainingId);
+        }
 
         private void OnBlockClicked(string blockId)
         {
-            UIController.OpenScreen(ScreenType.CreateBlock, blockId);
+            Vm.Save();
+            UIController.OpenScreen(ScreenType.CreateBlock, string.IsNullOrEmpty(blockId) ? Vm.TrainingId : blockId);
         }
     }
 }

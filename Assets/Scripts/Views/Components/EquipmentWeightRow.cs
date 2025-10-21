@@ -1,5 +1,7 @@
+using System;
 using System.Globalization;
 using Models;
+using Screens.CreateBlock;
 using TMPro;
 using UnityEngine;
 
@@ -11,21 +13,38 @@ namespace Views.Components
         [SerializeField] private TMP_InputField _equipmentWeightInputField;
         [SerializeField] private TMP_Dropdown _equipmentWeightTypeDropdown;
         
-        private ExerciseEquipmentRef _currentEquipment;
+        private EquipmentInBlockViewData  _equipmentInBlockViewData;
 
-        public void Setup(ExerciseEquipmentRef equipment, string equipmentName, float weight = 0f, WeightType weightType = WeightType.Kg)
+        private Action<float> _onWeightChanged;
+        private Action<WeightType> _onTypeChanged;
+        
+        //TODO: Заменить Input веса на Dropdown для целых кг и десятых кг: |72| , |25|
+
+        public void Setup(EquipmentInBlockViewData equipmentInBlockViewData, 
+            Action<(string Id, float Weight, WeightType WeightType)> onWeightChanged)
         {
-            _currentEquipment  = equipment;
+            _equipmentInBlockViewData = equipmentInBlockViewData;
             
-            _equipmentText.text = $"{_currentEquipment.Quantity}x {equipmentName}";
-            _equipmentWeightInputField.text = weight.ToString(CultureInfo.InvariantCulture);
-            _equipmentWeightTypeDropdown.SetValueWithoutNotify((int)weightType);
+            _equipmentText.text = $"{equipmentInBlockViewData.Quantity}x {equipmentInBlockViewData.Name}";
+            
+            _equipmentWeightInputField.onValueChanged.RemoveAllListeners();
+            _equipmentWeightInputField.text = equipmentInBlockViewData.Weight.ToString(CultureInfo.CurrentCulture);
+            _equipmentWeightInputField.onValueChanged.AddListener((_) => onWeightChanged?.Invoke(GetWeightData()));
+            
+            _equipmentWeightTypeDropdown.onValueChanged.RemoveAllListeners();
+            _equipmentWeightTypeDropdown.SetValueWithoutNotify((int)equipmentInBlockViewData.WeightType);
+            _equipmentWeightTypeDropdown.onValueChanged.AddListener((_) => onWeightChanged?.Invoke(GetWeightData()));
+            
         }
 
-        public EquipmentInBlock GetEquipmentInBlock()
+        private (string Id, float Weight, WeightType WeightType) GetWeightData()
         {
-            int equipmentWeight = int.Parse(_equipmentWeightInputField.text);
-            return new EquipmentInBlock(_currentEquipment, equipmentWeight, (WeightType)_equipmentWeightTypeDropdown.value);
+            return 
+            (
+                _equipmentInBlockViewData.Id, 
+                float.Parse(_equipmentWeightInputField.text, 
+                CultureInfo.CurrentCulture), (WeightType)_equipmentWeightTypeDropdown.value
+            );
         }
     }
 }

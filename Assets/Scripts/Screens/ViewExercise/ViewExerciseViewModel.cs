@@ -6,10 +6,9 @@ using Screens.ViewModels;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseViewModel: IViewModel
+    public class ViewExerciseViewModel : IViewModel
     {
         private readonly IDataService<Exercise> _exerciseDataService;
-        private readonly IDataService<Equipment> _equipmentDataService;
 
         private string _exerciseId;
         private Exercise _currentExercise;
@@ -33,11 +32,9 @@ namespace Screens.ViewExercise
 
         public ViewExerciseViewModel(
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService,
             string exerciseId)
         {
             _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
-            _equipmentDataService = equipmentDataService ?? throw new ArgumentNullException(nameof(equipmentDataService));
             ExerciseId = exerciseId ?? throw new ArgumentException("Exercise ID cannot be null or empty", nameof(exerciseId));
 
             _exerciseDataService.DataUpdated += _ => Load();
@@ -74,7 +71,7 @@ namespace Screens.ViewExercise
 
             var equipmentList = _currentExercise.RequiredEquipment.Select(r =>
             {
-                var eq = _equipmentDataService.GetDataById(r.EquipmentId);
+                var eq = r.Equipment;
                 return $"{(eq?.Name ?? "??")} x{r.Quantity}";
             });
 

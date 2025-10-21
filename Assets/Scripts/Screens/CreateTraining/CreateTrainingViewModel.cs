@@ -21,6 +21,8 @@ namespace Screens.CreateTraining
         public event Action<bool> CanSaveChanged;
         public event Action TrainingChanged;
 
+        public string TrainingId { get; private set; }
+        
         public string Name
         {
             get => _name;
@@ -49,14 +51,20 @@ namespace Screens.CreateTraining
                 
             }).ToList();
         
-        public bool CanSave => !string.IsNullOrWhiteSpace(Name) && _trainingBlocks.Count > 0;
+        public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
         public CreateTrainingViewModel(IDataService<Training> trainingDataService, string trainingId)
         {
             _trainingDataService =  trainingDataService;
-            _currentTraining = GetTrainingById(trainingId);
-            Load();
+            UpdateId(trainingId);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
+        }
+
+        public void UpdateId(string trainingId)
+        {
+            _currentTraining = GetTrainingById(trainingId);
+            TrainingId = _currentTraining.Id;
+            Load();
         }
 
         private Training GetTrainingById(string trainingId)
@@ -92,10 +100,15 @@ namespace Screens.CreateTraining
             if (!CanSave) return;
             _currentTraining.Name = Name;
             _currentTraining.Description = Description;
-            foreach (var trainingBlock in _trainingBlocks)
+            _currentTraining.PrepTimeSeconds = PrepTimeSeconds;
+            
+            List<TrainingBlock> blocksCopy = _trainingBlocks.ToList();
+            foreach (TrainingBlock trainingBlock in blocksCopy)
+            {
                 _currentTraining.AddOrUpdateBlock(trainingBlock);
+            }
 
-            if (IsEditMode)
+            if (_trainingDataService.GetDataById(TrainingId) != null)
             {
                 _trainingDataService.UpdateData(_currentTraining);
             }

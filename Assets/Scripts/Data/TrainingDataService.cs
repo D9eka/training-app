@@ -8,5 +8,20 @@ namespace Data
         public TrainingDataService(List<Training> cache) : base(cache)
         {
         }
+        
+        public TrainingBlock GetBlockById(string trainingBlockId)
+        {
+            foreach (Training training in Cache)
+            {
+                foreach (TrainingBlock block in training.Blocks)
+                {
+                    if (block.Id == trainingBlockId)
+                    {
+                        return block;
+                    }
+                }
+            }
+            return null;
+        }
     }
 }

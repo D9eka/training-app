@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Screens;
 using Screens.ViewExercise;
+using Utils;
 using Screen = Screens.Screen;
 
 namespace Core
@@ -84,12 +85,12 @@ namespace Core
 
         private async Task InitializeScreenIfNeeded(Screen screen, ScreenType type, object parameter)
         {
-            if (screen.IsInitialized && type != ScreenType.ViewExercise)
-                return;
-
-            if (screen.IsInitialized && screen is ViewExerciseScreen viewExerciseScreen)
+            if (screen.IsInitialized)
             {
-                await viewExerciseScreen.UpdateExerciseId(parameter.ToString());
+                if (screen is INeedUpdateId needUpdateId)
+                {
+                    needUpdateId.UpdateId(parameter.GetId(false));
+                }
                 return;
             }
 

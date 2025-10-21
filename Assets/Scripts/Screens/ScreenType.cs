@@ -13,6 +13,7 @@ namespace Screens
         CreateTraining,
         CreateBlock,
         ViewTraining,
-        ViewBlock
+        ViewBlock,
+        SelectExercise
     }
 }

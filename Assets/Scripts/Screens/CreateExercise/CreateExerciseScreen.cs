@@ -9,7 +9,7 @@ using Views.Components;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>
+    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>, INeedUpdateId
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -35,9 +35,6 @@ namespace Screens.CreateExercise
             Subscribe(() => Vm.CanSaveChanged -= OnCanSaveChanged);
             Subscribe(() => Vm.EquipmentsChanged -= MarkDirtyOrRefresh);
 
-            _nameInput.text = Vm.Name;
-            _descInput.text = Vm.Description;
-
             _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
             _descInput.onValueChanged.AddListener(v => Vm.Description = v);
 
@@ -51,11 +48,19 @@ namespace Screens.CreateExercise
             Refresh();
         }
 
+        public void UpdateId(string id)
+        {
+            Vm.UpdateId(id);
+        }
+
         protected override void Refresh()
         {
             _isRefreshing = true;
             try
             {
+                _nameInput.text = Vm.Name;
+                _descInput.text = Vm.Description;
+                
                 foreach (Transform child in _equipmentListParent)
                     if (child.TryGetComponent(out EquipmentItem _))
                         SimplePool.Return(child.gameObject, _equipmentPrefab.gameObject);

@@ -38,9 +38,15 @@ namespace Screens.CreateExercise
         {
             _exerciseDataService =  exerciseDataService;
             _equipmentDataService = equipmentDataService;
-            _currentExercise = GetExerciseById(exerciseId);
-            Load();
+            UpdateId(exerciseId);
             _equipmentDataService.DataUpdated += EquipmentDataServiceOnDataUpdated;
+        }
+
+        public void UpdateId(string exerciseId)
+        {
+            _currentExercise = GetExerciseById(exerciseId);
+            RequiredEquipment = _currentExercise.RequiredEquipment;
+            Load();
         }
 
         private Exercise GetExerciseById(string exerciseId)
@@ -72,7 +78,7 @@ namespace Screens.CreateExercise
         public void UpdateEquipmentQuantity(Equipment eq, int quantity)
         {
             if (eq == null) return;
-            var existing = RequiredEquipment.Find(r => r.EquipmentId == eq.Id);
+            var existing = RequiredEquipment.Find(r => r.Equipment == eq);
             if (quantity <= 0)
             {
                 if (existing != null) RequiredEquipment.Remove(existing);
@@ -80,7 +86,7 @@ namespace Screens.CreateExercise
             else
             {
                 if (existing != null) existing.Quantity = quantity;
-                else RequiredEquipment.Add(new ExerciseEquipmentRef(eq.Id, quantity));
+                else RequiredEquipment.Add(new ExerciseEquipmentRef(eq, quantity));
             }
             EquipmentsChanged?.Invoke();
         }
@@ -88,7 +94,7 @@ namespace Screens.CreateExercise
         public void RemoveEquipment(Equipment eq)
         {
             if (eq == null) return;
-            RequiredEquipment.RemoveAll(r => r.EquipmentId == eq.Id);
+            RequiredEquipment.RemoveAll(r => r.Equipment == eq);
             _equipmentDataService.RemoveData(eq.Id);
         }
 
@@ -98,7 +104,7 @@ namespace Screens.CreateExercise
             _currentExercise.Name = Name;
             _currentExercise.Description = Description;
             foreach (var r in RequiredEquipment)
-                _currentExercise.AddOrUpdateEquipment(r.EquipmentId, r.Quantity);
+                _currentExercise.AddOrUpdateEquipment(r.Equipment, r.Quantity);
 
             if (IsEditMode)
             {
@@ -112,7 +118,7 @@ namespace Screens.CreateExercise
 
         public int GetQuantity(string eqId)
         {
-            return RequiredEquipment.Find(r => r.EquipmentId == eqId)?.Quantity ?? 0;
+            return RequiredEquipment.Find(r => r.Equipment.Id == eqId)?.Quantity ?? 0;
         }
     }
 }

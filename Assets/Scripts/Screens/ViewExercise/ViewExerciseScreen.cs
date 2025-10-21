@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseScreen : ScreenWithViewModel<ViewExerciseViewModel>
+    public class ViewExerciseScreen : ScreenWithViewModel<ViewExerciseViewModel>, INeedUpdateId
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
@@ -27,10 +27,9 @@ namespace Screens.ViewExercise
             _deleteButton.onClick.AddListener(DeleteExercise);
         }
         
-        public async Task UpdateExerciseId(string newExerciseId)
+        public void UpdateId(string id)
         {
-            Vm.ExerciseId = newExerciseId;
-            await Task.CompletedTask;
+            Vm.ExerciseId = id;
         }
 
         protected override void Refresh()

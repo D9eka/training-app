@@ -35,7 +35,7 @@ namespace Core
             (
                 Resolve<IDataService<Equipment>>(),  
                 Resolve<IDataService<Exercise>>(),  
-                Resolve<IDataService<Training>>()
+                Resolve<TrainingDataService>()
             );
             Register(viewModelFactory);
             
