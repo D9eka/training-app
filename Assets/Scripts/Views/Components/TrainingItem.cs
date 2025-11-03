@@ -4,6 +4,7 @@ using Screens.ViewTrainings;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace Views.Components
 {

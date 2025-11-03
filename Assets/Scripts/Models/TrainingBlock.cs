@@ -7,98 +7,44 @@ namespace Models
     [Serializable]
     public class TrainingBlock : IModel
     {
-        [SerializeField] private string _trainingId;
-        [SerializeField] private string _id;
-        [SerializeField] private List<ExerciseInBlock> _exercises;
-        [SerializeField] private int _approaches;
-        [SerializeField] private TimeSpan _approachesTimeSpan;
-        [SerializeField] private int _sets;
-        [SerializeField] private TimeSpan _restAfterApproachTimeSpan;
-        [SerializeField] private TimeSpan _restAfterSetTimeSpan;
-        [SerializeField] private TimeSpan _restAfterBlockTimeSpan;
-
-        public string TrainingId
-        {
-            get => _trainingId;
-            private set => _trainingId = value;
-        }
-
-        public string Id
-        {
-            get => _id;
-            private set => _id = value;
-        }
-
-        public List<ExerciseInBlock> Exercises
-        {
-            get => _exercises;
-            set => _exercises = value;
-        }
-
-        public int Approaches
-        {
-            get => _approaches;
-            set => _approaches = value;
-        }
-
-        public TimeSpan ApproachesTimeSpan
-        {
-            get => _approachesTimeSpan;
-            set => _approachesTimeSpan = value;
-        }
-
-        public int Sets
-        {
-            get => _sets;
-            set => _sets = value;
-        }
-
-        public TimeSpan RestAfterApproachTimeSpan
-        {
-            get => _restAfterApproachTimeSpan;
-            set => _restAfterApproachTimeSpan = value;
-        }
-
-        public TimeSpan RestAfterSetTimeSpan
-        {
-            get => _restAfterSetTimeSpan;
-            set => _restAfterSetTimeSpan = value;
-        }
-
-        public TimeSpan RestAfterBlockTimeSpan
-        {
-            get => _restAfterBlockTimeSpan;
-            set => _restAfterBlockTimeSpan = value;
-        }
+        [field: SerializeField] public string TrainingId { get; private set; }
+        [field: SerializeField] public string Id { get; private set; }
+        [field: SerializeField] public List<ExerciseInBlock> Exercises { get; set; } = new();
+        [field: SerializeField] public int Approaches { get; set; }
+        [field: SerializeField] public TimeSpan ApproachesTimeSpan { get; set; }
+        [field: SerializeField] public int Sets { get; set; }
+        [field: SerializeField] public TimeSpan RestAfterApproachTimeSpan { get; set; }
+        [field: SerializeField] public TimeSpan RestAfterSetTimeSpan { get; set; }
+        [field: SerializeField] public TimeSpan RestAfterBlockTimeSpan { get; set; }
 
         public TrainingBlock(string trainingId)
         {
-            _trainingId = trainingId;
-            _id = Guid.NewGuid().ToString();
-            _exercises = new List<ExerciseInBlock>();
+            TrainingId = trainingId;
+            Id = Guid.NewGuid().ToString();
         }
 
-        public TrainingBlock(string trainingId, List<ExerciseInBlock> exercises, int approaches, TimeSpan approachesTimeSpan, 
-            int sets, TimeSpan restAfterApproachTimeSpan, TimeSpan restAfterSetTimeSpan, 
+        public TrainingBlock(string trainingId, List<ExerciseInBlock> exercises, int approaches, TimeSpan approachesTimeSpan,
+            int sets, TimeSpan restAfterApproachTimeSpan, TimeSpan restAfterSetTimeSpan,
             TimeSpan restAfterBlockTimeSpan) : this(trainingId)
         {
-            _exercises = exercises;
-            _approaches = approaches;
-            _approachesTimeSpan = approachesTimeSpan;
-            _sets = sets;
-            _restAfterApproachTimeSpan = restAfterApproachTimeSpan;
-            _restAfterSetTimeSpan = restAfterSetTimeSpan;
-            _restAfterBlockTimeSpan = restAfterBlockTimeSpan;
+            Exercises = exercises ?? new List<ExerciseInBlock>();
+            Approaches = approaches;
+            ApproachesTimeSpan = approachesTimeSpan;
+            Sets = sets;
+            RestAfterApproachTimeSpan = restAfterApproachTimeSpan;
+            RestAfterSetTimeSpan = restAfterSetTimeSpan;
+            RestAfterBlockTimeSpan = restAfterBlockTimeSpan;
         }
 
         public void AddExercise(ExerciseInBlock exercise)
         {
-            _exercises.Add(exercise);
+            Exercises ??= new List<ExerciseInBlock>();
+            Exercises.Add(exercise);
         }
 
         public void RemoveExercise(string exerciseId)
         {
-            _exercises.RemoveAll(r => r.Exercise.Id == exerciseId);
+            Exercises?.RemoveAll(e => e.ExerciseId == exerciseId);
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Screens.CreateTraining
         public bool IsEditMode { get; private set; }
         
         private readonly IDataService<Training> _trainingDataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
         private string _name = string.Empty;
     
         private Training _currentTraining;
@@ -32,30 +33,47 @@ namespace Screens.CreateTraining
         public string Description { get; set; }
         public float PrepTimeSeconds { get; set; }
         private List<TrainingBlock> _trainingBlocks = new List<TrainingBlock>();
-        public IReadOnlyList<TrainingBlockViewData> TrainingBlocks => _trainingBlocks.Select(block =>
-            new TrainingBlockViewData
+
+        public IReadOnlyList<TrainingBlockViewData> GetTrainingBlocks()
+        {
+            List<TrainingBlockViewData> trainingBlocks = new List<TrainingBlockViewData>();
+
+            foreach (var block in _trainingBlocks)
             {
-                Id = block.Id,
-                ExercisesInBlockViewData = block.Exercises.Select(ex => 
-                    new ExerciseInBlockViewData
+                List<ExerciseInBlockViewData> exerciseInBlockViewData = new List<ExerciseInBlockViewData>();
+                foreach (var exerciseInBlock in block.Exercises)
+                {
+                    Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.ExerciseId);
+                    exerciseInBlockViewData.Add(new ExerciseInBlockViewData
                     {
-                        Name = ex.Exercise.Name,
-                        Repetitions = ex.Repetitions
-                    }).ToList(),
-                Approaches = block.Approaches,
-                ApproachesTimeSpan = block.ApproachesTimeSpan,
-                RestAfterApproachTimeSpan = block.RestAfterApproachTimeSpan,
-                Sets = block.Sets,
-                RestAfterSetsTimeSpan = block.RestAfterSetTimeSpan,
-                RestAfterBlockTimeSpan = block.RestAfterBlockTimeSpan
+                        Name = exercise.Name,
+                        Repetitions = exerciseInBlock.Repetitions
+                    });
+                }
+                trainingBlocks.Add(new TrainingBlockViewData
+                {
+                    Id = block.Id,
+                    ExercisesInBlockViewData = exerciseInBlockViewData,
+                    Approaches = block.Approaches,
+                    ApproachesTimeSpan = block.ApproachesTimeSpan,
+                    RestAfterApproachTimeSpan = block.RestAfterApproachTimeSpan,
+                    Sets = block.Sets,
+                    RestAfterSetsTimeSpan = block.RestAfterSetTimeSpan,
+                    RestAfterBlockTimeSpan = block.RestAfterBlockTimeSpan
                 
-            }).ToList();
+                });
+            }
+            
+            return trainingBlocks;
+        }
         
         public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
-        public CreateTrainingViewModel(IDataService<Training> trainingDataService, string trainingId)
+        public CreateTrainingViewModel(IDataService<Training> trainingDataService, 
+            IDataService<Exercise> exerciseDataService, string trainingId)
         {
             _trainingDataService =  trainingDataService;
+            _exerciseDataService = exerciseDataService;
             UpdateId(trainingId);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }

@@ -80,7 +80,7 @@ namespace Screens.CreateTraining
                     if (child.TryGetComponent(out TrainingBlockItem _))
                         SimplePool.Return(child.gameObject, _trainingBlockPrefab.gameObject);
 
-                foreach (var block in Vm.TrainingBlocks)
+                foreach (var block in Vm.GetTrainingBlocks())
                 {
                     var go = SimplePool.Get(_trainingBlockPrefab.gameObject, _blockListParent);
                     var item = go.GetComponent<TrainingBlockItem>();

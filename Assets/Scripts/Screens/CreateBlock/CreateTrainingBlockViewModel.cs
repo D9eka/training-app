@@ -16,6 +16,7 @@ namespace Screens.CreateBlock
         public bool IsEditMode { get; private set; }
         
         private readonly TrainingDataService _trainingDataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
     
         private Training _currentTraining;
         private TrainingBlock _currentBlock;
@@ -24,24 +25,10 @@ namespace Screens.CreateBlock
         public event Action<bool> CanSaveChanged;
         public event Action BlockChanged;
         
-        private List<ExerciseInBlock> _exercises = new List<ExerciseInBlock>();
+        private List<ExerciseInBlock> _exercisesInBlock = new List<ExerciseInBlock>();
         
         public string BlockId { get; private set; }
-        public IReadOnlyList<ExerciseInBlockViewData> Exercises => _exercises.Select(exercise =>
-            new ExerciseInBlockViewData
-            {
-                Id = exercise.Id,
-                Name = exercise.Exercise.Name,
-                Equipments = exercise.Exercise.RequiredEquipment.Select(eq => new EquipmentInBlockViewData
-                {
-                    Id = eq.Equipment.Id,
-                    Name = eq.Equipment.Name,
-                    Quantity = eq.Quantity,
-                    NeedWeight = eq.Equipment.HasWeight
-                }).ToList(),
-                Repetitions = exercise.Repetitions,
-                DurationSeconds = exercise.DurationTimeSpan.Seconds
-            }).ToList();
+
         public int Approaches { get; set; }
         public TimeSpan ApproachesTimeSpan { get; set; }
         public int Sets { get; set; }
@@ -49,11 +36,13 @@ namespace Screens.CreateBlock
         public TimeSpan RestAfterSetTimeSpan { get; set; }
         public TimeSpan RestAfterBlockTimeSpan { get; set; }
         
-        public bool CanSave => _exercises.Count > 0;
+        public bool CanSave => _exercisesInBlock.Count > 0;
 
-        public CreateTrainingBlockViewModel(TrainingDataService trainingDataService, string id)
+        public CreateTrainingBlockViewModel(TrainingDataService trainingDataService, 
+            IDataService<Exercise> exerciseDataService, string id)
         {
             _trainingDataService =  trainingDataService;
+            _exerciseDataService = exerciseDataService;
             UpdateId(id);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
@@ -63,6 +52,32 @@ namespace Screens.CreateBlock
             _currentBlock = GetBlockById(id);
             BlockId = _currentBlock.Id;
             Load();
+        }
+        
+        
+        public IReadOnlyList<ExerciseInBlockViewData> GetExercises()
+        {
+            List<ExerciseInBlockViewData> exercises = new List<ExerciseInBlockViewData>();
+            
+            foreach (var exerciseInBlock in _exercisesInBlock)
+            {
+                Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.ExerciseId);
+                exercises.Add(new ExerciseInBlockViewData
+                {
+                    Id = exerciseInBlock.Id,
+                    Name = exercise.Name,
+                    Equipments = exercise.RequiredEquipment.Select(eq => new EquipmentInBlockViewData
+                    {
+                        Id = eq.Equipment.Id,
+                        Name = eq.Equipment.Name,
+                        Quantity = eq.Quantity,
+                        NeedWeight = eq.Equipment.HasWeight
+                    }).ToList(),
+                    Repetitions = exerciseInBlock.Repetitions,
+                    DurationSeconds = exerciseInBlock.DurationTimeSpan.Seconds
+                });
+            }
+            return exercises;
         }
 
         private TrainingBlock GetBlockById(string id)
@@ -76,7 +91,7 @@ namespace Screens.CreateBlock
 
         private void Load()
         {
-            _exercises = _currentBlock?.Exercises;
+            _exercisesInBlock = _currentBlock?.Exercises;
             Approaches = _currentBlock?.Approaches ?? 1;
             ApproachesTimeSpan = _currentBlock?.ApproachesTimeSpan ?? new TimeSpan(0,0,0);
             Sets = _currentBlock?.Sets ?? 1;
@@ -94,14 +109,14 @@ namespace Screens.CreateBlock
 
         public void RemoveExercise(string exerciseInBlockId)
         {
-            _exercises.Remove(_exercises.Find(block => block.Id == exerciseInBlockId));
+            _exercisesInBlock.Remove(_exercisesInBlock.Find(block => block.Id == exerciseInBlockId));
             CanSaveChanged?.Invoke(CanSave);
             BlockChanged?.Invoke();
         }
 
         public void Save()
         {
-            _currentBlock.Exercises = _exercises;
+            _currentBlock.Exercises = _exercisesInBlock;
             _currentBlock.Approaches = Approaches;
             _currentBlock.ApproachesTimeSpan = ApproachesTimeSpan;
             _currentBlock.Sets = Sets;
@@ -115,18 +130,18 @@ namespace Screens.CreateBlock
 
         public void UpdateRepetition(string exerciseId, int repetitions)
         {
-            _exercises.Find(ex => ex.Id == exerciseId).Repetitions = repetitions;
+            _exercisesInBlock.Find(ex => ex.Id == exerciseId).Repetitions = repetitions;
         }
 
         public void UpdateDuration(string exerciseId, int durationSeconds)
         {
-            _exercises.Find(ex => ex.Id == exerciseId).DurationTimeSpan = 
+            _exercisesInBlock.Find(ex => ex.Id == exerciseId).DurationTimeSpan = 
                 new TimeSpan(0,0, durationSeconds);
         }
 
         public void UpdateEquipmentWeight(string exerciseId, (string Id, float Weight, WeightType WeightType) weightData)
         {
-            EquipmentInBlock eq = _exercises.Find(ex => ex.Id == exerciseId).EquipmentWeights
+            EquipmentInBlock eq = _exercisesInBlock.Find(ex => ex.Id == exerciseId).EquipmentWeights
                 .Find(eqW => eqW.Equipment.Equipment.Id == weightData.Id);
             eq.Weight = weightData.Weight;
             eq.WeightType = weightData.WeightType;

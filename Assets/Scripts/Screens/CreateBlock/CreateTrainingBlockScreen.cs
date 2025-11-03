@@ -86,7 +86,7 @@ namespace Screens.CreateBlock
                     if (child.TryGetComponent(out ExerciseInBlockItem _))
                         SimplePool.Return(child.gameObject, _exerciseInBlockPrefab.gameObject);
 
-                foreach (var ex in Vm.Exercises)
+                foreach (var ex in Vm.GetExercises())
                 {
                     var go = SimplePool.Get(_exerciseInBlockPrefab.gameObject, _exerciseInBlockListParent);
                     var item = go.GetComponent<ExerciseInBlockItem>();

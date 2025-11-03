@@ -103,7 +103,7 @@ namespace Screens.CreateExercise
             if (!CanSave) return;
             _currentExercise.Name = Name;
             _currentExercise.Description = Description;
-            foreach (var r in RequiredEquipment)
+            foreach (var r in RequiredEquipment.ToArray())
                 _currentExercise.AddOrUpdateEquipment(r.Equipment, r.Quantity);
 
             if (IsEditMode)

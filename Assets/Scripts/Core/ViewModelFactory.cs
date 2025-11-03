@@ -66,11 +66,13 @@ namespace Core
             }
             if (typeof(T) == typeof(CreateTrainingViewModel))
             {
-                return new CreateTrainingViewModel(_trainingDataService, parameter.GetId(false)) as T;
+                return new CreateTrainingViewModel(_trainingDataService, _exerciseDataService, 
+                    parameter.GetId(false)) as T;
             }
             if (typeof(T) == typeof(CreateTrainingBlockViewModel))
             {
-                return new CreateTrainingBlockViewModel(_trainingDataService, parameter.GetId(false)) as T;
+                return new CreateTrainingBlockViewModel(_trainingDataService, _exerciseDataService, 
+                    parameter.GetId(false)) as T;
             }
             if (typeof(T) == typeof(SelectExerciseViewModel))
             {

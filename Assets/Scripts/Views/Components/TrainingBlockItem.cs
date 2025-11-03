@@ -5,6 +5,7 @@ using Screens.CreateTraining;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace Views.Components
 {
