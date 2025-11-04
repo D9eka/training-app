@@ -26,7 +26,7 @@ namespace Views.Components
         private Action<string> _onClickDeleteById;
         
         public void Setup(TrainingBlockViewData trainingBlockViewData, bool isEditMode,
-            Action<string> onClick, Action<string> onClickEdit = null, Action<string> onClickDelete = null)
+            Action<string> onClick = null, Action<string> onClickEdit = null, Action<string> onClickDelete = null)
         {
             _id = trainingBlockViewData.Id;
             _onClickById = onClick;

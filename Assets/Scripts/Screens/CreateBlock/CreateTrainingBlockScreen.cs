@@ -27,9 +27,8 @@ namespace Screens.CreateBlock
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addExerciseInBlockButton;
 
-        private readonly List<GameObject> _spawnedItems = new();
-
-        public override async Task InitializeAsync(CreateTrainingBlockViewModel viewModel, UiController uiController, object parameter = null)
+        public override async Task InitializeAsync(CreateTrainingBlockViewModel viewModel, UiController uiController, 
+            object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 
@@ -68,6 +67,7 @@ namespace Screens.CreateBlock
 
         public void UpdateId(string id)
         {
+            Vm.Active = true;
             Vm.UpdateId(id);
         }
 
@@ -90,8 +90,8 @@ namespace Screens.CreateBlock
                 {
                     var go = SimplePool.Get(_exerciseInBlockPrefab.gameObject, _exerciseInBlockListParent);
                     var item = go.GetComponent<ExerciseInBlockItem>();
-                    item.Setup(ex, OnEditExerciseClicked, Vm.RemoveExercise, Vm.UpdateRepetition, Vm.UpdateDuration, Vm.UpdateEquipmentWeight);
-                    _spawnedItems.Add(go);
+                    item.Setup(ex, OnEditExerciseClicked, Vm.RemoveExercise, 
+                        Vm.UpdateRepetition, Vm.UpdateDuration, Vm.UpdateEquipmentWeight);
                 }
             }
             finally
@@ -103,6 +103,7 @@ namespace Screens.CreateBlock
         private void OnCreate()
         {
             Vm.Save();
+            Vm.Active = false;
             UIController.CloseScreen();
         }
 

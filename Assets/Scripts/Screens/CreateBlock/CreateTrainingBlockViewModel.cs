@@ -13,6 +13,7 @@ namespace Screens.CreateBlock
 {
     public class CreateTrainingBlockViewModel : IViewModel
     {
+        public bool Active { get; set; } = true;
         public bool IsEditMode { get; private set; }
         
         private readonly TrainingDataService _trainingDataService;
@@ -85,7 +86,7 @@ namespace Screens.CreateBlock
             TrainingBlock block = _trainingDataService.GetBlockById(id);
             IsEditMode = block != null;
             EditModeChanged?.Invoke(IsEditMode);
-            _currentTraining = _trainingDataService.GetDataById(block?.TrainingId ?? id); // TODO: А НОВОЙ ТРЕНИРОВКИ ТО ТУТ НЕТУ!!
+            _currentTraining = _trainingDataService.GetDataById(block?.TrainingId ?? id);
             return block ?? new TrainingBlock(_currentTraining.Id);
         }
 
@@ -104,6 +105,7 @@ namespace Screens.CreateBlock
 
         private void TrainingDataServiceOnDataUpdated(IReadOnlyList<Training> trainings)
         {
+            if (!Active) return;
             UpdateId(BlockId);
         }
 

@@ -10,6 +10,7 @@ using Screens.CreateTraining;
 using Screens.SelectExercise;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
+using Screens.ViewTraining;
 using Screens.ViewTrainings;
 using Utils;
 
@@ -38,6 +39,7 @@ namespace Core
                 ScreenType.CreateExercise => Create<CreateExerciseViewModel>(parameter),
                 ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(parameter),
                 ScreenType.ViewTrainings => Create<ViewTrainingsViewModel>(parameter),
+                ScreenType.ViewTraining => Create<ViewTrainingViewModel>(parameter),
                 ScreenType.CreateTraining => Create<CreateTrainingViewModel>(parameter),
                 ScreenType.CreateBlock => Create<CreateTrainingBlockViewModel>(parameter),
                 ScreenType.SelectExercise => Create<SelectExerciseViewModel>(parameter),
@@ -63,6 +65,10 @@ namespace Core
             if (typeof(T) == typeof(ViewTrainingsViewModel))
             {
                 return new ViewTrainingsViewModel(_trainingDataService) as T;
+            }
+            if (typeof(T) == typeof(ViewTrainingViewModel))
+            {
+                return new ViewTrainingViewModel(_trainingDataService, _exerciseDataService, parameter.GetId()) as T;
             }
             if (typeof(T) == typeof(CreateTrainingViewModel))
             {
