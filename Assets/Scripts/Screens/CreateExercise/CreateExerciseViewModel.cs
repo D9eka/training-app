@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using Data;
 using Models;
+using Screens.Factories.Parameters;
 using Screens.ViewModels;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseViewModel: IViewModel
+    public class CreateExerciseViewModel: IUpdatableViewModel<ExerciseIdParameter>
     {
         public bool IsEditMode { get; private set; }
         
@@ -34,27 +35,21 @@ namespace Screens.CreateExercise
         public List<ExerciseEquipmentRef> RequiredEquipment { get; private set; } = new List<ExerciseEquipmentRef>();
 
         public CreateExerciseViewModel(IDataService<Exercise> exerciseDataService, 
-            IDataService<Equipment> equipmentDataService, string exerciseId)
+            IDataService<Equipment> equipmentDataService, ExerciseIdParameter param)
         {
             _exerciseDataService =  exerciseDataService;
             _equipmentDataService = equipmentDataService;
-            UpdateId(exerciseId);
+            UpdateParameter(param);
             _equipmentDataService.DataUpdated += EquipmentDataServiceOnDataUpdated;
         }
 
-        public void UpdateId(string exerciseId)
+        public void UpdateParameter(ExerciseIdParameter param)
         {
-            _currentExercise = GetExerciseById(exerciseId);
+            IsEditMode = param != null;
+            EditModeChanged?.Invoke(IsEditMode);
+            _currentExercise = param != null ? _exerciseDataService.GetDataById(param.ExerciseId) : new Exercise();
             RequiredEquipment = _currentExercise.RequiredEquipment;
             Load();
-        }
-
-        private Exercise GetExerciseById(string exerciseId)
-        {
-            Exercise exercise = _exerciseDataService.GetDataById(exerciseId);
-            IsEditMode = exercise != null;
-            EditModeChanged?.Invoke(IsEditMode);
-            return exercise ?? new Exercise();
         }
 
         private void Load()

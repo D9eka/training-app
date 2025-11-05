@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -47,7 +48,7 @@ namespace Screens.ViewExercises
 
         private void OnExerciseClicked(string exerciseId)
         {
-            UIController.OpenScreen(ScreenType.ViewExercise, exerciseId);
+            UIController.OpenScreen(ScreenType.ViewExercise, new ExerciseIdParameter(exerciseId));
         }
     }
 }

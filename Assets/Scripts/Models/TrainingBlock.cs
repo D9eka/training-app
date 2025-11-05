@@ -36,10 +36,13 @@ namespace Models
             RestAfterBlockTimeSpan = restAfterBlockTimeSpan;
         }
 
-        public void AddExercise(ExerciseInBlock exercise)
+        public void AddExercise(ExerciseInBlock exercise, int exerciseIndex = -1)
         {
             Exercises ??= new List<ExerciseInBlock>();
-            Exercises.Add(exercise);
+            if (exerciseIndex < 0) 
+                Exercises.Add(exercise);
+            else
+                Exercises.Insert(exerciseIndex, exercise);
         }
 
         public void RemoveExercise(string exerciseId)

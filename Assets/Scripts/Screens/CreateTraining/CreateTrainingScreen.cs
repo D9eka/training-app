@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ using Views.Components;
 
 namespace Screens.CreateTraining
 {
-    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>, INeedUpdateId
+    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -59,12 +60,6 @@ namespace Screens.CreateTraining
             OnCanSaveChanged(Vm.CanSave);
 
             Refresh();
-        }
-        
-
-        public void UpdateId(string id)
-        {
-            Vm.UpdateId(id);
         }
 
         protected override void Refresh()
@@ -115,13 +110,13 @@ namespace Screens.CreateTraining
         private void OnAddBlockClicked()
         {
             Vm.Save();
-            UIController.OpenScreen(ScreenType.CreateBlock, Vm.TrainingId);
+            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(Vm.TrainingId));
         }
 
         private void OnBlockClicked(string blockId)
         {
             Vm.Save();
-            UIController.OpenScreen(ScreenType.CreateBlock, string.IsNullOrEmpty(blockId) ? Vm.TrainingId : blockId);
+            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(Vm.TrainingId, blockId));
         }
     }
 }

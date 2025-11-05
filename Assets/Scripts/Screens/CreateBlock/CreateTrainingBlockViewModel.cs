@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Models;
-using Screens.CreateTraining;
+using Screens.Factories.Parameters;
 using Screens.ViewModels;
-using Unity.VisualScripting;
-using UnityEngine;
-using Views.Components;
 
 namespace Screens.CreateBlock
 {
-    public class CreateTrainingBlockViewModel : IViewModel
+    public class CreateTrainingBlockViewModel : IUpdatableViewModel<CreateTrainingBlockParameter>
     {
-        public bool Active { get; set; } = true;
         public bool IsEditMode { get; private set; }
         
         private readonly TrainingDataService _trainingDataService;
@@ -40,21 +36,32 @@ namespace Screens.CreateBlock
         public bool CanSave => _exercisesInBlock.Count > 0;
 
         public CreateTrainingBlockViewModel(TrainingDataService trainingDataService, 
-            IDataService<Exercise> exerciseDataService, string id)
+            IDataService<Exercise> exerciseDataService, CreateTrainingBlockParameter param)
         {
             _trainingDataService =  trainingDataService;
             _exerciseDataService = exerciseDataService;
-            UpdateId(id);
+            UpdateParameter(param);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
 
-        public void UpdateId(string id)
+        private void TrainingDataServiceOnDataUpdated(IReadOnlyList<Training> trainings)
         {
-            _currentBlock = GetBlockById(id);
+            if (_currentTraining != null)
+            {
+                UpdateParameter(new CreateTrainingBlockParameter(_currentTraining.Id, _currentBlock.Id));
+            }
+        }
+
+        public void UpdateParameter(CreateTrainingBlockParameter param)
+        {
+            _currentTraining = _trainingDataService.GetDataById(param.TrainingId);
+            _currentBlock = param.HasBlockId ? 
+                _trainingDataService.GetBlockById(param.BlockId) : new TrainingBlock(_currentTraining.Id);
+            IsEditMode = param.HasBlockId;
+            EditModeChanged?.Invoke(IsEditMode);
             BlockId = _currentBlock.Id;
             Load();
         }
-        
         
         public IReadOnlyList<ExerciseInBlockViewData> GetExercises()
         {
@@ -81,15 +88,6 @@ namespace Screens.CreateBlock
             return exercises;
         }
 
-        private TrainingBlock GetBlockById(string id)
-        {
-            TrainingBlock block = _trainingDataService.GetBlockById(id);
-            IsEditMode = block != null;
-            EditModeChanged?.Invoke(IsEditMode);
-            _currentTraining = _trainingDataService.GetDataById(block?.TrainingId ?? id);
-            return block ?? new TrainingBlock(_currentTraining.Id);
-        }
-
         private void Load()
         {
             _exercisesInBlock = _currentBlock?.Exercises;
@@ -103,10 +101,9 @@ namespace Screens.CreateBlock
             BlockChanged?.Invoke();
         }
 
-        private void TrainingDataServiceOnDataUpdated(IReadOnlyList<Training> trainings)
+        public int GetExerciseIndex(string exerciseInBlockId)
         {
-            if (!Active) return;
-            UpdateId(BlockId);
+            return _exercisesInBlock.FindIndex(block => block.Id == exerciseInBlockId);
         }
 
         public void RemoveExercise(string exerciseInBlockId)
@@ -147,6 +144,12 @@ namespace Screens.CreateBlock
                 .Find(eqW => eqW.Equipment.Equipment.Id == weightData.Id);
             eq.Weight = weightData.Weight;
             eq.WeightType = weightData.WeightType;
+        }
+
+        public void OnCreate()
+        {
+            Save();
+            _currentTraining = null;
         }
     }
 }

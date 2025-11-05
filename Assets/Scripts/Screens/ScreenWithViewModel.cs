@@ -8,7 +8,7 @@ namespace Screens
     public abstract class ScreenWithViewModel<TViewModel> : ReactiveScreen, IScreenWithViewModel
         where TViewModel : class, IViewModel
     {
-        protected TViewModel Vm;
+        public TViewModel Vm { get; private set; }
         protected UiController UIController;
 
         public virtual async Task InitializeAsync(TViewModel viewModel, UiController uiController, object parameter = null)
@@ -22,7 +22,7 @@ namespace Screens
             await base.InitializeAsync(parameter);
         }
 
-        async Task IScreenWithViewModel.InitializeWithViewModel(object viewModel, UiController ui, object parameter)
+        async Task IScreenWithViewModel.InitializeWithViewModel(IViewModel viewModel, UiController ui, object parameter)
         {
             if (viewModel is not TViewModel typed)
                 throw new ArgumentException($"Expected {typeof(TViewModel).Name}, got {viewModel?.GetType().Name}");

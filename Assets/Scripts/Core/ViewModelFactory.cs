@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using Data;
 using Models;
 using Screens;
@@ -7,85 +8,57 @@ using Screens.CreateBlock;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;
 using Screens.CreateTraining;
+using Screens.Factories;
+using Screens.Factories.Parameters;
 using Screens.SelectExercise;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
-using Screens.ViewTraining;
-using Screens.ViewTrainings;
-using Utils;
+using Screens.ViewModels;
 
 namespace Core
 {
     public class ViewModelFactory
     {
-        private readonly IDataService<Equipment> _equipmentDataService;
-        private readonly IDataService<Exercise> _exerciseDataService;
-        private readonly TrainingDataService _trainingDataService;
-
-        public ViewModelFactory(IDataService<Equipment> equipmentDataService, 
-            IDataService<Exercise> exerciseDataService, TrainingDataService trainingsDataService)
-        {
-            _equipmentDataService = equipmentDataService;
-            _exerciseDataService = exerciseDataService;
-            _trainingDataService = trainingsDataService;
-        }
-
-        public object CreateForScreen(ScreenType type, object parameter = null)
-        {
-            return type switch
+        private readonly Dictionary<ScreenType, Func<IScreenParameter, IViewModel>> _creators =
+            new Dictionary<ScreenType, Func<IScreenParameter, IViewModel>>
             {
-                ScreenType.ViewExercises => Create<ViewExercisesViewModel>(parameter),
-                ScreenType.ViewExercise => Create<ViewExerciseViewModel>(parameter),
-                ScreenType.CreateExercise => Create<CreateExerciseViewModel>(parameter),
-                ScreenType.CreateEquipment => Create<CreateEquipmentViewModel>(parameter),
-                ScreenType.ViewTrainings => Create<ViewTrainingsViewModel>(parameter),
-                ScreenType.ViewTraining => Create<ViewTrainingViewModel>(parameter),
-                ScreenType.CreateTraining => Create<CreateTrainingViewModel>(parameter),
-                ScreenType.CreateBlock => Create<CreateTrainingBlockViewModel>(parameter),
-                ScreenType.SelectExercise => Create<SelectExerciseViewModel>(parameter),
-                _ => throw new InvalidOperationException($"Unknown screen type {type}")
+                [ScreenType.CreateEquipment] = param => 
+                    DiContainer.Instance.Resolve<CreateEquipmentFactory>().Create(param),
+                [ScreenType.CreateExercise] = param => 
+                    DiContainer.Instance.Resolve<CreateExerciseFactory>().Create(RequireParam<ExerciseIdParameter>(param)),
+                [ScreenType.CreateBlock] = param => 
+                    DiContainer.Instance.Resolve<CreateTrainingBlockFactory>().Create(RequireParam<CreateTrainingBlockParameter>(param)),
+                [ScreenType.CreateTraining] = param => 
+                    DiContainer.Instance.Resolve<CreateTrainingFactory>().Create(RequireParam<TrainingIdParameter>(param)),
+                [ScreenType.SelectExercise] = param => 
+                    DiContainer.Instance.Resolve<SelectExerciseFactory>().Create(RequireParam<SelectExerciseParameter>(param)),
+                [ScreenType.ViewExercise] = param => 
+                    DiContainer.Instance.Resolve<ViewExerciseFactory>().Create(RequireParam<ExerciseIdParameter>(param)),
+                [ScreenType.ViewExercises] = param => 
+                    DiContainer.Instance.Resolve<ViewExercisesFactory>().Create(param),
+                [ScreenType.ViewTraining] = param => 
+                    DiContainer.Instance.Resolve<ViewTrainingFactory>().Create(RequireParam<TrainingIdParameter>(param)),
+                [ScreenType.ViewTrainings] = param => 
+                    DiContainer.Instance.Resolve<ViewTrainingsFactory>().Create(RequireParam<ExerciseIdParameter>(param)),
             };
-        }
-
-        public T? Create<T>(object parameter = null) where T : class
+        
+        public IViewModel CreateForScreen(ScreenType type, IScreenParameter param)
         {
-            if (typeof(T) == typeof(ViewExercisesViewModel))
-                return new ViewExercisesViewModel(_exerciseDataService, _equipmentDataService) as T;
-            if (typeof(T) == typeof(ViewExerciseViewModel))
-            {
-                return new ViewExerciseViewModel(_exerciseDataService, parameter.GetId()) as T;
-            }
-            if (typeof(T) == typeof(CreateExerciseViewModel))
-            {
-                return new CreateExerciseViewModel(_exerciseDataService, _equipmentDataService, 
-                    parameter.GetId(false)) as T;
-            }
-            if (typeof(T) == typeof(CreateEquipmentViewModel))
-                return new CreateEquipmentViewModel(_equipmentDataService) as T;
-            if (typeof(T) == typeof(ViewTrainingsViewModel))
-            {
-                return new ViewTrainingsViewModel(_trainingDataService) as T;
-            }
-            if (typeof(T) == typeof(ViewTrainingViewModel))
-            {
-                return new ViewTrainingViewModel(_trainingDataService, _exerciseDataService, parameter.GetId()) as T;
-            }
-            if (typeof(T) == typeof(CreateTrainingViewModel))
-            {
-                return new CreateTrainingViewModel(_trainingDataService, _exerciseDataService, 
-                    parameter.GetId(false)) as T;
-            }
-            if (typeof(T) == typeof(CreateTrainingBlockViewModel))
-            {
-                return new CreateTrainingBlockViewModel(_trainingDataService, _exerciseDataService, 
-                    parameter.GetId(false)) as T;
-            }
-            if (typeof(T) == typeof(SelectExerciseViewModel))
-            {
-                return new SelectExerciseViewModel(_exerciseDataService, _trainingDataService, 
-                    parameter.GetId(false)) as T;
-            }
-            throw new InvalidOperationException($"Unknown ViewModel type {typeof(T).Name}");
+            return _creators[type](param);
+        }
+        
+        private static T RequireParam<T>(IScreenParameter param)
+            where T : class, IScreenParameter
+        {
+            if (param == null)
+                return null;
+            
+            if (param is T typedParam)
+                return typedParam;
+
+            throw new InvalidOperationException(
+                $"Screen expects parameter of type '{typeof(T).Name}', " +
+                $"but received '{param?.GetType().Name ?? "null"}'.");
         }
     }
 }

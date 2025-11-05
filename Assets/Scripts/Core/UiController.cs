@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using Screens;
+using Screens.Factories.Parameters;
 using Screens.ViewExercise;
+using Screens.ViewModels;
 using Utils;
 using Screen = Screens.Screen;
 
@@ -17,20 +19,18 @@ namespace Core
 
         public void Initialize(ViewModelFactory factory) => _viewModelFactory = factory;
 
-        public async void OpenScreen(ScreenType type, object parameter = null)
+        public async void OpenScreen(ScreenType type, IScreenParameter param = null)
         {
             try
             {
-                GameObject screenGo = DiContainer.Instance.ResolveNamed(type.ToString());
-                if (screenGo == null)
-                    throw new ArgumentNullException(nameof(screenGo), $"Screen {type} not found");
+                GameObject screenGo = DiContainer.Instance.ResolveNamed(type.ToString()) ?? 
+                                      throw new ArgumentNullException(nameof(screenGo), $"Screen {type} not found");
 
-                Screen screen = screenGo.GetComponent<Screen>();
-                if (screen == null)
-                    throw new InvalidOperationException($"No Screen component on {type}");
+                Screen screen = screenGo.GetComponent<Screen>() ??
+                                throw new InvalidOperationException($"No Screen component on {type}");
 
                 await HandleScreenTransition(screen);
-                await InitializeScreenIfNeeded(screen, type, parameter);
+                await InitializeScreenIfNeeded(screen, type, param);
                 await screen.OnShowAsync();
                 _stack.Push(screen);
                 _navigationBar?.SetActive(screen.ShowNavBar);
@@ -83,23 +83,20 @@ namespace Core
             next.gameObject.SetActive(true);
         }
 
-        private async Task InitializeScreenIfNeeded(Screen screen, ScreenType type, object parameter)
+        private async Task InitializeScreenIfNeeded(Screen screen, ScreenType type, IScreenParameter parameter)
         {
-            if (screen.IsInitialized)
-            {
-                if (screen is INeedUpdateId needUpdateId)
-                {
-                    needUpdateId.UpdateId(parameter.GetId(false));
-                }
-                return;
-            }
-
             if (screen is IScreenWithViewModel vmScreen)
             {
+                if (screen.IsInitialized && vmScreen is ScreenWithViewModel<IUpdatableViewModel<IScreenParameter>> updatableScreen)
+                {
+                    updatableScreen.Vm.UpdateParameter(parameter);
+                    return;
+                }
+
                 var vm = _viewModelFactory.CreateForScreen(type, parameter);
                 await vmScreen.InitializeWithViewModel(vm, this, parameter);
             }
-            else
+            else if (!screen.IsInitialized)
             {
                 await screen.InitializeAsync(parameter);
             }

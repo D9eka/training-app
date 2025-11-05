@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils;
@@ -13,7 +14,8 @@ namespace Screens.ViewTrainings
         [SerializeField] private TrainingItem _trainingItemPrefab;
         [SerializeField] private Button _createButton;
 
-        public override async Task InitializeAsync(ViewTrainingsViewModel viewModel, UiController uiController, object parameter = null)
+        public override async Task InitializeAsync(ViewTrainingsViewModel viewModel, UiController uiController, 
+            object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 
@@ -47,7 +49,7 @@ namespace Screens.ViewTrainings
 
         private void OnTrainingClicked(string trainingId)
         {
-            UIController.OpenScreen(ScreenType.ViewTraining, trainingId);
+            UIController.OpenScreen(ScreenType.ViewTraining, new TrainingIdParameter(trainingId));
         }
     }
 }

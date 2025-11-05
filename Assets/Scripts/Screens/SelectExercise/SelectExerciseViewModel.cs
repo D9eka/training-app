@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Models;
+using Screens.Factories.Parameters;
 using Screens.ViewExercises;
 using Screens.ViewModels;
 
 namespace Screens.SelectExercise
 {
-    public class SelectExerciseViewModel : IViewModel
+    public class SelectExerciseViewModel : IUpdatableViewModel<SelectExerciseParameter>
     {
-        private readonly IDataService<Exercise> _exerciseDataService;
         private readonly TrainingDataService _trainingDataService;
+        private readonly IDataService<Exercise> _exerciseDataService;
         private string _searchQuery = string.Empty;
     
         private Training _currentTraining;
         private TrainingBlock _currentBlock;
+        private int _exerciseIndex;
 
         public event Action ExercisesWithQueryUpdated;
 
@@ -33,23 +35,24 @@ namespace Screens.SelectExercise
         private IReadOnlyList<Exercise> _allExercises;
         public List<ExerciseViewData> ExercisesWithQuery { get; private set; }
 
-        public SelectExerciseViewModel(IDataService<Exercise> exerciseDataService, 
-            TrainingDataService trainingDataService, string blockId)
+        public SelectExerciseViewModel(TrainingDataService trainingDataService,
+            IDataService<Exercise> exerciseDataService, SelectExerciseParameter param)
         {
-            _exerciseDataService =  exerciseDataService;
             _trainingDataService = trainingDataService;
+            _exerciseDataService =  exerciseDataService;
 
             _allExercises = _exerciseDataService.Cache;
             UpdateExercisesWithQueryList(SearchQuery);
             
-            UpdateId(blockId);
+            UpdateParameter(param);
             _exerciseDataService.DataUpdated += ExerciseDataServiceOnDataUpdated;
         }
 
-        public void UpdateId(string blockId)
+        public void UpdateParameter(SelectExerciseParameter param)
         {
-            _currentBlock = _trainingDataService.GetBlockById(blockId);
+            _currentBlock = _trainingDataService.GetBlockById(param.BlockId);
             _currentTraining = _trainingDataService.GetDataById(_currentBlock.TrainingId);
+            _exerciseIndex = param.ExerciseIndex;
         }
 
         private void ExerciseDataServiceOnDataUpdated(IReadOnlyList<Exercise> cache)
@@ -81,7 +84,7 @@ namespace Screens.SelectExercise
 
         public void Save(string exerciseId)
         {
-            _currentBlock.AddExercise(new ExerciseInBlock(_exerciseDataService.GetDataById(exerciseId)));
+            _currentBlock.AddExercise(new ExerciseInBlock(_exerciseDataService.GetDataById(exerciseId)), _exerciseIndex);
             _currentTraining.AddOrUpdateBlock(_currentBlock);
         }
     }

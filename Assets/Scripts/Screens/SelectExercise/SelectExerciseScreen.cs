@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using Views.Components;
 
 namespace Screens.SelectExercise
 {
-    public class SelectExerciseScreen : ScreenWithViewModel<SelectExerciseViewModel>, INeedUpdateId
+    public class SelectExerciseScreen : ScreenWithViewModel<SelectExerciseViewModel>
     {
         [SerializeField] private TMP_InputField _searchInputField;
         [SerializeField] private Transform _contentParent;
@@ -31,11 +32,6 @@ namespace Screens.SelectExercise
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
 
             Refresh();
-        }
-
-        public void UpdateId(string id)
-        {
-            Vm.UpdateId(id);
         }
 
         protected override void Refresh()

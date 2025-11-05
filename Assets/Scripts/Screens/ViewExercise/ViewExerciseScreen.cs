@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseScreen : ScreenWithViewModel<ViewExerciseViewModel>, INeedUpdateId
+    public class ViewExerciseScreen : ScreenWithViewModel<ViewExerciseViewModel>
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
@@ -22,14 +23,10 @@ namespace Screens.ViewExercise
             Vm.ExerciseChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.ExerciseChanged -= MarkDirtyOrRefresh);
 
-            _editButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateExercise, Vm.ExerciseId));
+            _editButton.onClick.AddListener(() => 
+                UIController.OpenScreen(ScreenType.CreateExercise, new ExerciseIdParameter(Vm.ExerciseId)));
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
             _deleteButton.onClick.AddListener(DeleteExercise);
-        }
-        
-        public void UpdateId(string id)
-        {
-            Vm.ExerciseId = id;
         }
 
         protected override void Refresh()

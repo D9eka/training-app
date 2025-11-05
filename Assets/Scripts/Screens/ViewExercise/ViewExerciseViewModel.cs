@@ -2,11 +2,12 @@ using System;
 using System.Linq;
 using Data;
 using Models;
+using Screens.Factories.Parameters;
 using Screens.ViewModels;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseViewModel : IViewModel
+    public class ViewExerciseViewModel : IUpdatableViewModel<ExerciseIdParameter>
     {
         private readonly IDataService<Exercise> _exerciseDataService;
 
@@ -32,13 +33,17 @@ namespace Screens.ViewExercise
 
         public ViewExerciseViewModel(
             IDataService<Exercise> exerciseDataService,
-            string exerciseId)
+            ExerciseIdParameter param)
         {
-            _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
-            ExerciseId = exerciseId ?? throw new ArgumentException("Exercise ID cannot be null or empty", nameof(exerciseId));
-
+            _exerciseDataService = exerciseDataService;
+            UpdateParameter(param);
             _exerciseDataService.DataUpdated += _ => Load();
             Load();
+        }
+
+        public void UpdateParameter(ExerciseIdParameter param)
+        {
+            ExerciseId = param.ExerciseId;
         }
 
         private void Load()

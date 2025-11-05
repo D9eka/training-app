@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using Screens.ViewExercise;
 using TMPro;
 using UnityEngine;
@@ -10,7 +11,7 @@ using Views.Components;
 
 namespace Screens.ViewTraining
 {
-    public class ViewTrainingScreen : ScreenWithViewModel<ViewTrainingViewModel>, INeedUpdateId
+    public class ViewTrainingScreen : ScreenWithViewModel<ViewTrainingViewModel>
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
@@ -30,14 +31,10 @@ namespace Screens.ViewTraining
             Vm.TrainingChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.TrainingChanged -= MarkDirtyOrRefresh);
 
-            _editButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateTraining, Vm.TrainingId));
+            _editButton.onClick.AddListener(() => 
+                UIController.OpenScreen(ScreenType.CreateTraining, new TrainingIdParameter(Vm.TrainingId)));
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
             _deleteButton.onClick.AddListener(DeleteTraining);
-        }
-        
-        public void UpdateId(string id)
-        {
-            Vm.TrainingId = id;
         }
 
         protected override void Refresh()

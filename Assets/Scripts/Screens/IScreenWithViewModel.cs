@@ -1,10 +1,11 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.ViewModels;
 
 namespace Screens
 {
     public interface IScreenWithViewModel
     {
-        Task InitializeWithViewModel(object viewModel, UiController uiController, object parameter = null);
+        Task InitializeWithViewModel(IViewModel viewModel, UiController uiController, object parameter = null);
     }
 }

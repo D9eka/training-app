@@ -4,11 +4,12 @@ using System.Linq;
 using Data;
 using Models;
 using Screens.CreateExercise;
+using Screens.Factories.Parameters;
 using Screens.ViewModels;
 
 namespace Screens.CreateTraining
 {
-    public class CreateTrainingViewModel : IViewModel
+    public class CreateTrainingViewModel : IUpdatableViewModel<TrainingIdParameter>
     {
         public bool IsEditMode { get; private set; }
         
@@ -70,27 +71,21 @@ namespace Screens.CreateTraining
         public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
         public CreateTrainingViewModel(IDataService<Training> trainingDataService, 
-            IDataService<Exercise> exerciseDataService, string trainingId)
+            IDataService<Exercise> exerciseDataService, TrainingIdParameter param)
         {
             _trainingDataService =  trainingDataService;
             _exerciseDataService = exerciseDataService;
-            UpdateId(trainingId);
+            UpdateParameter(param);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
 
-        public void UpdateId(string trainingId)
+        public void UpdateParameter(TrainingIdParameter param)
         {
-            _currentTraining = GetTrainingById(trainingId);
+            IsEditMode = param != null;
+            EditModeChanged?.Invoke(IsEditMode);
+            _currentTraining = param != null ? _trainingDataService.GetDataById(param.TrainingId) : new Training();
             TrainingId = _currentTraining.Id;
             Load();
-        }
-
-        private Training GetTrainingById(string trainingId)
-        {
-            Training training = _trainingDataService.GetDataById(trainingId);
-            IsEditMode = training != null;
-            EditModeChanged?.Invoke(IsEditMode);
-            return training ?? new Training();
         }
 
         private void Load()

@@ -4,11 +4,12 @@ using System.Globalization;
 using Data;
 using Models;
 using Screens.CreateTraining;
+using Screens.Factories.Parameters;
 using Screens.ViewModels;
 
 namespace Screens.ViewTraining
 {
-    public class ViewTrainingViewModel : IViewModel
+    public class ViewTrainingViewModel : IUpdatableViewModel<TrainingIdParameter>
     {
         private readonly TrainingDataService _trainingDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
@@ -37,14 +38,19 @@ namespace Screens.ViewTraining
         public ViewTrainingViewModel(
             TrainingDataService trainingDataService,
             IDataService<Exercise> exerciseDataService,
-            string trainingId)
+            TrainingIdParameter param)
         {
-            _trainingDataService = trainingDataService ?? throw new ArgumentNullException(nameof(trainingDataService));
-            _exerciseDataService = exerciseDataService ?? throw new ArgumentNullException(nameof(exerciseDataService));
-            TrainingId = trainingId ?? throw new ArgumentException("Training ID cannot be null or empty", nameof(trainingId));
+            _trainingDataService = trainingDataService;
+            _exerciseDataService = exerciseDataService;
+            UpdateParameter(param);
 
             _trainingDataService.DataUpdated += _ => Load();
             Load();
+        }
+
+        public void UpdateParameter(TrainingIdParameter param)
+        {
+            TrainingId = param.TrainingId;
         }
 
         private void Load()

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using TMPro;
@@ -9,7 +8,7 @@ using Views.Components;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>, INeedUpdateId
+    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -20,8 +19,6 @@ namespace Screens.CreateExercise
         [SerializeField] private TMP_Text _createButtonText;
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addEquipmentButton;
-
-        private readonly List<GameObject> _spawnedItems = new();
 
         public override async Task InitializeAsync(CreateExerciseViewModel viewModel, UiController uiController, object parameter = null)
         {
@@ -48,11 +45,6 @@ namespace Screens.CreateExercise
             Refresh();
         }
 
-        public void UpdateId(string id)
-        {
-            Vm.UpdateId(id);
-        }
-
         protected override void Refresh()
         {
             _isRefreshing = true;
@@ -71,7 +63,6 @@ namespace Screens.CreateExercise
                     var go = SimplePool.Get(_equipmentPrefab.gameObject, _equipmentListParent);
                     var item = go.GetComponent<EquipmentItem>();
                     item.Setup(eq, EquipmentItem.Mode.Edit, quantity, Vm.RemoveEquipment, Vm.UpdateEquipmentQuantity);
-                    _spawnedItems.Add(go);
                 }
             }
             finally

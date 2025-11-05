@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ using Views.Components;
 
 namespace Screens.CreateBlock
 {
-    public class CreateTrainingBlockScreen : ScreenWithViewModel<CreateTrainingBlockViewModel>, INeedUpdateId
+    public class CreateTrainingBlockScreen : ScreenWithViewModel<CreateTrainingBlockViewModel>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private Transform _exerciseInBlockListParent;
@@ -65,12 +66,6 @@ namespace Screens.CreateBlock
             Refresh();
         }
 
-        public void UpdateId(string id)
-        {
-            Vm.Active = true;
-            Vm.UpdateId(id);
-        }
-
         protected override void Refresh()
         {
             _isRefreshing = true;
@@ -102,8 +97,7 @@ namespace Screens.CreateBlock
 
         private void OnCreate()
         {
-            Vm.Save();
-            Vm.Active = false;
+            Vm.OnCreate();
             UIController.CloseScreen();
         }
 
@@ -118,14 +112,15 @@ namespace Screens.CreateBlock
 
         private void OnEditExerciseClicked(string exerciseInBlockId)
         {
+            int exerciseIndex = Vm.GetExerciseIndex(exerciseInBlockId);
             Vm.RemoveExercise(exerciseInBlockId);
-            UIController.OpenScreen(ScreenType.SelectExercise, Vm.BlockId);
+            UIController.OpenScreen(ScreenType.SelectExercise, new SelectExerciseParameter(Vm.BlockId, exerciseIndex));
         }
 
         private void OnAddExercise()
         {
             Vm.Save();
-            UIController.OpenScreen(ScreenType.SelectExercise, Vm.BlockId);
+            UIController.OpenScreen(ScreenType.SelectExercise, new SelectExerciseParameter(Vm.BlockId));
             //BUG: Сбрасывается вес у существующих упражнений после добавления нового
         }
     }

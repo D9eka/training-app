@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.Installers;
 using Data;
 using Models;
+using Screens.Factories;
 using UnityEngine;
 
 namespace Core
@@ -30,17 +31,26 @@ namespace Core
             
             _screensInstaller.Install(this);
             new DataServiceInstaller().Install(this);
+
+            RegisterScreenFactories();
             
-            ViewModelFactory viewModelFactory = new ViewModelFactory
-            (
-                Resolve<IDataService<Equipment>>(),  
-                Resolve<IDataService<Exercise>>(),  
-                Resolve<TrainingDataService>()
-            );
-            Register(viewModelFactory);
-            
-            _uiController.Initialize(viewModelFactory);
+            _uiController.Initialize(Resolve<ViewModelFactory>());
             Register(_uiController);
+        }
+
+        private void RegisterScreenFactories()
+        {
+            Register(new CreateEquipmentFactory(Resolve<IDataService<Equipment>>()));
+            Register(new CreateExerciseFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
+            Register(new CreateTrainingBlockFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
+            Register(new CreateTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
+            Register(new SelectExerciseFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
+            Register(new ViewExerciseFactory(Resolve<IDataService<Exercise>>()));
+            Register(new ViewExercisesFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
+            Register(new ViewTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
+            Register(new ViewTrainingsFactory(Resolve<TrainingDataService>()));
+            
+            Register(new ViewModelFactory());
         }
 
         public void Register<T>(T service)
