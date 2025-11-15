@@ -10,7 +10,7 @@ namespace Models
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public string Name { get; set; }
         [field: SerializeField] public string Description { get; set; }
-        [field: SerializeField] public float PrepTimeSeconds { get; set; }
+        [field: SerializeField] public int PrepTimeSeconds { get; set; }
         [field: SerializeField] public List<TrainingBlock> Blocks { get; set; } = new();
 
         public Training()
@@ -18,7 +18,7 @@ namespace Models
             Id = Guid.NewGuid().ToString();
         }
 
-        public Training(string name, string description, float prepTimeSeconds) : this()
+        public Training(string name, string description, int prepTimeSeconds) : this()
         {
             Name = name;
             Description = description;

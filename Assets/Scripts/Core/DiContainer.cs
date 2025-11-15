@@ -13,6 +13,7 @@ namespace Core
     {
         [SerializeField] private ScreensInstaller _screensInstaller;
         [SerializeField] private UiController _uiController;
+        [SerializeField] private TickableManager _tickableManager;
         
         public static DiContainer Instance { get; private set; }
 
@@ -32,6 +33,7 @@ namespace Core
             _screensInstaller.Install(this);
             new DataServiceInstaller().Install(this);
 
+            Register(_tickableManager);
             RegisterScreenFactories();
             
             _uiController.Initialize(Resolve<ViewModelFactory>());
@@ -49,6 +51,9 @@ namespace Core
             Register(new ViewExercisesFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new ViewTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
             Register(new ViewTrainingsFactory(Resolve<TrainingDataService>()));
+            Register(new TimerFactory(Resolve<TrainingDataService>(), 
+                Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>(), 
+                Resolve<TickableManager>()));
             
             Register(new ViewModelFactory());
         }

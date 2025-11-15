@@ -32,7 +32,7 @@ namespace Screens.CreateTraining
         }
 
         public string Description { get; set; }
-        public float PrepTimeSeconds { get; set; }
+        public int PrepTimeSeconds { get; set; }
         private List<TrainingBlock> _trainingBlocks = new List<TrainingBlock>();
 
         public IReadOnlyList<TrainingBlockViewData> GetTrainingBlocks()

@@ -10,7 +10,6 @@ using Screens.CreateExercise;
 using Screens.CreateTraining;
 using Screens.Factories;
 using Screens.Factories.Parameters;
-using Screens.SelectExercise;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
 using Screens.ViewModels;
