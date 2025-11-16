@@ -10,6 +10,7 @@ namespace Screens.Timer
     public class TimerScreenDataCreator
     {
         private const string PREP_SCREEN_HEADER = "Подготовка";
+        private const string EXERCISE_SCREEN_HEADER = "Работа";
         private const string REST_AFTER_APPROACH_SCREEN_HEADER = "Отдых";
         private const string REST_AFTER_SET_SCREEN_HEADER = "Отдых после сета";
         private const string REST_AFTER_BLOCK_SCREEN_HEADER = "Отдых после блока";
@@ -18,15 +19,45 @@ namespace Screens.Timer
         private readonly IDataService<Equipment> _equipmentDataService;
         
         private readonly Color _prepScreenColor = Color.green;
+        private readonly Color _exerciseScreenColor = Color.softRed;
         private readonly Color _restAfterApproachScreenColor = Color.paleGreen;
         private readonly Color _restAfterSetScreenColor = Color.darkSeaGreen;
         private readonly Color _restAfterBlockScreenColor = Color.lightSeaGreen;
-        private readonly Color _exerciseScreenColor = Color.softRed;
 
-        public TimerScreenDataCreator(IDataService<Exercise> exerciseDataService, IDataService<Equipment> equipmentDataService)
+        public TimerScreenDataCreator(IDataService<Exercise> exerciseDataService, 
+            IDataService<Equipment> equipmentDataService)
         {
             _exerciseDataService = exerciseDataService;
             _equipmentDataService = equipmentDataService;
+        }
+
+        public List<TimerScreenData> CreateTimeScreens(SimpleTrainingData trainingData)
+        {
+            List<TimerScreenData> timeScreens = new List<TimerScreenData>();
+            int blockIndex = 1;
+
+            string indexText = CreateIndexText(blockIndex, 1, 1, 1);
+            timeScreens.Add(
+                CreatePrepTimeScreen(trainingData.PrepTimeSeconds, indexText));
+
+            for (int set = 0; set < trainingData.Sets; set++)
+            {
+                for (int approach = 0; approach < trainingData.Approaches; set++)
+                {
+                    indexText = CreateIndexText(blockIndex, set, approach, 1);
+                    timeScreens.Add(CreateExerciseTimeScreen(trainingData.ExerciseDurationSeconds, indexText));
+                    if (approach != trainingData.Approaches - 1)
+                    {
+                        timeScreens.Add(
+                            CreateRestAfterApproachTimeScreen(trainingData.RestAfterApproachSeconds, indexText));
+                    }
+                }
+                if (set != trainingData.Sets - 1)
+                {
+                    timeScreens.Add(CreateRestAfterSetTimeScreen(trainingData.RestAfterSetSeconds, indexText));
+                }
+            }
+            return timeScreens;
         }
 
         public List<TimerScreenData> CreateTimeScreens(Training training)
@@ -68,24 +99,21 @@ namespace Screens.Timer
             return timeScreens;
         }
 
-        private TimerScreenData CreatePrepTimeScreen(int prepTimeSeconds, string indexText)
-        {
-            int value = prepTimeSeconds;
-            TimeValueType valueType = TimeValueType.Seconds;
-            string valueTypeText = CreateValueTypeText(valueType);
-            return new TimerScreenData(
-                _prepScreenColor,
-                PREP_SCREEN_HEADER,
-                value,
-                valueType,
-                valueTypeText,
-                indexText
-            );
-        }
-
         private string CreateIndexText(int blockIndex, int set, int approach, int exerciseIndex)
         {
             return $"Блок {blockIndex + 1} Сет {set + 1} Подход {approach + 1} Упр {exerciseIndex + 1}";
+        }
+
+        private TimerScreenData CreatePrepTimeScreen(int prepTimeSeconds, string indexText)
+        {
+            return CreateScreen(_prepScreenColor, PREP_SCREEN_HEADER, prepTimeSeconds, TimeValueType.Seconds, 
+                indexText);
+        }
+        
+        private TimerScreenData CreateExerciseTimeScreen(int timeSeconds, string indexText)
+        {
+            return CreateScreen(_exerciseScreenColor, EXERCISE_SCREEN_HEADER, 
+                timeSeconds, TimeValueType.Seconds, indexText);
         }
 
         private TimerScreenData CreateExerciseTimeScreen(ExerciseInBlock exerciseInBlock, string indexText)
@@ -95,15 +123,7 @@ namespace Screens.Timer
             string header = CreateHeader(exerciseInBlock, exercise);
             int value = haveDuration ? exerciseInBlock.DurationTimeSpan.Seconds : exerciseInBlock.Repetitions;
             TimeValueType valueType = haveDuration ? TimeValueType.Seconds : TimeValueType.Repetitions;
-            string valueTypeText = CreateValueTypeText(valueType);
-            return new TimerScreenData(
-                _exerciseScreenColor,
-                header,
-                value,
-                valueType,
-                valueTypeText,
-                indexText
-            );
+            return CreateScreen(_exerciseScreenColor, header, value, valueType, indexText);
         }
 
         private string CreateHeader(ExerciseInBlock exerciseInBlock, Exercise exercise)
@@ -139,6 +159,30 @@ namespace Screens.Timer
             return equipmentStringBuilder.ToString();
         }
 
+        private TimerScreenData CreateRestAfterApproachTimeScreen(int restAfterApproachTimeSeconds, string indexText)
+        {
+            return CreateScreen(_restAfterApproachScreenColor, REST_AFTER_APPROACH_SCREEN_HEADER, 
+                restAfterApproachTimeSeconds, TimeValueType.Seconds, indexText);
+        }
+
+        private TimerScreenData CreateRestAfterSetTimeScreen(int restAfterSetTimeSeconds, string indexText)
+        {
+            return CreateScreen(_restAfterSetScreenColor, REST_AFTER_SET_SCREEN_HEADER, restAfterSetTimeSeconds,
+                TimeValueType.Seconds, indexText);
+        }
+
+        private TimerScreenData CreateRestAfterBlockTimeScreen(int restAfterBlockTimeSeconds, string indexText)
+        {
+            return CreateScreen(_restAfterBlockScreenColor, REST_AFTER_BLOCK_SCREEN_HEADER, restAfterBlockTimeSeconds,
+                TimeValueType.Seconds, indexText);
+        }
+
+        private TimerScreenData CreateScreen(Color color, string header, int value, TimeValueType valueType, string indexText)
+        {
+            string valueTypeText = CreateValueTypeText(valueType);
+            return new TimerScreenData(color, header, value, valueType, valueTypeText, indexText);
+        }
+
         private string CreateValueTypeText(TimeValueType valueType)
         {
             return valueType switch
@@ -147,51 +191,6 @@ namespace Screens.Timer
                 TimeValueType.Repetitions => "раз",
                 _ => throw new NotImplementedException($"Value type {valueType} not implemented")
             };
-        }
-
-        private TimerScreenData CreateRestAfterApproachTimeScreen(int restAfterApproachTimeSeconds, string indexText)
-        {
-            int value = restAfterApproachTimeSeconds;
-            TimeValueType valueType = TimeValueType.Seconds;
-            string valueTypeText = CreateValueTypeText(valueType);
-            return new TimerScreenData(
-                _restAfterApproachScreenColor,
-                REST_AFTER_APPROACH_SCREEN_HEADER,
-                value,
-                valueType,
-                valueTypeText,
-                indexText
-            );
-        }
-
-        private TimerScreenData CreateRestAfterSetTimeScreen(int restAfterSetTimeSeconds, string indexText)
-        {
-            int value = restAfterSetTimeSeconds;
-            TimeValueType valueType = TimeValueType.Seconds;
-            string valueTypeText = CreateValueTypeText(valueType);
-            return new TimerScreenData(
-                _restAfterSetScreenColor,
-                REST_AFTER_SET_SCREEN_HEADER,
-                value,
-                valueType,
-                valueTypeText,
-                indexText
-            );
-        }
-
-        private TimerScreenData CreateRestAfterBlockTimeScreen(int restAfterBlockTimeSeconds, string indexText)
-        {
-            int value = restAfterBlockTimeSeconds;
-            TimeValueType valueType = TimeValueType.Seconds;
-            string valueTypeText = CreateValueTypeText(valueType);
-            return new TimerScreenData(
-                _restAfterBlockScreenColor,
-                REST_AFTER_BLOCK_SCREEN_HEADER,
-                value,
-                valueType,
-                valueTypeText,
-                indexText
-            );
         }
     }
 }

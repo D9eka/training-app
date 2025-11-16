@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Screens.Timer
 {
-    public class TimerViewModel : IUpdatableViewModel<TrainingIdParameter>, ITickable
+    public class TimerViewModel : IUpdatableViewModel<TimerParameter>, ITickable
     {
         public Action ValueUpdated;
         
@@ -31,17 +31,29 @@ namespace Screens.Timer
 
         public TimerViewModel(TrainingDataService trainingDataService,
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService, TrainingIdParameter param)
+            IDataService<Equipment> equipmentDataService, TimerParameter param)
         {
             _trainingDataService = trainingDataService;
             _timerScreenDataCreator = new TimerScreenDataCreator(exerciseDataService, equipmentDataService);
             UpdateParameter(param);
         }
 
-        public void UpdateParameter(TrainingIdParameter param)
+        public void UpdateParameter(TimerParameter param)
         {
-            _currentTraining = _trainingDataService.GetDataById(param.TrainingId);
-            _timeScreens = _timerScreenDataCreator.CreateTimeScreens(_currentTraining);
+            _currentTraining = null;
+            if (param.HasTrainingId)
+            {
+                _currentTraining = _trainingDataService.GetDataById(param.TrainingId);
+                _timeScreens = _timerScreenDataCreator.CreateTimeScreens(_currentTraining);
+            }
+            else if (param.HaveSimpleTrainingData)
+            {
+                _timeScreens = _timerScreenDataCreator.CreateTimeScreens(param.SimpleTrainingData);
+            }
+            else
+            {
+                throw new NullReferenceException("Parameter has no training id or timer data!");
+            }
             SelectTimeScreen(0);
         }
 
@@ -51,6 +63,7 @@ namespace Screens.Timer
 
             _secondsLeft -= deltaTime;
             ValueText = ((int)_secondsLeft).ToString();
+            ValueUpdated?.Invoke();
         }
         
         public void OnPreviousExerciseClicked()
@@ -96,6 +109,7 @@ namespace Screens.Timer
                 _secondsLeft = currentTimerScreen.Value;
                 _isTimerEnabled = true;
             }
+            ValueUpdated?.Invoke();
         }
     }
 }

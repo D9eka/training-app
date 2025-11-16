@@ -58,6 +58,7 @@ namespace Screens.Timer
             _isRefreshing = true;
             try
             {
+                _backgroundImage.color = Vm.BackgroundColor;
                 _currentExerciseText.text = Vm.CurrentExerciseText;
                 _valueText.text = Vm.ValueText;
                 _valueTypeText.text = Vm.ValueTypeText;

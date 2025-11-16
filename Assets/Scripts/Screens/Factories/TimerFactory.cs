@@ -6,7 +6,7 @@ using Screens.Timer;
 
 namespace Screens.Factories
 {
-    public class TimerFactory : IViewModelFactory<TimerViewModel, TrainingIdParameter>
+    public class TimerFactory : IViewModelFactory<TimerViewModel, TimerParameter>
     {
         private readonly TrainingDataService _trainingService;
         private readonly IDataService<Exercise> _exerciseService;
@@ -22,7 +22,7 @@ namespace Screens.Factories
             _tickableManager = tickableManager;
         }
 
-        public TimerViewModel Create(TrainingIdParameter param)
+        public TimerViewModel Create(TimerParameter param)
         {
             TimerViewModel vm = new TimerViewModel(_trainingService, _exerciseService, _equipmentService, param);
             _tickableManager.Register(vm);
