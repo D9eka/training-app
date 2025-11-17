@@ -41,6 +41,8 @@ namespace Core
                     DiContainer.Instance.Resolve<ViewTrainingFactory>().Create(RequireParam<TrainingIdParameter>(param)),
                 [ScreenType.ViewTrainings] = param => 
                     DiContainer.Instance.Resolve<ViewTrainingsFactory>().Create(RequireParam<ExerciseIdParameter>(param)),
+                [ScreenType.StartTraining] = param =>
+                    DiContainer.Instance.Resolve<StartTrainingFactory>().Create(param),
             };
         
         public IViewModel CreateForScreen(ScreenType type, IScreenParameter param)

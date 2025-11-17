@@ -15,6 +15,7 @@ namespace Screens
         ViewTraining,
         ViewBlock,
         SelectExercise,
-        Timer
+        Timer,
+        StartTraining,
     }
 }

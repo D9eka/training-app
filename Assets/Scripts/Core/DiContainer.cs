@@ -52,6 +52,7 @@ namespace Core
             Register(new ViewExercisesFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new ViewTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
             Register(new ViewTrainingsFactory(Resolve<TrainingDataService>()));
+            Register(new StartTrainingFactory(Resolve<TrainingDataService>()));
             Register(new TimerFactory(Resolve<TrainingDataService>(), 
                 Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>(), 
                 Resolve<TickableManager>()));
