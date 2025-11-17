@@ -27,11 +27,11 @@ namespace Screens.CreateBlock
         public string BlockId { get; private set; }
 
         public int Approaches { get; set; } = 1;
-        public TimeSpan ApproachesTimeSpan { get; set; }
+        public int ApproachesDurationSeconds { get; set; }
         public int Sets { get; set; } = 1;
-        public TimeSpan RestAfterApproachTimeSpan { get; set; }
-        public TimeSpan RestAfterSetTimeSpan { get; set; }
-        public TimeSpan RestAfterBlockTimeSpan { get; set; }
+        public int RestAfterApproachSeconds { get; set; }
+        public int RestAfterSetSeconds { get; set; }
+        public int RestAfterBlockSeconds { get; set; }
         
         public bool CanSave => _exercisesInBlock.Count > 0;
 
@@ -92,7 +92,7 @@ namespace Screens.CreateBlock
                     Name = exercise.Name,
                     Equipments = equipments,
                     Repetitions = exerciseInBlock.Repetitions,
-                    DurationSeconds = exerciseInBlock.DurationTimeSpan.Seconds
+                    DurationSeconds = exerciseInBlock.DurationSeconds
                 });
             }
             return exercises;
@@ -113,11 +113,11 @@ namespace Screens.CreateBlock
         {
             _currentBlock.Exercises = _exercisesInBlock;
             _currentBlock.Approaches = Approaches;
-            _currentBlock.ApproachesTimeSpan = ApproachesTimeSpan;
+            _currentBlock.ApproachesSeconds = ApproachesDurationSeconds;
             _currentBlock.Sets = Sets;
-            _currentBlock.RestAfterApproachTimeSpan = RestAfterApproachTimeSpan;
-            _currentBlock.RestAfterSetTimeSpan = RestAfterSetTimeSpan;
-            _currentBlock.RestAfterBlockTimeSpan = RestAfterBlockTimeSpan;
+            _currentBlock.RestAfterApproachSeconds = RestAfterApproachSeconds;
+            _currentBlock.RestAfterSetSeconds = RestAfterSetSeconds;
+            _currentBlock.RestAfterBlockSeconds = RestAfterBlockSeconds;
             
             _currentTraining.AddOrUpdateBlock(_currentBlock);
             _trainingDataService.UpdateData(_currentTraining);
@@ -130,8 +130,7 @@ namespace Screens.CreateBlock
 
         public void UpdateDuration(string exerciseId, int durationSeconds)
         {
-            _exercisesInBlock.Find(ex => ex.Id == exerciseId).DurationTimeSpan = 
-                new TimeSpan(0,0, durationSeconds);
+            _exercisesInBlock.Find(ex => ex.Id == exerciseId).DurationSeconds = durationSeconds;
         }
 
         public void UpdateEquipmentWeight(string exerciseId, (string Id, float Weight, WeightType WeightType) weightData)
@@ -168,11 +167,11 @@ namespace Screens.CreateBlock
         {
             _exercisesInBlock = _currentBlock?.Exercises;
             Approaches = _currentBlock?.Approaches ?? 1;
-            ApproachesTimeSpan = _currentBlock?.ApproachesTimeSpan ?? new TimeSpan(0,0,0);
+            ApproachesDurationSeconds = _currentBlock?.ApproachesSeconds ?? 0;
             Sets = _currentBlock?.Sets ?? 1;
-            RestAfterApproachTimeSpan = _currentBlock?.RestAfterApproachTimeSpan ?? new TimeSpan(0,0,0);
-            RestAfterSetTimeSpan = _currentBlock?.RestAfterSetTimeSpan ?? new TimeSpan(0,0,0);
-            RestAfterBlockTimeSpan = _currentBlock?.RestAfterBlockTimeSpan ?? new TimeSpan(0,0,0);
+            RestAfterApproachSeconds = _currentBlock?.RestAfterApproachSeconds ?? 0;
+            RestAfterSetSeconds = _currentBlock?.RestAfterSetSeconds ?? 0;
+            RestAfterBlockSeconds = _currentBlock?.RestAfterBlockSeconds ?? 0;
             BlockChanged?.Invoke();
         }
 
@@ -183,11 +182,11 @@ namespace Screens.CreateBlock
             _exercisesInBlock = new List<ExerciseInBlock>();
             BlockId = string.Empty;
             Approaches = 1;
-            ApproachesTimeSpan = TimeSpan.Zero;
+            ApproachesDurationSeconds = 0;
             Sets = 1;
-            RestAfterApproachTimeSpan = TimeSpan.Zero;
-            RestAfterSetTimeSpan = TimeSpan.Zero;
-            RestAfterBlockTimeSpan = TimeSpan.Zero;
+            RestAfterApproachSeconds = 0;
+            RestAfterSetSeconds = 0;
+            RestAfterBlockSeconds = 0;
             BlockChanged?.Invoke();
         }
     }

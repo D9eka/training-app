@@ -11,11 +11,16 @@ namespace Models
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public List<ExerciseInBlock> Exercises { get; set; } = new();
         [field: SerializeField] public int Approaches { get; set; }
-        [field: SerializeField] public TimeSpan ApproachesTimeSpan { get; set; }
+        [field: SerializeField] public int ApproachesSeconds { get; set; }
         [field: SerializeField] public int Sets { get; set; }
-        [field: SerializeField] public TimeSpan RestAfterApproachTimeSpan { get; set; }
-        [field: SerializeField] public TimeSpan RestAfterSetTimeSpan { get; set; }
-        [field: SerializeField] public TimeSpan RestAfterBlockTimeSpan { get; set; }
+        [field: SerializeField] public int RestAfterApproachSeconds { get; set; }
+        [field: SerializeField] public int RestAfterSetSeconds { get; set; }
+        [field: SerializeField] public int RestAfterBlockSeconds { get; set; }
+
+        public TimeSpan ApproachesTimeSpan => TimeSpan.FromSeconds(ApproachesSeconds);
+        public TimeSpan RestAfterApproachTimeSpan => TimeSpan.FromSeconds(RestAfterApproachSeconds);
+        public TimeSpan RestAfterSetTimeSpan => TimeSpan.FromSeconds(RestAfterSetSeconds);
+        public TimeSpan RestAfterBlockTimeSpan => TimeSpan.FromSeconds(RestAfterBlockSeconds);
 
         public TrainingBlock(string trainingId)
         {
@@ -29,11 +34,11 @@ namespace Models
         {
             Exercises = exercises ?? new List<ExerciseInBlock>();
             Approaches = approaches;
-            ApproachesTimeSpan = approachesTimeSpan;
+            ApproachesSeconds = (int)approachesTimeSpan.TotalSeconds;
             Sets = sets;
-            RestAfterApproachTimeSpan = restAfterApproachTimeSpan;
-            RestAfterSetTimeSpan = restAfterSetTimeSpan;
-            RestAfterBlockTimeSpan = restAfterBlockTimeSpan;
+            RestAfterApproachSeconds = (int)restAfterApproachTimeSpan.TotalSeconds;
+            RestAfterSetSeconds = (int)restAfterSetTimeSpan.TotalSeconds;
+            RestAfterBlockSeconds = (int)restAfterBlockTimeSpan.TotalSeconds;
         }
 
         public void AddExercise(ExerciseInBlock exercise, int exerciseIndex = -1)

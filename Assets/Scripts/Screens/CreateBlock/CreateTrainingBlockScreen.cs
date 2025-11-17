@@ -40,22 +40,22 @@ namespace Screens.CreateBlock
             Subscribe(() => Vm.BlockChanged -= MarkDirtyOrRefresh);
             
             _approachesInputField.onValueChanged.RemoveAllListeners();
-            _approachesInputField.onValueChanged.AddListener(v => Vm.Approaches = int.Parse(v));
+            _approachesInputField.onValueChanged.AddListener(v => Vm.Approaches = ParseInt(v));
             
             _setsInputField.onValueChanged.RemoveAllListeners();
-            _setsInputField.onValueChanged.AddListener(v => Vm.Sets = int.Parse(v));
+            _setsInputField.onValueChanged.AddListener(v => Vm.Sets = ParseInt(v));
             
             _restAfterApproachSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterApproachSecondsInputField.onValueChanged.AddListener(v => 
-                Vm.RestAfterApproachTimeSpan = new TimeSpan(0,0,int.Parse(v)));
+                Vm.RestAfterApproachSeconds = ParseInt(v));
             
             _restAfterSetSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterSetSecondsInputField.onValueChanged.AddListener(v => 
-                Vm.RestAfterSetTimeSpan = new TimeSpan(0,0,int.Parse(v)));
+                Vm.RestAfterSetSeconds = ParseInt(v));
             
             _restAfterBlockSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterBlockSecondsInputField.onValueChanged.AddListener(v => 
-                Vm.RestAfterBlockTimeSpan = new TimeSpan(0,0,int.Parse(v)));
+                Vm.RestAfterBlockSeconds = ParseInt(v));
 
             _createButton.onClick.RemoveAllListeners();
             _createButton.onClick.AddListener(OnCreate);
@@ -80,9 +80,9 @@ namespace Screens.CreateBlock
                 OnCanSaveChanged(Vm.CanSave);
                 _approachesInputField.text = Vm.Approaches.ToString();
                 _setsInputField.text = Vm.Sets.ToString();
-                _restAfterApproachSecondsInputField.text = Vm.RestAfterApproachTimeSpan.TotalSeconds.ToString();
-                _restAfterSetSecondsInputField.text = Vm.RestAfterSetTimeSpan.TotalSeconds.ToString();
-                _restAfterBlockSecondsInputField.text = Vm.RestAfterBlockTimeSpan.TotalSeconds.ToString();
+                _restAfterApproachSecondsInputField.text = Vm.RestAfterApproachSeconds.ToString();
+                _restAfterSetSecondsInputField.text = Vm.RestAfterSetSeconds.ToString();
+                _restAfterBlockSecondsInputField.text = Vm.RestAfterBlockSeconds.ToString();
                 
                 foreach (Transform child in _exerciseInBlockListParent)
                     if (child.TryGetComponent(out ExerciseInBlockItem _))
@@ -129,6 +129,11 @@ namespace Screens.CreateBlock
             Vm.Save();
             UIController.OpenScreen(ScreenType.SelectExercise, new SelectExerciseParameter(Vm.BlockId));
             //BUG: Сбрасывается вес у существующих упражнений после добавления нового
+        }
+
+        private int ParseInt(string value)
+        {
+            return int.TryParse(value, out int result) ? result : 0;
         }
     }
 }

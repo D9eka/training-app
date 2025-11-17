@@ -35,9 +35,8 @@ namespace Views.Components
 
             _nameText.text = $"Блок {transform.GetSiblingIndex()}";
             _exercisesText.text = GetExercisesText(trainingBlockViewData.ExercisesInBlockViewData);
-            _approachesText.text = $"{trainingBlockViewData.Approaches} подходов по " +
-                                   $"{trainingBlockViewData.ApproachesTimeSpan.ToRussianFormattedString()}," +
-                                   $" отдых {trainingBlockViewData.RestAfterApproachTimeSpan.ToRussianFormattedString()}";
+            _approachesText.text = $"{trainingBlockViewData.Approaches}, " +
+                                   $"отдых {trainingBlockViewData.RestAfterApproachTimeSpan.ToRussianFormattedString()}";
             _setsText.text = $"{trainingBlockViewData.Sets} сета, отдых после сета " +
                              $"{trainingBlockViewData.RestAfterSetsTimeSpan.ToRussianFormattedString()}";
             _restText.text = $"Отдых после блока " +

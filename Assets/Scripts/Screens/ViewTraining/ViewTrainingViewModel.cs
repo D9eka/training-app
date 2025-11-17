@@ -100,7 +100,6 @@ namespace Screens.ViewTraining
                     Id = block.Id,
                     ExercisesInBlockViewData = exerciseInBlockViewData,
                     Approaches = block.Approaches,
-                    ApproachesTimeSpan = block.ApproachesTimeSpan,
                     RestAfterApproachTimeSpan = block.RestAfterApproachTimeSpan,
                     Sets = block.Sets,
                     RestAfterSetsTimeSpan = block.RestAfterSetTimeSpan,

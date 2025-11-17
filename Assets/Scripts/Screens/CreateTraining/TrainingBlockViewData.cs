@@ -8,7 +8,6 @@ namespace Screens.CreateTraining
         public string Id;
         public List<ExerciseInBlockViewData> ExercisesInBlockViewData;
         public int Approaches;
-        public TimeSpan ApproachesTimeSpan;
         public TimeSpan RestAfterApproachTimeSpan;
         public int Sets;
         public TimeSpan RestAfterSetsTimeSpan;

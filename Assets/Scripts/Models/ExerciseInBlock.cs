@@ -11,7 +11,7 @@ namespace Models
         [field: SerializeField] public string ExerciseId { get; private set; }
         [field: SerializeField] public List<EquipmentInBlock> EquipmentWeights { get; set; }
         [field: SerializeField] public int Repetitions { get; set; }
-        [field: SerializeField] public TimeSpan DurationTimeSpan { get; set; }
+        [field: SerializeField] public int DurationSeconds { get; set; }
 
         public ExerciseInBlock(Exercise exercise)
         {
@@ -23,7 +23,7 @@ namespace Models
                 EquipmentWeights.Add(new EquipmentInBlock(exerciseEquipmentRef));
             }
             Repetitions = 0;
-            DurationTimeSpan = TimeSpan.Zero;
+            DurationSeconds = 0;
         }
     }
 }

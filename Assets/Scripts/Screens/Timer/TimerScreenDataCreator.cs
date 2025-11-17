@@ -83,17 +83,17 @@ namespace Screens.Timer
                         if (approach != block.Approaches - 1)
                         {
                             timeScreens.Add(
-                                CreateRestAfterApproachTimeScreen(block.RestAfterApproachTimeSpan.Seconds, indexText));
+                                CreateRestAfterApproachTimeScreen(block.RestAfterApproachSeconds, indexText));
                         }
                     }
                     if (set != block.Sets - 1)
                     {
-                        timeScreens.Add(CreateRestAfterSetTimeScreen(block.RestAfterSetTimeSpan.Seconds, indexText));
+                        timeScreens.Add(CreateRestAfterSetTimeScreen(block.RestAfterSetSeconds, indexText));
                     }
                 }
                 if (blockIndex != training.Blocks.Count - 1)
                 {
-                    timeScreens.Add(CreateRestAfterBlockTimeScreen(block.RestAfterBlockTimeSpan.Seconds, indexText));
+                    timeScreens.Add(CreateRestAfterBlockTimeScreen(block.RestAfterBlockSeconds, indexText));
                 }
             }
             return timeScreens;
@@ -119,9 +119,9 @@ namespace Screens.Timer
         private TimerScreenData CreateExerciseTimeScreen(ExerciseInBlock exerciseInBlock, string indexText)
         {
             Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.ExerciseId);
-            bool haveDuration = exerciseInBlock.DurationTimeSpan.Seconds > 0;
+            bool haveDuration = exerciseInBlock.DurationSeconds > 0;
             string header = CreateHeader(exerciseInBlock, exercise);
-            int value = haveDuration ? exerciseInBlock.DurationTimeSpan.Seconds : exerciseInBlock.Repetitions;
+            int value = haveDuration ? exerciseInBlock.DurationSeconds : exerciseInBlock.Repetitions;
             TimeValueType valueType = haveDuration ? TimeValueType.Seconds : TimeValueType.Repetitions;
             return CreateScreen(_exerciseScreenColor, header, value, valueType, indexText);
         }
