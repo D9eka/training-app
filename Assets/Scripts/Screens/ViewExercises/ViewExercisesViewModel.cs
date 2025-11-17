@@ -34,7 +34,10 @@ namespace Screens.ViewExercises
                     Id = ex.Id,
                     Name = ex.Name,
                     Equipments = ex.RequiredEquipment.Select(req =>
-                        (req.Equipment?.Name ?? "???", req.Quantity)
+                    {
+                        Equipment equipment = _equipmentDataService.GetDataById(req.EquipmentId);
+                        return (equipment?.Name ?? "???", req.Quantity);
+                    }
                     ).ToList()
                 })
                 .ToList();

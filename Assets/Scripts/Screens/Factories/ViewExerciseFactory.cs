@@ -9,15 +9,19 @@ namespace Screens.Factories
         : IViewModelFactory<ViewExerciseViewModel, ExerciseIdParameter>
     {
         private readonly IDataService<Exercise> _exerciseService;
+        private readonly IDataService<Equipment> _equipmentService;
 
-        public ViewExerciseFactory(IDataService<Exercise> exerciseService)
+        public ViewExerciseFactory(
+            IDataService<Exercise> exerciseService,
+            IDataService<Equipment> equipmentService)
         {
             _exerciseService = exerciseService;
+            _equipmentService = equipmentService;
         }
 
         public ViewExerciseViewModel Create(ExerciseIdParameter param)
         {
-            return new ViewExerciseViewModel(_exerciseService, param);
+            return new ViewExerciseViewModel(_exerciseService, _equipmentService, param);
         }
     }
 }

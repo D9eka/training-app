@@ -30,16 +30,22 @@ namespace Models
         public void AddOrUpdateEquipment(Equipment equipment, int quantity)
         {
             if (equipment == null) return;
+            AddOrUpdateEquipment(equipment.Id, quantity);
+        }
 
-            RequiredEquipment.RemoveAll(r => r.Equipment.Id == equipment.Id);
+        public void AddOrUpdateEquipment(string equipmentId, int quantity)
+        {
+            if (string.IsNullOrEmpty(equipmentId)) return;
+
+            RequiredEquipment.RemoveAll(r => r.EquipmentId == equipmentId);
 
             if (quantity > 0)
-                RequiredEquipment.Add(new ExerciseEquipmentRef(equipment, quantity));
+                RequiredEquipment.Add(new ExerciseEquipmentRef(equipmentId, quantity));
         }
 
         public void RemoveEquipment(string equipmentId)
         {
-            RequiredEquipment.RemoveAll(r => r.Equipment.Id == equipmentId);
+            RequiredEquipment.RemoveAll(r => r.EquipmentId == equipmentId);
         }
     }
 }

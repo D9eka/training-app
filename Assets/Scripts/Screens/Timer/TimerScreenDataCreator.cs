@@ -144,12 +144,17 @@ namespace Screens.Timer
         {
             StringBuilder equipmentStringBuilder = new StringBuilder();
             ExerciseEquipmentRef equipmentRef = equipmentInBlock.Equipment;
-            Equipment equipment = equipmentRef.Equipment;
+            Equipment equipment = _equipmentDataService.GetDataById(equipmentRef.EquipmentId);
+            if (equipment == null)
+            {
+                equipmentStringBuilder.Append("??");
+                return equipmentStringBuilder.ToString();
+            }
             if (equipment.HasQuantity)
             {
                 equipmentStringBuilder.Append($"{equipmentRef.Quantity}x ");
             }
-            equipmentStringBuilder.Append(equipment.Name); //TODO: Заменить на _equipmentDataService.GetDataById(...)
+            equipmentStringBuilder.Append(equipment.Name);
             if (equipment.HasWeight)
             {
                 equipmentStringBuilder.Append($" {equipmentInBlock.Weight} {equipmentInBlock.WeightType}");

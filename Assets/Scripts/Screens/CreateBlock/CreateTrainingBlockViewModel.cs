@@ -14,6 +14,7 @@ namespace Screens.CreateBlock
         
         private readonly TrainingDataService _trainingDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
+        private readonly IDataService<Equipment> _equipmentDataService;
     
         private Training _currentTraining;
         private TrainingBlock _currentBlock;
@@ -35,10 +36,13 @@ namespace Screens.CreateBlock
         public bool CanSave => _exercisesInBlock.Count > 0;
 
         public CreateTrainingBlockViewModel(TrainingDataService trainingDataService, 
-            IDataService<Exercise> exerciseDataService, CreateTrainingBlockParameter param)
+            IDataService<Exercise> exerciseDataService,
+            IDataService<Equipment> equipmentDataService,
+            CreateTrainingBlockParameter param)
         {
             _trainingDataService =  trainingDataService;
             _exerciseDataService = exerciseDataService;
+            _equipmentDataService = equipmentDataService;
             UpdateParameter(param);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
@@ -61,19 +65,22 @@ namespace Screens.CreateBlock
             foreach (var exerciseInBlock in _exercisesInBlock)
             {
                 Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.ExerciseId);
+                if (exercise == null)
+                    continue;
 
                 var equipments = new List<EquipmentInBlockViewData>();
                 foreach (var eq in exercise.RequiredEquipment)
                 {
+                    Equipment equipment = _equipmentDataService.GetDataById(eq.EquipmentId);
                     EquipmentInBlock equipmentInBlock = exerciseInBlock.EquipmentWeights?
-                        .Find(e => e.Equipment.Equipment.Id == eq.Equipment.Id);
+                        .Find(e => e.Equipment.EquipmentId == eq.EquipmentId);
 
                     equipments.Add(new EquipmentInBlockViewData
                     {
-                        Id = eq.Equipment.Id,
-                        Name = eq.Equipment.Name,
+                        Id = eq.EquipmentId,
+                        Name = equipment?.Name ?? "???",
                         Quantity = eq.Quantity,
-                        NeedWeight = eq.Equipment.HasWeight,
+                        NeedWeight = equipment?.HasWeight ?? false,
                         Weight = equipmentInBlock != null ? (int)equipmentInBlock.Weight : 0,
                         WeightType = equipmentInBlock != null ? equipmentInBlock.WeightType : WeightType.Kg
                     });
@@ -129,8 +136,16 @@ namespace Screens.CreateBlock
 
         public void UpdateEquipmentWeight(string exerciseId, (string Id, float Weight, WeightType WeightType) weightData)
         {
-            EquipmentInBlock eq = _exercisesInBlock.Find(ex => ex.Id == exerciseId).EquipmentWeights
-                .Find(eqW => eqW.Equipment.Equipment.Id == weightData.Id);
+            var exercise = _exercisesInBlock.Find(ex => ex.Id == exerciseId);
+            if (exercise == null) return;
+
+            var weights = exercise.EquipmentWeights ??= new List<EquipmentInBlock>();
+            var eq = weights.Find(eqW => eqW.Equipment.EquipmentId == weightData.Id);
+            if (eq == null)
+            {
+                eq = new EquipmentInBlock(new ExerciseEquipmentRef(weightData.Id, 0));
+                weights.Add(eq);
+            }
             eq.Weight = weightData.Weight;
             eq.WeightType = weightData.WeightType;
         }

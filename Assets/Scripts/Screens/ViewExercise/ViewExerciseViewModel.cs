@@ -9,6 +9,7 @@ namespace Screens.ViewExercise
     public class ViewExerciseViewModel : IUpdatableViewModel<ExerciseIdParameter>
     {
         private readonly IDataService<Exercise> _exerciseDataService;
+        private readonly IDataService<Equipment> _equipmentDataService;
 
         private string _exerciseId;
         private Exercise _currentExercise;
@@ -32,9 +33,11 @@ namespace Screens.ViewExercise
 
         public ViewExerciseViewModel(
             IDataService<Exercise> exerciseDataService,
+            IDataService<Equipment> equipmentDataService,
             ExerciseIdParameter param)
         {
             _exerciseDataService = exerciseDataService;
+            _equipmentDataService = equipmentDataService;
             UpdateParameter(param);
             _exerciseDataService.DataUpdated += _ => Load();
             Load();
@@ -75,7 +78,7 @@ namespace Screens.ViewExercise
 
             var equipmentList = _currentExercise.RequiredEquipment.Select(r =>
             {
-                var eq = r.Equipment;
+                Equipment eq = _equipmentDataService.GetDataById(r.EquipmentId);
                 return $"{(eq?.Name ?? "??")} x{r.Quantity}";
             });
 

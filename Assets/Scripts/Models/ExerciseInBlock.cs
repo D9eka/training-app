@@ -20,10 +20,7 @@ namespace Models
             EquipmentWeights = new List<EquipmentInBlock>();
             foreach (ExerciseEquipmentRef exerciseEquipmentRef in exercise.RequiredEquipment)
             {
-                if (exerciseEquipmentRef.Equipment.HasWeight)
-                {
-                    EquipmentWeights.Add(new EquipmentInBlock(exerciseEquipmentRef));
-                }
+                EquipmentWeights.Add(new EquipmentInBlock(exerciseEquipmentRef));
             }
             Repetitions = 0;
             DurationTimeSpan = TimeSpan.Zero;

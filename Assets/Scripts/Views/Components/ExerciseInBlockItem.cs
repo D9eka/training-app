@@ -26,7 +26,6 @@ namespace Views.Components
 
         private ExerciseInBlockViewData _exerciseInBlockViewData;
         private string _id;
-        private List<EquipmentWeightRow> _weights = new List<EquipmentWeightRow>();
         
         private Action<string> _onClickEditById;
         private Action<string> _onClickDeleteById;
@@ -34,8 +33,8 @@ namespace Views.Components
         private Action<string, int> _onChangeDuration;
         private Action<string, (string Id, float Weight, WeightType WeightType)> _onChangeEquipmentWeight;
 
-        public void Setup(ExerciseInBlockViewData exerciseInBlockViewData, Action<string> onClickEdit, Action<string> onClickDelete, 
-            Action<string, int> onChangeRepetitions, Action<string, int> onChangeDuration, 
+        public void Setup(ExerciseInBlockViewData exerciseInBlockViewData, Action<string> onClickEdit, 
+            Action<string> onClickDelete, Action<string, int> onChangeRepetitions, Action<string, int> onChangeDuration, 
             Action<string, (string Id, float Weight, WeightType WeightType)> onChangeEquipmentWeight)
         {
             _exerciseInBlockViewData = exerciseInBlockViewData;
@@ -85,7 +84,6 @@ namespace Views.Components
 
         private void SetupWeights(List<EquipmentInBlockViewData> equipmentsInExerciseInBlockViewData)
         {
-            _weights.Clear();
             foreach (Transform t in _weightRowParent)
             {
                 SimplePool.Return(t.gameObject, _weightRowPrefab.gameObject);
@@ -98,7 +96,6 @@ namespace Views.Components
                 EquipmentWeightRow equipmentWeightRow = 
                     SimplePool.Get(_weightRowPrefab.gameObject, _weightRowParent).GetComponent<EquipmentWeightRow>();
                 equipmentWeightRow.Setup(equipmentInBlockViewData, OnChangeEquipmentWeight);
-                _weights.Add(equipmentWeightRow);
             }
             _weightRowParent.gameObject.SetActive(_weightRowParent.transform.childCount > 0);
         }

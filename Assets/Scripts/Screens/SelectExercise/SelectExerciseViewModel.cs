@@ -13,6 +13,7 @@ namespace Screens.SelectExercise
     {
         private readonly TrainingDataService _trainingDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
+        private readonly IDataService<Equipment> _equipmentDataService;
         private string _searchQuery = string.Empty;
     
         private Training _currentTraining;
@@ -35,10 +36,13 @@ namespace Screens.SelectExercise
         public List<ExerciseViewData> ExercisesWithQuery { get; private set; }
 
         public SelectExerciseViewModel(TrainingDataService trainingDataService,
-            IDataService<Exercise> exerciseDataService, SelectExerciseParameter param)
+            IDataService<Exercise> exerciseDataService,
+            IDataService<Equipment> equipmentDataService,
+            SelectExerciseParameter param)
         {
             _trainingDataService = trainingDataService;
             _exerciseDataService =  exerciseDataService;
+            _equipmentDataService = equipmentDataService;
 
             _allExercises = _exerciseDataService.Cache;
             UpdateExercisesWithQueryList(SearchQuery);
@@ -75,14 +79,17 @@ namespace Screens.SelectExercise
             {
                 if (exercise.Name.ToLower().Contains(searchQuery.ToLower()))
                 {
-                    ExercisesWithQuery.Add(new ExerciseViewData
-                    {
-                        Id = exercise.Id,
-                        Name = exercise.Name,
-                        Equipments = exercise.RequiredEquipment.Select(req =>
-                            (req.Equipment?.Name ?? "???", req.Quantity)
-                        ).ToList()
-                    });
+                        ExercisesWithQuery.Add(new ExerciseViewData
+                        {
+                            Id = exercise.Id,
+                            Name = exercise.Name,
+                            Equipments = exercise.RequiredEquipment.Select(req =>
+                            {
+                                Equipment equipment = _equipmentDataService.GetDataById(req.EquipmentId);
+                                return (equipment?.Name ?? "???", req.Quantity);
+                            }
+                            ).ToList()
+                        });
                 }
             }
             ExercisesWithQueryUpdated?.Invoke();

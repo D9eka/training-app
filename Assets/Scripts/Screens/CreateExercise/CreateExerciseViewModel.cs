@@ -54,7 +54,7 @@ namespace Screens.CreateExercise
         public void UpdateEquipmentQuantity(Equipment eq, int quantity)
         {
             if (eq == null) return;
-            var existing = RequiredEquipment.Find(r => r.Equipment == eq);
+            var existing = RequiredEquipment.Find(r => r.EquipmentId == eq.Id);
             if (quantity <= 0)
             {
                 if (existing != null) RequiredEquipment.Remove(existing);
@@ -70,7 +70,7 @@ namespace Screens.CreateExercise
         public void RemoveEquipment(Equipment eq)
         {
             if (eq == null) return;
-            RequiredEquipment.RemoveAll(r => r.Equipment == eq);
+            RequiredEquipment.RemoveAll(r => r.EquipmentId == eq.Id);
             _equipmentDataService.RemoveData(eq.Id);
         }
 
@@ -80,7 +80,7 @@ namespace Screens.CreateExercise
             _currentExercise.Name = Name;
             _currentExercise.Description = Description;
             foreach (var r in RequiredEquipment.ToArray())
-                _currentExercise.AddOrUpdateEquipment(r.Equipment, r.Quantity);
+                _currentExercise.AddOrUpdateEquipment(r.EquipmentId, r.Quantity);
             if (IsEditMode)
             {
                 _exerciseDataService.UpdateData(_currentExercise);
@@ -95,7 +95,7 @@ namespace Screens.CreateExercise
 
         public int GetQuantity(string eqId)
         {
-            return RequiredEquipment.Find(r => r.Equipment.Id == eqId)?.Quantity ?? 0;
+            return RequiredEquipment.Find(r => r.EquipmentId == eqId)?.Quantity ?? 0;
         }
 
         private void Load()

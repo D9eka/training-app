@@ -45,10 +45,10 @@ namespace Core
             Register(new MainFactory(Resolve<TrainingDataService>()));
             Register(new CreateEquipmentFactory(Resolve<IDataService<Equipment>>()));
             Register(new CreateExerciseFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
-            Register(new CreateTrainingBlockFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
+            Register(new CreateTrainingBlockFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new CreateTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
-            Register(new SelectExerciseFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
-            Register(new ViewExerciseFactory(Resolve<IDataService<Exercise>>()));
+            Register(new SelectExerciseFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
+            Register(new ViewExerciseFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new ViewExercisesFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new ViewTrainingFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));
             Register(new ViewTrainingsFactory(Resolve<TrainingDataService>()));
