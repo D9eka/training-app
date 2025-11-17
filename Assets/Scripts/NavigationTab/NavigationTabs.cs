@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Core;
 using Screens;
+using Screens.Factories.Parameters;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,6 +50,7 @@ namespace NavigationTab
             for (int i = 0; i < _tabs.Length; i++)
             {
                 int tabIndex = i;
+                _tabs[i].Button.onClick.RemoveAllListeners();
                 _tabs[i].Button.onClick.AddListener(() => OpenTab(tabIndex));
                 DiContainer.Instance.ResolveNamed(_tabs[i].Type.ToString()).SetActive(false);
             }
@@ -72,7 +74,8 @@ namespace NavigationTab
                 foreach (NavigationTab tab in _tabs)
                     DiContainer.Instance.ResolveNamed(tab.Type.ToString()).SetActive(tab == CurrentTab);
 
-                _uiController.OpenScreen(CurrentTab.Type);
+                IScreenParameter param = CreateScreenParameter(CurrentTab.Type);
+                _uiController.OpenScreen(CurrentTab.Type, param, true);
             }
             catch (Exception ex)
             {
@@ -82,6 +85,14 @@ namespace NavigationTab
             {
                 _isSwitching = false;
             }
+        }
+
+        private IScreenParameter CreateScreenParameter(ScreenType currentTabType)
+        {
+            return currentTabType switch
+            {
+                _ => null
+            };
         }
 
         private void OnDestroy()

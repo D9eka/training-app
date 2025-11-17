@@ -42,6 +42,7 @@ namespace Core
 
         private void RegisterScreenFactories()
         {
+            Register(new MainFactory(Resolve<TrainingDataService>()));
             Register(new CreateEquipmentFactory(Resolve<IDataService<Equipment>>()));
             Register(new CreateExerciseFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new CreateTrainingBlockFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>()));

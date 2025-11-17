@@ -12,10 +12,14 @@ namespace Models
         [field: SerializeField] public string Description { get; set; }
         [field: SerializeField] public int PrepTimeSeconds { get; set; }
         [field: SerializeField] public List<TrainingBlock> Blocks { get; set; } = new();
+        [field: SerializeField] public TimeSpan Duration { get; set; }
+        [field: SerializeField] public DateTime LastTime { get; set; }
 
         public Training()
         {
             Id = Guid.NewGuid().ToString();
+            Duration = new TimeSpan(1, 0, 0);
+            LastTime = DateTime.Now;
         }
 
         public Training(string name, string description, int prepTimeSeconds) : this()

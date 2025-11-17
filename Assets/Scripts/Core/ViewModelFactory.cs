@@ -21,6 +21,8 @@ namespace Core
         private readonly Dictionary<ScreenType, Func<IScreenParameter, IViewModel>> _creators =
             new Dictionary<ScreenType, Func<IScreenParameter, IViewModel>>
             {
+                [ScreenType.Main] = param =>
+                    DiContainer.Instance.Resolve<MainFactory>().Create(param),
                 [ScreenType.CreateEquipment] = param => 
                     DiContainer.Instance.Resolve<CreateEquipmentFactory>().Create(param),
                 [ScreenType.CreateExercise] = param => 
