@@ -10,7 +10,7 @@ namespace Models
         [field: SerializeField] public string Id { get; private set; }
         [field: SerializeField] public string Name { get; set; }
         [field: SerializeField] public string Description { get; set; } = string.Empty;
-        [field: SerializeField] public List<ExerciseEquipmentRef> RequiredEquipment { get; } = new();
+        [field: SerializeField] public List<ExerciseEquipmentRef> RequiredEquipment { get; set; } = new();
         
         // TODO: Функция для упражнений с одной рукой: добавить тип повторения:
         // ПО (кол-во левой, кол-во правой; сделать указанное значение левой, сделать указанное значение правой),
