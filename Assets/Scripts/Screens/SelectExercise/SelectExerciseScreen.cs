@@ -9,7 +9,7 @@ using Views.Components;
 
 namespace Screens.SelectExercise
 {
-    public class SelectExerciseScreen : ScreenWithViewModel<SelectExerciseViewModel>
+    public class SelectExerciseScreen : ScreenWithUpdatableViewModel<SelectExerciseViewModel, SelectExerciseParameter>
     {
         [SerializeField] private TMP_InputField _searchInputField;
         [SerializeField] private Transform _contentParent;

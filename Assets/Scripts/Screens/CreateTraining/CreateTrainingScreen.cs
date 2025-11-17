@@ -11,7 +11,7 @@ using Views.Components;
 
 namespace Screens.CreateTraining
 {
-    public class CreateTrainingScreen : ScreenWithViewModel<CreateTrainingViewModel>
+    public class CreateTrainingScreen : ScreenWithUpdatableViewModel<CreateTrainingViewModel, TrainingIdParameter>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -91,7 +91,7 @@ namespace Screens.CreateTraining
 
         private void OnCreate()
         {
-            Vm.Save();
+            Vm.OnCreate();
             UIController.CloseScreen();
         }
 
@@ -109,14 +109,16 @@ namespace Screens.CreateTraining
 
         private void OnAddBlockClicked()
         {
+            string trainingId = Vm.TrainingId;
             Vm.Save();
-            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(Vm.TrainingId));
+            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(trainingId));
         }
 
         private void OnBlockClicked(string blockId)
         {
+            string trainingId = Vm.TrainingId;
             Vm.Save();
-            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(Vm.TrainingId, blockId));
+            UIController.OpenScreen(ScreenType.CreateBlock, new CreateTrainingBlockParameter(trainingId, blockId));
         }
     }
 }

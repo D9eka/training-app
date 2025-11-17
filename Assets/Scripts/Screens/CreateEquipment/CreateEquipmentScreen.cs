@@ -14,11 +14,12 @@ namespace Screens.CreateEquipment
         [SerializeField] private Button _saveButton;
         [SerializeField] private Button _backButton;
 
-        public override async Task InitializeAsync(CreateEquipmentViewModel viewModel, UiController uiController, object parameter = null)
+        public override async Task InitializeAsync(CreateEquipmentViewModel viewModel, UiController uiController, 
+            object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 
-            Vm.CanSaveChanged += MarkDirtyOrRefresh;
+            Vm.DataUpdated += MarkDirtyOrRefresh;
             
             _nameInput.text = Vm.Name;
             _hasQuantity.isOn = Vm.HasQuantity;
@@ -36,6 +37,8 @@ namespace Screens.CreateEquipment
 
             _backButton.onClick.RemoveAllListeners();
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
+            
+            Refresh();
         }
 
         protected override void Refresh()
@@ -43,6 +46,9 @@ namespace Screens.CreateEquipment
             _isRefreshing = true;
             try
             {
+                _nameInput.text = Vm.Name;
+                _hasQuantity.isOn = Vm.HasQuantity;
+                _hasWeight.isOn = Vm.HasWeight;
                 _saveButton.interactable = Vm.CanSave;
             }
             finally

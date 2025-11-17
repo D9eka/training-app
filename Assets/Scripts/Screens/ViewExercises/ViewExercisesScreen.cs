@@ -14,7 +14,8 @@ namespace Screens.ViewExercises
         [SerializeField] private ExerciseItem _exerciseItemPrefab;
         [SerializeField] private Button _createButton;
 
-        public override async Task InitializeAsync(ViewExercisesViewModel viewModel, UiController uiController, object parameter = null)
+        public override async Task InitializeAsync(ViewExercisesViewModel viewModel, UiController uiController, 
+            object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 

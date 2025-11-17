@@ -12,6 +12,7 @@ namespace Screens.Timer
     {
         public Action ValueUpdated;
         
+        private readonly UiController _uiController;
         private readonly TrainingDataService _trainingDataService;
         private readonly TimerScreenDataCreator _timerScreenDataCreator;
     
@@ -31,10 +32,11 @@ namespace Screens.Timer
 
         public TimerViewModel(TrainingDataService trainingDataService,
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService, TimerParameter param)
+            IDataService<Equipment> equipmentDataService, UiController uiController, TimerParameter param)
         {
             _trainingDataService = trainingDataService;
             _timerScreenDataCreator = new TimerScreenDataCreator(exerciseDataService, equipmentDataService);
+            _uiController = uiController;
             UpdateParameter(param);
         }
 
@@ -62,16 +64,19 @@ namespace Screens.Timer
             if (!_isTimerEnabled) return;
 
             _secondsLeft -= deltaTime;
+            if (_secondsLeft <= 1)
+            {
+                OnNextExerciseClicked();
+                return;
+            }
             ValueText = ((int)_secondsLeft).ToString();
             ValueUpdated?.Invoke();
         }
         
         public void OnPreviousExerciseClicked()
         {
-            if (_timeScreenIndex > 0)
-            {
-                SelectTimeScreen(_timeScreenIndex - 1);
-            }
+            int prevIndex = _timeScreenIndex - (_timeScreenIndex > 0 ? 1 : 0);
+            SelectTimeScreen(prevIndex);
         }
 
         public void OnPauseExerciseClicked()
@@ -85,6 +90,10 @@ namespace Screens.Timer
             {
                 SelectTimeScreen(_timeScreenIndex + 1);
             }
+            else
+            {
+                _uiController.CloseScreen();
+            }
         }
 
         private void SelectTimeScreen(int index)
@@ -97,18 +106,18 @@ namespace Screens.Timer
         {
             TimerScreenData currentTimerScreen = _timeScreens[_timeScreenIndex];
             BackgroundColor = currentTimerScreen.Color;
+            
             CurrentExerciseText = currentTimerScreen.CurrentExerciseHeader;
             ValueText = currentTimerScreen.Value.ToString();
             ValueTypeText = currentTimerScreen.ValueTypeText;
             NextExerciseText = _timeScreenIndex < _timeScreens.Count - 1 ? 
                 _timeScreens[_timeScreenIndex + 1].CurrentExerciseHeader : "";
             CurrentExerciseIndexText = currentTimerScreen.IndexText;
-
-            if (currentTimerScreen.ValueType == TimeValueType.Seconds)
-            {
-                _secondsLeft = currentTimerScreen.Value;
-                _isTimerEnabled = true;
-            }
+            
+            bool isSeconds = currentTimerScreen.ValueType == TimeValueType.Seconds;
+            _isTimerEnabled = isSeconds;
+            _secondsLeft = isSeconds ? currentTimerScreen.Value + 1 : 0;
+            
             ValueUpdated?.Invoke();
         }
     }

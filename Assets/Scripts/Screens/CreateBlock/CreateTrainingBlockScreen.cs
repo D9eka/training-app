@@ -11,7 +11,7 @@ using Views.Components;
 
 namespace Screens.CreateBlock
 {
-    public class CreateTrainingBlockScreen : ScreenWithViewModel<CreateTrainingBlockViewModel>
+    public class CreateTrainingBlockScreen : ScreenWithUpdatableViewModel<CreateTrainingBlockViewModel, CreateTrainingBlockParameter>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private Transform _exerciseInBlockListParent;
@@ -34,20 +34,26 @@ namespace Screens.CreateBlock
             await base.InitializeAsync(viewModel, uiController, parameter);
 
             Vm.EditModeChanged += OnEditModeChanged;
-            Vm.CanSaveChanged += OnCanSaveChanged;
             Vm.BlockChanged += MarkDirtyOrRefresh;
 
             Subscribe(() => Vm.EditModeChanged -= OnEditModeChanged);
-            Subscribe(() => Vm.CanSaveChanged -= OnCanSaveChanged);
             Subscribe(() => Vm.BlockChanged -= MarkDirtyOrRefresh);
             
-            
+            _approachesInputField.onValueChanged.RemoveAllListeners();
             _approachesInputField.onValueChanged.AddListener(v => Vm.Approaches = int.Parse(v));
+            
+            _setsInputField.onValueChanged.RemoveAllListeners();
             _setsInputField.onValueChanged.AddListener(v => Vm.Sets = int.Parse(v));
+            
+            _restAfterApproachSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterApproachSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterApproachTimeSpan = new TimeSpan(0,0,int.Parse(v)));
+            
+            _restAfterSetSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterSetSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterSetTimeSpan = new TimeSpan(0,0,int.Parse(v)));
+            
+            _restAfterBlockSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterBlockSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterBlockTimeSpan = new TimeSpan(0,0,int.Parse(v)));
 
@@ -71,6 +77,7 @@ namespace Screens.CreateBlock
             _isRefreshing = true;
             try
             {
+                OnCanSaveChanged(Vm.CanSave);
                 _approachesInputField.text = Vm.Approaches.ToString();
                 _setsInputField.text = Vm.Sets.ToString();
                 _restAfterApproachSecondsInputField.text = Vm.RestAfterApproachTimeSpan.TotalSeconds.ToString();

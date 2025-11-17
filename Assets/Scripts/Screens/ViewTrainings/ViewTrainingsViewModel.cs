@@ -26,14 +26,7 @@ namespace Screens.ViewTrainings
         private void Load(IReadOnlyList<Training> allTrainings)
         {
             Trainings = allTrainings
-                .Select(ex => new TrainingViewData
-                {
-                    Id = ex.Id,
-                    Name = ex.Name,
-                    ExerciseCount = ex.Blocks.Sum(b => b.Exercises.Count),
-                    Duration = new TimeSpan(1, 0, 0),
-                    LastTime = DateTime.Today
-                })
+                .Select(training => new TrainingViewData(training))
                 .ToList();
 
             TrainingsChanged?.Invoke();

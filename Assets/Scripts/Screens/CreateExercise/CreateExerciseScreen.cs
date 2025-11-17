@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,7 +9,7 @@ using Views.Components;
 
 namespace Screens.CreateExercise
 {
-    public class CreateExerciseScreen : ScreenWithViewModel<CreateExerciseViewModel>
+    public class CreateExerciseScreen : ScreenWithUpdatableViewModel<CreateExerciseViewModel, ExerciseIdParameter>
     {
         [SerializeField] private TMP_Text _header;
         [SerializeField] private TMP_InputField _nameInput;
@@ -32,11 +33,19 @@ namespace Screens.CreateExercise
             Subscribe(() => Vm.CanSaveChanged -= OnCanSaveChanged);
             Subscribe(() => Vm.EquipmentsChanged -= MarkDirtyOrRefresh);
 
+            _nameInput.onValueChanged.RemoveAllListeners();
             _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
+
+            _descInput.onValueChanged.RemoveAllListeners();
             _descInput.onValueChanged.AddListener(v => Vm.Description = v);
 
+            _createButton.onClick.RemoveAllListeners();
             _createButton.onClick.AddListener(OnCreate);
+
+            _backButton.onClick.RemoveAllListeners();
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
+
+            _addEquipmentButton.onClick.RemoveAllListeners();
             _addEquipmentButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.CreateEquipment));
 
             OnEditModeChanged(Vm.IsEditMode);

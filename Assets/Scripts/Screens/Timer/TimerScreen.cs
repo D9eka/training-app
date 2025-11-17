@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Core;
+using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Screens.Timer
 {
-    public class TimerScreen : ScreenWithViewModel<TimerViewModel>
+    public class TimerScreen : ScreenWithUpdatableViewModel<TimerViewModel, TimerParameter>
     {
         [SerializeField] private Image _backgroundImage;
         [Space]

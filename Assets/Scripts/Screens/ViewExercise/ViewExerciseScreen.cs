@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace Screens.ViewExercise
 {
-    public class ViewExerciseScreen : ScreenWithViewModel<ViewExerciseViewModel>
+    public class ViewExerciseScreen : ScreenWithUpdatableViewModel<ViewExerciseViewModel, ExerciseIdParameter>
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;
@@ -23,10 +23,17 @@ namespace Screens.ViewExercise
             Vm.ExerciseChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.ExerciseChanged -= MarkDirtyOrRefresh);
 
+            _editButton.onClick.RemoveAllListeners();
             _editButton.onClick.AddListener(() => 
                 UIController.OpenScreen(ScreenType.CreateExercise, new ExerciseIdParameter(Vm.ExerciseId)));
+            
+            _backButton.onClick.RemoveAllListeners();
             _backButton.onClick.AddListener(() => UIController.CloseScreen());
+            
+            _deleteButton.onClick.RemoveAllListeners();
             _deleteButton.onClick.AddListener(DeleteExercise);
+            
+            Refresh();
         }
 
         protected override void Refresh()

@@ -17,6 +17,7 @@ namespace Screens.SelectExercise
     
         private Training _currentTraining;
         private TrainingBlock _currentBlock;
+        private IReadOnlyList<Exercise> _allExercises;
         private int _exerciseIndex;
 
         public event Action ExercisesWithQueryUpdated;
@@ -31,8 +32,6 @@ namespace Screens.SelectExercise
                 UpdateExercisesWithQueryList(_searchQuery);
             }
         }
-
-        private IReadOnlyList<Exercise> _allExercises;
         public List<ExerciseViewData> ExercisesWithQuery { get; private set; }
 
         public SelectExerciseViewModel(TrainingDataService trainingDataService,
@@ -55,11 +54,18 @@ namespace Screens.SelectExercise
             _exerciseIndex = param.ExerciseIndex;
         }
 
+        public void Save(string exerciseId)
+        {
+            _currentBlock.AddExercise(new ExerciseInBlock(_exerciseDataService.GetDataById(exerciseId)), _exerciseIndex);
+            _currentTraining.AddOrUpdateBlock(_currentBlock);
+            _trainingDataService.UpdateData(_currentTraining);
+            Clear();
+        }
+
         private void ExerciseDataServiceOnDataUpdated(IReadOnlyList<Exercise> cache)
         {
             _allExercises = cache;
             UpdateExercisesWithQueryList(SearchQuery);
-            ExercisesWithQueryUpdated?.Invoke();
         }
 
         private void UpdateExercisesWithQueryList(string searchQuery)
@@ -82,10 +88,14 @@ namespace Screens.SelectExercise
             ExercisesWithQueryUpdated?.Invoke();
         }
 
-        public void Save(string exerciseId)
+        private void Clear()
         {
-            _currentBlock.AddExercise(new ExerciseInBlock(_exerciseDataService.GetDataById(exerciseId)), _exerciseIndex);
-            _currentTraining.AddOrUpdateBlock(_currentBlock);
+            _currentTraining = null;
+            _currentBlock = null;
+            _exerciseIndex = -1;
+            _allExercises = new List<Exercise>();
+            SearchQuery = string.Empty;
+            ExercisesWithQueryUpdated?.Invoke();
         }
     }
 }

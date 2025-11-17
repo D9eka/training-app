@@ -10,6 +10,8 @@ using Screens.CreateExercise;
 using Screens.CreateTraining;
 using Screens.Factories;
 using Screens.Factories.Parameters;
+using Screens.StartTraining;
+using Screens.Timer;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
 using Screens.ViewModels;
@@ -43,6 +45,8 @@ namespace Core
                     DiContainer.Instance.Resolve<ViewTrainingsFactory>().Create(RequireParam<ExerciseIdParameter>(param)),
                 [ScreenType.StartTraining] = param =>
                     DiContainer.Instance.Resolve<StartTrainingFactory>().Create(param),
+                [ScreenType.Timer]  = param =>
+                    DiContainer.Instance.Resolve<TimerFactory>().Create(RequireParam<TimerParameter>(param))
             };
         
         public IViewModel CreateForScreen(ScreenType type, IScreenParameter param)

@@ -34,10 +34,10 @@ namespace Screens.ViewTrainings
                 foreach (Transform t in _contentParent)
                     SimplePool.Return(t.gameObject, _trainingItemPrefab.gameObject);
 
-                foreach (var trainingViewData in Vm.Trainings)
+                foreach (TrainingViewData trainingViewData in Vm.Trainings)
                 {
                     GameObject go = SimplePool.Get(_trainingItemPrefab.gameObject, _contentParent);
-                    var item = go.GetComponent<TrainingItem>();
+                    TrainingItem item = go.GetComponent<TrainingItem>();
                     item.Setup(trainingViewData, OnTrainingClicked);
                 }
             }

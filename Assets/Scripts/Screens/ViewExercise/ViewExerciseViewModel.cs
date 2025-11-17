@@ -3,7 +3,6 @@ using System.Linq;
 using Data;
 using Models;
 using Screens.Factories.Parameters;
-using Screens.ViewModels;
 
 namespace Screens.ViewExercise
 {

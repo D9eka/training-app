@@ -17,5 +17,6 @@ namespace Screens
         SelectExercise,
         Timer,
         StartTraining,
+        CreateSimpleTraining
     }
 }

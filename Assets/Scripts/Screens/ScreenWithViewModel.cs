@@ -9,6 +9,7 @@ namespace Screens
         where TViewModel : class, IViewModel
     {
         public TViewModel Vm { get; private set; }
+        public IViewModel IVm => Vm;
         protected UiController UIController;
 
         public virtual async Task InitializeAsync(TViewModel viewModel, UiController uiController, object parameter = null)

@@ -7,10 +7,10 @@ namespace Screens.CreateEquipment
 {
     public class CreateEquipmentViewModel: IViewModel
     {
+        public event Action DataUpdated;
+        
         private readonly IDataService<Equipment> _equipmentDataService;
         private string _name = string.Empty;
-
-        public event Action CanSaveChanged;
 
         public string Name
         {
@@ -18,7 +18,7 @@ namespace Screens.CreateEquipment
             set
             {
                 _name = value ?? string.Empty;
-                CanSaveChanged?.Invoke();
+                DataUpdated?.Invoke();
             }
         }
 
@@ -38,6 +38,15 @@ namespace Screens.CreateEquipment
             if (!CanSave) return;
             Equipment eq = new Equipment(Name.Trim(), HasQuantity, HasWeight);
             _equipmentDataService.AddData(eq);
+            Clear();
+        }
+
+        private void Clear()
+        {
+            Name =  string.Empty;
+            HasQuantity = false;
+            HasWeight = false;
+            DataUpdated?.Invoke();
         }
     }
 }

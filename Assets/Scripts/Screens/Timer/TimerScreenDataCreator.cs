@@ -42,7 +42,7 @@ namespace Screens.Timer
 
             for (int set = 0; set < trainingData.Sets; set++)
             {
-                for (int approach = 0; approach < trainingData.Approaches; set++)
+                for (int approach = 0; approach < trainingData.Approaches; approach++)
                 {
                     indexText = CreateIndexText(blockIndex, set, approach, 1);
                     timeScreens.Add(CreateExerciseTimeScreen(trainingData.ExerciseDurationSeconds, indexText));
@@ -73,12 +73,12 @@ namespace Screens.Timer
                 TrainingBlock block = training.Blocks[blockIndex];
                 for (int set = 0; set < block.Sets; set++)
                 {
-                    for (int approach = 0; approach < block.Approaches; set++)
+                    for (int approach = 0; approach < block.Approaches; approach++)
                     {
                         for (int exerciseIndex = 0; exerciseIndex < block.Exercises.Count; exerciseIndex++)
                         {
                             indexText = CreateIndexText(blockIndex, set, approach, exerciseIndex);
-                            timeScreens.Add(CreateExerciseTimeScreen(block.Exercises[exerciseIndex],indexText));
+                            timeScreens.Add(CreateExerciseTimeScreen(block.Exercises[exerciseIndex], indexText));
                         }
                         if (approach != block.Approaches - 1)
                         {
@@ -118,8 +118,8 @@ namespace Screens.Timer
 
         private TimerScreenData CreateExerciseTimeScreen(ExerciseInBlock exerciseInBlock, string indexText)
         {
-            Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.Id);
-            bool haveDuration = exerciseInBlock.DurationTimeSpan.Seconds >= 0;
+            Exercise exercise = _exerciseDataService.GetDataById(exerciseInBlock.ExerciseId);
+            bool haveDuration = exerciseInBlock.DurationTimeSpan.Seconds > 0;
             string header = CreateHeader(exerciseInBlock, exercise);
             int value = haveDuration ? exerciseInBlock.DurationTimeSpan.Seconds : exerciseInBlock.Repetitions;
             TimeValueType valueType = haveDuration ? TimeValueType.Seconds : TimeValueType.Repetitions;

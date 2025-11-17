@@ -11,7 +11,7 @@ using Views.Components;
 
 namespace Screens.ViewTraining
 {
-    public class ViewTrainingScreen : ScreenWithViewModel<ViewTrainingViewModel>
+    public class ViewTrainingScreen : ScreenWithUpdatableViewModel<ViewTrainingViewModel, TrainingIdParameter>
     {
         [SerializeField] private TMP_Text _nameText;
         [SerializeField] private TMP_Text _descriptionText;

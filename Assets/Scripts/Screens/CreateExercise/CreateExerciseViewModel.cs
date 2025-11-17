@@ -48,26 +48,7 @@ namespace Screens.CreateExercise
             IsEditMode = param != null;
             EditModeChanged?.Invoke(IsEditMode);
             _currentExercise = param != null ? _exerciseDataService.GetDataById(param.ExerciseId) : new Exercise();
-            RequiredEquipment = _currentExercise.RequiredEquipment;
             Load();
-        }
-
-        private void Load()
-        {
-            Name = _currentExercise.Name;
-            Description = _currentExercise.Description;
-            LoadEquipments();
-        }
-
-        private void LoadEquipments()
-        {
-            AllEquipments = _equipmentDataService.Cache;
-            EquipmentsChanged?.Invoke();
-        }
-
-        private void EquipmentDataServiceOnDataUpdated(IReadOnlyList<Equipment> cache)
-        {
-            EquipmentsChanged?.Invoke();
         }
 
         public void UpdateEquipmentQuantity(Equipment eq, int quantity)
@@ -100,7 +81,6 @@ namespace Screens.CreateExercise
             _currentExercise.Description = Description;
             foreach (var r in RequiredEquipment.ToArray())
                 _currentExercise.AddOrUpdateEquipment(r.Equipment, r.Quantity);
-
             if (IsEditMode)
             {
                 _exerciseDataService.UpdateData(_currentExercise);
@@ -109,11 +89,41 @@ namespace Screens.CreateExercise
             {
                 _exerciseDataService.AddData(_currentExercise);
             }
+
+            Clear();
         }
 
         public int GetQuantity(string eqId)
         {
             return RequiredEquipment.Find(r => r.Equipment.Id == eqId)?.Quantity ?? 0;
+        }
+
+        private void Load()
+        {
+            Name = _currentExercise.Name;
+            Description = _currentExercise.Description;
+            LoadEquipments();
+        }
+
+        private void LoadEquipments()
+        {
+            AllEquipments = _equipmentDataService.Cache;
+            RequiredEquipment = _currentExercise.RequiredEquipment;
+            EquipmentsChanged?.Invoke();
+        }
+
+        private void EquipmentDataServiceOnDataUpdated(IReadOnlyList<Equipment> cache)
+        {
+            EquipmentsChanged?.Invoke();
+        }
+
+        private void Clear()
+        {
+            _currentExercise = null;
+            Name = string.Empty;
+            Description = string.Empty;
+            AllEquipments = new List<Equipment>();
+            RequiredEquipment = new List<ExerciseEquipmentRef>();
         }
     }
 }

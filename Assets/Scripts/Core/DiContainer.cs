@@ -32,12 +32,12 @@ namespace Core
             
             _screensInstaller.Install(this);
             new DataServiceInstaller().Install(this);
-
+            
+            Register(_uiController);
             Register(_tickableManager);
             RegisterScreenFactories();
             
             _uiController.Initialize(Resolve<ViewModelFactory>());
-            Register(_uiController);
         }
 
         private void RegisterScreenFactories()
@@ -55,7 +55,7 @@ namespace Core
             Register(new StartTrainingFactory(Resolve<TrainingDataService>()));
             Register(new TimerFactory(Resolve<TrainingDataService>(), 
                 Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>(), 
-                Resolve<TickableManager>()));
+                Resolve<UiController>(),Resolve<TickableManager>()));
             
             Register(new ViewModelFactory());
         }
