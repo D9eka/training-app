@@ -14,7 +14,7 @@ namespace NavigationTab
         public class NavigationTab
         {
             public ScreenType Type;
-            public Button Button;
+            public NavigationButton Button;
         }
 
         [SerializeField] private NavigationTab[] _tabs;
@@ -27,7 +27,7 @@ namespace NavigationTab
 
         private NavigationTab CurrentTab => _tabs[_currentTabIndex];
 
-        private void Awake()
+        private void Start()
         {
             if (_tabs == null || _tabs.Length == 0)
                 throw new InvalidOperationException("Tabs array is empty or null");
@@ -67,10 +67,10 @@ namespace NavigationTab
             try
             {
                 if (_currentTabIndex >= 0 && _currentTabIndex < _tabs.Length)
-                    CurrentTab.Button.interactable = true;
+                    CurrentTab.Button.SetActive(false);
 
                 _currentTabIndex = tabIndex;
-                CurrentTab.Button.interactable = false;
+                CurrentTab.Button.SetActive(true);
                 foreach (NavigationTab tab in _tabs)
                     DiContainer.Instance.ResolveNamed(tab.Type.ToString()).SetActive(tab == CurrentTab);
 
