@@ -18,11 +18,11 @@ namespace Screens.Timer
         private readonly IDataService<Exercise> _exerciseDataService;
         private readonly IDataService<Equipment> _equipmentDataService;
         
-        private readonly Color _prepScreenColor = Color.green;
-        private readonly Color _exerciseScreenColor = Color.softRed;
-        private readonly Color _restAfterApproachScreenColor = Color.paleGreen;
-        private readonly Color _restAfterSetScreenColor = Color.darkSeaGreen;
-        private readonly Color _restAfterBlockScreenColor = Color.lightSeaGreen;
+        private readonly Color _prepScreenColor = new Color32(254, 247, 255, 255);
+        private readonly Color _exerciseScreenColor = new Color32(255, 152, 184, 255);
+        private readonly Color _restAfterApproachScreenColor = new Color32(234, 221, 255, 255);
+        private readonly Color _restAfterSetScreenColor = new Color32(244, 228, 255, 255);
+        private readonly Color _restAfterBlockScreenColor = new Color32(208, 188, 255, 255);
 
         public TimerScreenDataCreator(IDataService<Exercise> exerciseDataService, 
             IDataService<Equipment> equipmentDataService)
