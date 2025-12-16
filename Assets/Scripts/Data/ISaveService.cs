@@ -16,5 +16,6 @@ namespace Data
         List<Equipment> EquipmentsCache { get; }
         List<Exercise> ExercisesCache { get; }
         List<Training> TrainingsCache { get; }
+        List<WeightTracking> WeightsCache { get; }
     }
 }

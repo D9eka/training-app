@@ -12,6 +12,7 @@ namespace Data
         public List<Equipment> EquipmentsCache => _cache.Equipments;
         public List<Exercise> ExercisesCache =>  _cache.Exercises;
         public List<Training> TrainingsCache => _cache.Trainings;
+        public List<WeightTracking> WeightsCache => _cache.Weights;
         
         private const string FileName = "appData.json";
         private readonly string _filePath;

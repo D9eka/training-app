@@ -6,6 +6,12 @@ namespace Screens.ViewTrainings
 {
     public class TrainingViewData
     {
+        public string Id;
+        public string Name;
+        public int ExerciseCount;
+        public TimeSpan Duration;
+        public DateTime LastTime;
+        
         public TrainingViewData(string id, string name, int exerciseCount, TimeSpan duration, DateTime lastTime)
         {
             Id = id;
@@ -23,11 +29,5 @@ namespace Screens.ViewTrainings
             training.LastTime)
         {
         }
-
-        public string Id;
-        public string Name;
-        public int ExerciseCount;
-        public TimeSpan Duration;
-        public DateTime LastTime;
     }
 }

@@ -42,7 +42,7 @@ namespace Core
 
         private void RegisterScreenFactories()
         {
-            Register(new MainFactory(Resolve<TrainingDataService>()));
+            Register(new MainFactory(Resolve<TrainingDataService>(), Resolve<IDataService<WeightTracking>>()));
             Register(new CreateEquipmentFactory(Resolve<IDataService<Equipment>>()));
             Register(new CreateExerciseFactory(Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
             Register(new CreateTrainingBlockFactory(Resolve<TrainingDataService>(), Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>()));
@@ -56,6 +56,8 @@ namespace Core
             Register(new TimerFactory(Resolve<TrainingDataService>(), 
                 Resolve<IDataService<Exercise>>(), Resolve<IDataService<Equipment>>(), 
                 Resolve<UiController>(),Resolve<TickableManager>()));
+            Register(new WeightTrackerFactory(Resolve<IDataService<WeightTracking>>()));
+            Register(new AddWeightFactory(Resolve<IDataService<WeightTracking>>()));
             
             Register(new ViewModelFactory());
         }

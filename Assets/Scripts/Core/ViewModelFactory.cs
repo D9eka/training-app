@@ -46,7 +46,11 @@ namespace Core
                 [ScreenType.StartTraining] = param =>
                     DiContainer.Instance.Resolve<StartTrainingFactory>().Create(param),
                 [ScreenType.Timer]  = param =>
-                    DiContainer.Instance.Resolve<TimerFactory>().Create(RequireParam<TimerParameter>(param))
+                    DiContainer.Instance.Resolve<TimerFactory>().Create(RequireParam<TimerParameter>(param)),
+                [ScreenType.WeightTracker]  = param =>
+                    DiContainer.Instance.Resolve<WeightTrackerFactory>().Create(param),
+                [ScreenType.AddWeight]  = param =>
+                    DiContainer.Instance.Resolve<AddWeightFactory>().Create(param)
             };
         
         public IViewModel CreateForScreen(ScreenType type, IScreenParameter param)

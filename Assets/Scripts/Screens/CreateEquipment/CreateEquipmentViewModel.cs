@@ -5,7 +5,7 @@ using Screens.ViewModels;
 
 namespace Screens.CreateEquipment
 {
-    public class CreateEquipmentViewModel: IViewModel
+    public class CreateEquipmentViewModel : IViewModel
     {
         public event Action DataUpdated;
         

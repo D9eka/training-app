@@ -27,8 +27,10 @@ namespace Screens.CreateEquipment
 
             _nameInput.onValueChanged.RemoveAllListeners();
             _nameInput.onValueChanged.AddListener(v => Vm.Name = v);
+            
             _hasQuantity.onValueChanged.RemoveAllListeners();
             _hasQuantity.onValueChanged.AddListener(v => Vm.HasQuantity = v);
+            
             _hasWeight.onValueChanged.RemoveAllListeners();
             _hasWeight.onValueChanged.AddListener(v => Vm.HasWeight = v);
 

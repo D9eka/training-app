@@ -14,7 +14,7 @@ namespace Models
         public Equipment(string name, bool hasQuantity = false, bool hasWeight = false)
         {
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Name cannot be empty", nameof(name));
+                throw new ArgumentException("Weight cannot be empty", nameof(name));
 
             Id = Guid.NewGuid().ToString();
             Name = name;
@@ -24,7 +24,7 @@ namespace Models
 
         public void SetName(string name)
         {
-            Name = name ?? throw new ArgumentException("Name cannot be empty", nameof(name));
+            Name = name ?? throw new ArgumentException("Weight cannot be empty", nameof(name));
         }
     }
 }

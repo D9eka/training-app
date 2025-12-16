@@ -9,9 +9,11 @@ namespace Data
         private readonly IDataService<Equipment> _equipmentDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
         private readonly IDataService<Training> _trainingDataService;
+        private readonly IDataService<WeightTracking> _weightTrackingDataService;
         
         public DataService(ISaveService saveService, IDataService<Equipment> equipmentDataService, 
-            IDataService<Exercise> exerciseDataService, IDataService<Training> trainingDataService)
+            IDataService<Exercise> exerciseDataService, IDataService<Training> trainingDataService, 
+            IDataService<WeightTracking> weightTrackingDataService)
         {
             _saveService = saveService;
             
@@ -25,6 +27,10 @@ namespace Data
             
             _trainingDataService = trainingDataService;
             _trainingDataService.DataUpdated += list => _saveService.Commit();
+            
+            _weightTrackingDataService = weightTrackingDataService;
+            _weightTrackingDataService.DataUpdated += list => _saveService.Commit();
+            _weightTrackingDataService.DataRemoved += TryDeleteEquipmentInExercises;
         }
 
         private void TryDeleteEquipmentInExercises(string equipmentId)

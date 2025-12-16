@@ -12,8 +12,11 @@ namespace Screens.Main
     public class MainScreen : ScreenWithUpdatableViewModel<MainViewModel, IScreenParameter>
     {
         [SerializeField] private Button _startTrainingButton;
+        [SerializeField] private Button _addWeightButton;
+        [SerializeField] private Button _openWeightTrackerButton;
         [SerializeField] private Transform _lastTrainingsParent;
         [SerializeField] private TrainingItem _trainingItemPrefab;
+        [SerializeField] private AreaGraph _areaGraph;
         
         public override async Task InitializeAsync(MainViewModel viewModel, UiController uiController, object parameter = null)
         {
@@ -25,6 +28,12 @@ namespace Screens.Main
             
             _startTrainingButton.onClick.RemoveAllListeners();
             _startTrainingButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.StartTraining));
+            
+            _addWeightButton.onClick.RemoveAllListeners();
+            _addWeightButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.AddWeight));
+            
+            _openWeightTrackerButton.onClick.RemoveAllListeners();
+            _openWeightTrackerButton.onClick.AddListener(() => UIController.OpenScreen(ScreenType.WeightTracker));
             
             Refresh();
         }
@@ -43,6 +52,8 @@ namespace Screens.Main
                     TrainingItem item = go.GetComponent<TrainingItem>();
                     item.Setup(trainingViewData, OnTrainingClicked);
                 }
+                
+                _areaGraph.SetValues(Vm.WeekWeights);
             }
             finally
             {

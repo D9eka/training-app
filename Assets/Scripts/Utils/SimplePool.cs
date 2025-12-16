@@ -30,6 +30,7 @@ namespace Utils
         {
             if (obj == null || prefab == null) return;
             obj.SetActive(false);
+            obj.transform.SetParent(null);
             if (!_pools.TryGetValue(prefab, out Stack<GameObject> stack))
             {
                 stack = new Stack<GameObject>();
