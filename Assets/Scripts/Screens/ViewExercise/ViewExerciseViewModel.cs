@@ -1,13 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Models;
 using Screens.Factories.Parameters;
+using Screens.ViewTrainings;
 
 namespace Screens.ViewExercise
 {
     public class ViewExerciseViewModel : IUpdatableViewModel<ExerciseIdParameter>
     {
+        private readonly IDataService<Training> _trainingDataService;
         private readonly IDataService<Exercise> _exerciseDataService;
         private readonly IDataService<Equipment> _equipmentDataService;
 
@@ -28,14 +31,15 @@ namespace Screens.ViewExercise
         public string ExerciseDescription { get; private set; }
         public string EquipmentsText { get; private set; }
         public bool IsNotFound { get; private set; }
+        public List<TrainingViewData> UsingInTrainings { get; private set; } = new List<TrainingViewData>();
 
         public event Action ExerciseChanged;
 
-        public ViewExerciseViewModel(
-            IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService,
+        public ViewExerciseViewModel(IDataService<Training> trainingDataService, 
+            IDataService<Exercise> exerciseDataService, IDataService<Equipment> equipmentDataService, 
             ExerciseIdParameter param)
         {
+            _trainingDataService = trainingDataService;
             _exerciseDataService = exerciseDataService;
             _equipmentDataService = equipmentDataService;
             UpdateParameter(param);
@@ -59,10 +63,7 @@ namespace Screens.ViewExercise
         {
             if (_currentExercise == null)
             {
-                IsNotFound = true;
-                ExerciseName = "Упражнение не найдено";
-                ExerciseDescription = "";
-                EquipmentsText = "";
+                Clear();
                 return;
             }
 
@@ -70,10 +71,29 @@ namespace Screens.ViewExercise
             ExerciseName = _currentExercise.Name;
             ExerciseDescription = $"Описание: {_currentExercise.Description}";
 
+            EquipmentsText = GetEquipmentsText();
+            UsingInTrainings = GetUsingIsTrainings();
+        }
+
+        public void DeleteExercise()
+        {
+            _exerciseDataService.RemoveData(ExerciseId);
+        }
+
+        private void Clear()
+        {
+            IsNotFound = true;
+            ExerciseName = "Упражнение не найдено";
+            ExerciseDescription = "";
+            EquipmentsText = "";
+            UsingInTrainings = new List<TrainingViewData>();
+        }
+
+        private string GetEquipmentsText()
+        {
             if (_currentExercise.RequiredEquipment == null || _currentExercise.RequiredEquipment.Count == 0)
             {
-                EquipmentsText = "Без оборудования";
-                return;
+                return "Без оборудования";
             }
 
             var equipmentList = _currentExercise.RequiredEquipment.Select(r =>
@@ -82,12 +102,19 @@ namespace Screens.ViewExercise
                 return $"{(eq?.Name ?? "??")} x{r.Quantity}";
             });
 
-            EquipmentsText = $"Нужно: {string.Join(", ", equipmentList)}";
+            return $"Нужно: {string.Join(", ", equipmentList)}";
         }
 
-        public void DeleteExercise()
+        private List<TrainingViewData> GetUsingIsTrainings()
         {
-            _exerciseDataService.RemoveData(ExerciseId);
+            return _trainingDataService.Cache
+                .Where(training =>
+                    training.Blocks.Any(block =>
+                        block.Exercises.Any(ex => ex.ExerciseId == ExerciseId)
+                    )
+                )
+                .Select(training => new TrainingViewData(training))
+                .ToList();
         }
     }
 }
