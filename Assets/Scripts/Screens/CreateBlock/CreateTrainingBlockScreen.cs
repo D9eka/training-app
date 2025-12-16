@@ -38,21 +38,26 @@ namespace Screens.CreateBlock
 
             Subscribe(() => Vm.EditModeChanged -= OnEditModeChanged);
             Subscribe(() => Vm.BlockChanged -= MarkDirtyOrRefresh);
-            
+
+            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _approachesInputField.onValueChanged.RemoveAllListeners();
             _approachesInputField.onValueChanged.AddListener(v => Vm.Approaches = ParseInt(v));
             
+            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _setsInputField.onValueChanged.RemoveAllListeners();
             _setsInputField.onValueChanged.AddListener(v => Vm.Sets = ParseInt(v));
             
+            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterApproachSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterApproachSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterApproachSeconds = ParseInt(v));
             
+            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterSetSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterSetSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterSetSeconds = ParseInt(v));
             
+            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterBlockSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterBlockSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterBlockSeconds = ParseInt(v));
