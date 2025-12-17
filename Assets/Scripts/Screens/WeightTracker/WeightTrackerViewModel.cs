@@ -13,6 +13,8 @@ namespace Screens.WeightTracker
         
         public IReadOnlyList<WeightItemViewData> Weights { get; private set; }
         public List<float> GraphValues { get; private set; } = new List<float>();
+
+        private GraphMode _currentGraphMode;
         
         public event Action WeightsChanged;
         public event Action GraphDataChanged;
@@ -41,11 +43,13 @@ namespace Screens.WeightTracker
                 weightsView.Add(new WeightItemViewData(weights[i], i < weights.Count - 1 ? weights[i + 1] : null));
             }
             Weights = weightsView;
+            UpdateGraphData(_currentGraphMode);
             WeightsChanged?.Invoke();
         }
 
         public void UpdateGraphData(GraphMode mode)
         {
+            _currentGraphMode = mode;
             IReadOnlyList<WeightTracking> weightData = _weightTrackingDataService.Cache;
             GraphValues = new List<float>();
 
@@ -54,13 +58,13 @@ namespace Screens.WeightTracker
 
             IEnumerable<WeightTracking> filtered;
 
-            if (mode == GraphMode.All)
+            if (_currentGraphMode == GraphMode.All)
             {
                 filtered = weightData;
             }
             else
             {
-                int days = mode switch
+                int days = _currentGraphMode switch
                 {
                     GraphMode.Weekly => 7,
                     GraphMode.Monthly => 30,
