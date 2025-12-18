@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using Screens.Factories.Parameters;
@@ -18,9 +19,13 @@ namespace Screens.Main
         [SerializeField] private TrainingItem _trainingItemPrefab;
         [SerializeField] private AreaGraph _areaGraph;
         
+        private ItemsGroup<TrainingItem> _trainingItemsGroup;
+        
         public override async Task InitializeAsync(MainViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _trainingItemsGroup = new ItemsGroup<TrainingItem>(_lastTrainingsParent, _trainingItemPrefab);
 
             Vm.DataUpdated += MarkDirtyOrRefresh;
             
@@ -43,14 +48,10 @@ namespace Screens.Main
             _isRefreshing = true;
             try
             {
-                foreach (TrainingItem t in _lastTrainingsParent.GetComponentsInChildren<TrainingItem>())
-                    SimplePool.Return(t.gameObject, _trainingItemPrefab.gameObject);
-
-                foreach (TrainingViewData trainingViewData in Vm.LastTrainings)
+                List<TrainingItem> items = _trainingItemsGroup.Refresh(Vm.LastTrainings.Count);
+                for (int i = 0; i < Vm.LastTrainings.Count; i++)
                 {
-                    GameObject go = SimplePool.Get(_trainingItemPrefab.gameObject, _lastTrainingsParent);
-                    TrainingItem item = go.GetComponent<TrainingItem>();
-                    item.Setup(trainingViewData, OnTrainingClicked);
+                    items[i].Setup(Vm.LastTrainings[i], OnTrainingClicked);
                 }
                 
                 _areaGraph.SetValues(Vm.WeekWeights);

@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
+using Models;
 using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
@@ -20,11 +22,15 @@ namespace Screens.CreateExercise
         [SerializeField] private TMP_Text _createButtonText;
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addEquipmentButton;
+        
+        private ItemsGroup<EquipmentItem> _equipmentItemsGroup;
 
         public override async Task InitializeAsync(CreateExerciseViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
 
+            _equipmentItemsGroup = new ItemsGroup<EquipmentItem>(_equipmentListParent, _equipmentPrefab);
+            
             Vm.EditModeChanged += OnEditModeChanged;
             Vm.CanSaveChanged += OnCanSaveChanged;
             Vm.EquipmentsChanged += MarkDirtyOrRefresh;
@@ -62,16 +68,12 @@ namespace Screens.CreateExercise
                 _nameInput.text = Vm.Name;
                 _descInput.text = Vm.Description;
                 
-                foreach (Transform child in _equipmentListParent)
-                    if (child.TryGetComponent(out EquipmentItem _))
-                        SimplePool.Return(child.gameObject, _equipmentPrefab.gameObject);
-
-                foreach (var eq in Vm.AllEquipments)
+                List<EquipmentItem> items = _equipmentItemsGroup.Refresh(Vm.AllEquipments.Count);
+                for (int i = 0; i < Vm.AllEquipments.Count; i++)
                 {
+                    Equipment eq = Vm.AllEquipments[i];
                     int quantity = Vm.GetQuantity(eq.Id);
-                    var go = SimplePool.Get(_equipmentPrefab.gameObject, _equipmentListParent);
-                    var item = go.GetComponent<EquipmentItem>();
-                    item.Setup(eq, EquipmentItem.Mode.Edit, quantity, Vm.RemoveEquipment, Vm.UpdateEquipmentQuantity);
+                    items[i].Setup(eq, EquipmentItem.Mode.Edit, quantity, Vm.RemoveEquipment, Vm.UpdateEquipmentQuantity);
                 }
             }
             finally

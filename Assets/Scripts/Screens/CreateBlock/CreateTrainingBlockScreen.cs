@@ -27,11 +27,16 @@ namespace Screens.CreateBlock
         [SerializeField] private TMP_Text _createButtonText;
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addExerciseInBlockButton;
+        
+        private ItemsGroup<ExerciseInBlockItem> _exerciseInBlockItemsGroup;
 
         public override async Task InitializeAsync(CreateTrainingBlockViewModel viewModel, UiController uiController, 
             object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _exerciseInBlockItemsGroup =
+                new ItemsGroup<ExerciseInBlockItem>(_exerciseInBlockListParent, _exerciseInBlockPrefab);
 
             Vm.EditModeChanged += OnEditModeChanged;
             Vm.BlockChanged += MarkDirtyOrRefresh;
@@ -88,16 +93,12 @@ namespace Screens.CreateBlock
                 _restAfterApproachSecondsInputField.text = Vm.RestAfterApproachSeconds.ToString();
                 _restAfterSetSecondsInputField.text = Vm.RestAfterSetSeconds.ToString();
                 _restAfterBlockSecondsInputField.text = Vm.RestAfterBlockSeconds.ToString();
-                
-                foreach (Transform child in _exerciseInBlockListParent)
-                    if (child.TryGetComponent(out ExerciseInBlockItem _))
-                        SimplePool.Return(child.gameObject, _exerciseInBlockPrefab.gameObject);
 
-                foreach (var ex in Vm.GetExercises())
+                IReadOnlyList<ExerciseInBlockViewData> exercises = Vm.GetExercises();
+                List<ExerciseInBlockItem> items = _exerciseInBlockItemsGroup.Refresh(exercises.Count);
+                for (int i = 0; i < exercises.Count; i++)
                 {
-                    var go = SimplePool.Get(_exerciseInBlockPrefab.gameObject, _exerciseInBlockListParent);
-                    var item = go.GetComponent<ExerciseInBlockItem>();
-                    item.Setup(ex, OnEditExerciseClicked, Vm.RemoveExercise, 
+                    items[i].Setup(exercises[i], OnEditExerciseClicked, Vm.RemoveExercise, 
                         Vm.UpdateRepetition, Vm.UpdateDuration, Vm.UpdateEquipmentWeight);
                 }
             }

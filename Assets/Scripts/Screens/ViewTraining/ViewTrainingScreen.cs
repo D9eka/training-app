@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
+using Screens.CreateTraining;
 using Screens.Factories.Parameters;
 using Screens.ViewExercise;
 using TMPro;
@@ -23,10 +24,14 @@ namespace Screens.ViewTraining
         [SerializeField] private Button _editButton;
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _deleteButton;
+        
+        private ItemsGroup<TrainingBlockItem> _trainingBlockItemsGroup;
 
         public override async Task InitializeAsync(ViewTrainingViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+            
+            _trainingBlockItemsGroup = new ItemsGroup<TrainingBlockItem>(_blockListParent, _trainingBlockPrefab);
 
             Vm.TrainingChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.TrainingChanged -= MarkDirtyOrRefresh);
@@ -45,16 +50,12 @@ namespace Screens.ViewTraining
                 _nameText.text = Vm.TrainingName;
                 _descriptionText.text = Vm.TrainingDescription;
                 _prepTimeText.text = Vm.PrepTimeText;
-                
-                foreach (Transform child in _blockListParent)
-                    if (child.TryGetComponent(out TrainingBlockItem _))
-                        SimplePool.Return(child.gameObject, _trainingBlockPrefab.gameObject);
 
-                foreach (var block in Vm.GetTrainingBlocks())
+                IReadOnlyList<TrainingBlockViewData> trainingBlocks = Vm.GetTrainingBlocks();
+                List<TrainingBlockItem> items = _trainingBlockItemsGroup.Refresh(trainingBlocks.Count);
+                for (int i = 0; i < trainingBlocks.Count; i++)
                 {
-                    var go = SimplePool.Get(_trainingBlockPrefab.gameObject, _blockListParent);
-                    var item = go.GetComponent<TrainingBlockItem>();
-                    item.Setup(block, false);
+                    items[i].Setup(trainingBlocks[i], false);
                 }
             }
             finally

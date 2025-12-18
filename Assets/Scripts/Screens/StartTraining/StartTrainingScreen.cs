@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using Screens.Factories.Parameters;
@@ -16,10 +17,14 @@ namespace Screens.StartTraining
         [SerializeField] private Transform _contentParent;
         [SerializeField] private TrainingItem _trainingItemPrefab;
         [SerializeField] private Button _backButton;
+        
+        private ItemsGroup<TrainingItem> _trainingItemsGroup;
 
         public override async Task InitializeAsync(StartTrainingViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _trainingItemsGroup = new ItemsGroup<TrainingItem>(_contentParent, _trainingItemPrefab);
 
             Vm.TrainingsWithQueryUpdated += MarkDirtyOrRefresh;
             
@@ -44,14 +49,10 @@ namespace Screens.StartTraining
             _isRefreshing = true;
             try
             {
-                foreach (Transform t in _contentParent)
-                    SimplePool.Return(t.gameObject, _trainingItemPrefab.gameObject);
-
-                foreach (var trainingViewData in Vm.TrainingsWithQuery)
+                List<TrainingItem> items = _trainingItemsGroup.Refresh(Vm.TrainingsWithQuery.Count);
+                for (int i = 0; i < Vm.TrainingsWithQuery.Count; i++)
                 {
-                    GameObject go = SimplePool.Get(_trainingItemPrefab.gameObject, _contentParent);
-                    TrainingItem item = go.GetComponent<TrainingItem>();
-                    item.Setup(trainingViewData, OnTrainingClicked);
+                    items[i].Setup(Vm.TrainingsWithQuery[i], OnTrainingClicked);
                 }
             }
             finally

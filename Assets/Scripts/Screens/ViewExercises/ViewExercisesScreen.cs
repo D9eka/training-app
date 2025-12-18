@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using Screens.Factories.Parameters;
@@ -13,12 +14,16 @@ namespace Screens.ViewExercises
         [SerializeField] private Transform _contentParent;
         [SerializeField] private ExerciseItem _exerciseItemPrefab;
         [SerializeField] private Button _createButton;
+        
+        private ItemsGroup<ExerciseItem> _exerciseItemsGroup;
 
         public override async Task InitializeAsync(ViewExercisesViewModel viewModel, UiController uiController, 
             object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
-
+            
+            _exerciseItemsGroup = new ItemsGroup<ExerciseItem>(_contentParent, _exerciseItemPrefab);
+            
             Subscribe(() => Vm.ExercisesChanged -= MarkDirtyOrRefresh);
             Vm.ExercisesChanged += MarkDirtyOrRefresh;
 
@@ -31,14 +36,10 @@ namespace Screens.ViewExercises
             _isRefreshing = true;
             try
             {
-                foreach (Transform t in _contentParent)
-                    SimplePool.Return(t.gameObject, _exerciseItemPrefab.gameObject);
-
-                foreach (var ex in Vm.Exercises)
+                List<ExerciseItem> items = _exerciseItemsGroup.Refresh(Vm.Exercises.Count);
+                for (int i = 0; i < Vm.Exercises.Count; i++)
                 {
-                    GameObject go = SimplePool.Get(_exerciseItemPrefab.gameObject, _contentParent);
-                    var item = go.GetComponent<ExerciseItem>();
-                    item.Setup(ex, OnExerciseClicked);
+                    items[i].Setup(Vm.Exercises[i], OnExerciseClicked);
                 }
             }
             finally

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Models;
 using Screens.CreateBlock;
@@ -26,12 +27,18 @@ namespace Views.Components
 
         private ExerciseInBlockViewData _exerciseInBlockViewData;
         private string _id;
+        private ItemsGroup<EquipmentWeightRow> _equipmentWeightRowItemsGroup;
         
         private Action<string> _onClickEditById;
         private Action<string> _onClickDeleteById;
         private Action<string, int> _onChangeRepetitions;
         private Action<string, int> _onChangeDuration;
         private Action<string, (string Id, float Weight, WeightType WeightType)> _onChangeEquipmentWeight;
+
+        private void Awake()
+        {
+            _equipmentWeightRowItemsGroup = new ItemsGroup<EquipmentWeightRow>(_weightRowParent, _weightRowPrefab);
+        }
 
         public void Setup(ExerciseInBlockViewData exerciseInBlockViewData, Action<string> onClickEdit, 
             Action<string> onClickDelete, Action<string, int> onChangeRepetitions, Action<string, int> onChangeDuration, 
@@ -84,18 +91,12 @@ namespace Views.Components
 
         private void SetupWeights(List<EquipmentInBlockViewData> equipmentsInExerciseInBlockViewData)
         {
-            foreach (Transform t in _weightRowParent)
+            List<EquipmentInBlockViewData> eqsWithWeights = 
+                equipmentsInExerciseInBlockViewData.Where(eq => eq.NeedWeight).ToList();
+            List<EquipmentWeightRow> items = _equipmentWeightRowItemsGroup.Refresh(eqsWithWeights.Count);
+            for (int i = 0; i < eqsWithWeights.Count; i++)
             {
-                SimplePool.Return(t.gameObject, _weightRowPrefab.gameObject);
-            }
-
-            foreach (var equipmentInBlockViewData in equipmentsInExerciseInBlockViewData)
-            {
-                if (!equipmentInBlockViewData.NeedWeight) continue;
-                
-                EquipmentWeightRow equipmentWeightRow = 
-                    SimplePool.Get(_weightRowPrefab.gameObject, _weightRowParent).GetComponent<EquipmentWeightRow>();
-                equipmentWeightRow.Setup(equipmentInBlockViewData, OnChangeEquipmentWeight);
+                items[i].Setup(eqsWithWeights[i], OnChangeEquipmentWeight);
             }
             _weightRowParent.gameObject.SetActive(_weightRowParent.transform.childCount > 0);
         }

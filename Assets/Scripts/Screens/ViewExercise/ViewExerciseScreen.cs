@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using Screens.Factories.Parameters;
@@ -21,10 +22,14 @@ namespace Screens.ViewExercise
         [Space]
         [SerializeField] private Transform _usingInTrainingsParent;
         [SerializeField] private TrainingItem _trainingItemPrefab;
+        
+        private ItemsGroup<TrainingItem> _trainingItemsGroup;
 
         public override async Task InitializeAsync(ViewExerciseViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _trainingItemsGroup = new ItemsGroup<TrainingItem>(_usingInTrainingsParent, _trainingItemPrefab);
 
             Vm.ExerciseChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.ExerciseChanged -= MarkDirtyOrRefresh);
@@ -66,14 +71,10 @@ namespace Screens.ViewExercise
 
         private void UpdateUsingIsTrainings()
         {
-            foreach (TrainingItem t in _usingInTrainingsParent.GetComponentsInChildren<TrainingItem>())
-                SimplePool.Return(t.gameObject, _trainingItemPrefab.gameObject);
-
-            foreach (TrainingViewData trainingViewData in Vm.UsingInTrainings)
+            List<TrainingItem> items = _trainingItemsGroup.Refresh(Vm.UsingInTrainings.Count);
+            for (int i = 0; i < Vm.UsingInTrainings.Count; i++)
             {
-                GameObject go = SimplePool.Get(_trainingItemPrefab.gameObject, _usingInTrainingsParent);
-                TrainingItem item = go.GetComponent<TrainingItem>();
-                item.Setup(trainingViewData, OnTrainingClicked);
+                items[i].Setup(Vm.UsingInTrainings[i], OnTrainingClicked);
             }
         }
 

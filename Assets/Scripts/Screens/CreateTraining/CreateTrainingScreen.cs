@@ -23,12 +23,14 @@ namespace Screens.CreateTraining
         [SerializeField] private TMP_Text _createButtonText;
         [SerializeField] private Button _backButton;
         [SerializeField] private Button _addBlockButton;
-
-        private readonly List<GameObject> _spawnedItems = new();
+        
+        private ItemsGroup<TrainingBlockItem> _trainingBlockItemsGroup;
 
         public override async Task InitializeAsync(CreateTrainingViewModel viewModel, UiController uiController, object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _trainingBlockItemsGroup = new ItemsGroup<TrainingBlockItem>(_blockListParent, _trainingBlockPrefab);
 
             Vm.EditModeChanged += OnEditModeChanged;
             Vm.CanSaveChanged += OnCanSaveChanged;
@@ -70,17 +72,13 @@ namespace Screens.CreateTraining
                 _nameInput.text = Vm.Name;
                 _descInput.text = Vm.Description;
                 _prepTimeInput.text = Vm.PrepTimeSeconds.ToString(CultureInfo.CurrentCulture);
-                
-                foreach (Transform child in _blockListParent)
-                    if (child.TryGetComponent(out TrainingBlockItem _))
-                        SimplePool.Return(child.gameObject, _trainingBlockPrefab.gameObject);
 
-                foreach (var block in Vm.GetTrainingBlocks())
+                IReadOnlyList<TrainingBlockViewData> trainingsBlock = Vm.GetTrainingBlocks();
+                List<TrainingBlockItem> items = _trainingBlockItemsGroup.Refresh(trainingsBlock.Count);
+                for (int i = 0; i < trainingsBlock.Count; i++)
                 {
-                    var go = SimplePool.Get(_trainingBlockPrefab.gameObject, _blockListParent);
-                    var item = go.GetComponent<TrainingBlockItem>();
-                    item.Setup(block, Vm.IsEditMode, OnBlockClicked,OnBlockClicked, Vm.RemoveBlock);
-                    _spawnedItems.Add(go);
+                    items[i].Setup(trainingsBlock[i], Vm.IsEditMode, 
+                        OnBlockClicked,OnBlockClicked, Vm.RemoveBlock);
                 }
             }
             finally

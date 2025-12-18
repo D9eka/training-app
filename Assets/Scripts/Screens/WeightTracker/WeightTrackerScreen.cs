@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using UnityEngine;
@@ -22,10 +23,14 @@ namespace Screens.WeightTracker
         [Space]
         [SerializeField] private Button _backButton;
         
+        private ItemsGroup<WeightItem> _weightItemsGroup;
+        
         public override async Task InitializeAsync(WeightTrackerViewModel viewModel, UiController uiController, 
             object parameter = null)
         {
             await base.InitializeAsync(viewModel, uiController, parameter);
+
+            _weightItemsGroup = new ItemsGroup<WeightItem>(_contentParent, _weightItemPrefab);
 
             Vm.WeightsChanged += MarkDirtyOrRefresh;
             Subscribe(() => Vm.WeightsChanged -= MarkDirtyOrRefresh);
@@ -56,14 +61,10 @@ namespace Screens.WeightTracker
             _isRefreshing = true;
             try
             {
-                foreach (WeightItem weightItem in _contentParent.GetComponentsInChildren<WeightItem>())
-                    SimplePool.Return(weightItem.gameObject, _weightItemPrefab.gameObject);
-
-                foreach (WeightItemViewData weightItemViewData in Vm.Weights)
+                List<WeightItem> items = _weightItemsGroup.Refresh(Vm.Weights.Count);
+                for (int i = 0; i < Vm.Weights.Count; i++)
                 {
-                    GameObject go = SimplePool.Get(_weightItemPrefab.gameObject, _contentParent);
-                    WeightItem item = go.GetComponent<WeightItem>();
-                    item.Setup(weightItemViewData);
+                    items[i].Setup(Vm.Weights[i]);
                 }
                 _weightGraph.SetValues(Vm.GraphValues);
             }
