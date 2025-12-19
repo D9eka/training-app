@@ -4,6 +4,7 @@ using Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Screens.AddWeight
 {
@@ -12,6 +13,12 @@ namespace Screens.AddWeight
         [SerializeField] private TMP_InputField _weightInput;
         [SerializeField] private Button _saveButton;
         [SerializeField] private Button _backButton;
+        
+        [Inject]
+        public void Construct(AddWeightViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
         
         public override async Task InitializeAsync(AddWeightViewModel viewModel, UiController uiController, 
             object parameter = null)

@@ -37,8 +37,7 @@ namespace Screens.SelectExercise
 
         public SelectExerciseViewModel(TrainingDataService trainingDataService,
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService,
-            SelectExerciseParameter param)
+            IDataService<Equipment> equipmentDataService)
         {
             _trainingDataService = trainingDataService;
             _exerciseDataService =  exerciseDataService;
@@ -47,7 +46,6 @@ namespace Screens.SelectExercise
             _allExercises = _exerciseDataService.Cache;
             UpdateExercisesWithQueryList(SearchQuery);
             
-            UpdateParameter(param);
             _exerciseDataService.DataUpdated += ExerciseDataServiceOnDataUpdated;
         }
 

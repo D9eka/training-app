@@ -70,11 +70,10 @@ namespace Screens.CreateTraining
         public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
         public CreateTrainingViewModel(IDataService<Training> trainingDataService, 
-            IDataService<Exercise> exerciseDataService, TrainingIdParameter param)
+            IDataService<Exercise> exerciseDataService)
         {
             _trainingDataService =  trainingDataService;
             _exerciseDataService = exerciseDataService;
-            UpdateParameter(param);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
 

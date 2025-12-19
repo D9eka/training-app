@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 using Views.Components;
+using Zenject;
 
 namespace Screens.WeightTracker
 {
@@ -24,6 +25,12 @@ namespace Screens.WeightTracker
         [SerializeField] private Button _backButton;
         
         private ItemsGroup<WeightItem> _weightItemsGroup;
+        
+        [Inject]
+        public void Construct(WeightTrackerViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
         
         public override async Task InitializeAsync(WeightTrackerViewModel viewModel, UiController uiController, 
             object parameter = null)

@@ -22,11 +22,10 @@ namespace Screens.Main
         public Action DataUpdated;
         
         public MainViewModel(TrainingDataService trainingService, 
-            IDataService<WeightTracking> weightTrackingDataService, IScreenParameter param)
+            IDataService<WeightTracking> weightTrackingDataService)
         {
             _trainingDataService =  trainingService;
             _weightTrackingDataService = weightTrackingDataService;
-            UpdateParameter(param);
             _trainingDataService.DataUpdated += _ => UpdateParameter(default);
             _weightTrackingDataService.DataUpdated += _ => UpdateParameter(default);
         }

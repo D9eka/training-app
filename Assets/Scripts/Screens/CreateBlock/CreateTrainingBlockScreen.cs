@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 using Views.Components;
+using Zenject;
 
 namespace Screens.CreateBlock
 {
@@ -29,6 +30,12 @@ namespace Screens.CreateBlock
         [SerializeField] private Button _addExerciseInBlockButton;
         
         private ItemsGroup<ExerciseInBlockItem> _exerciseInBlockItemsGroup;
+        
+        [Inject]
+        public void Construct(CreateTrainingBlockViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
 
         public override async Task InitializeAsync(CreateTrainingBlockViewModel viewModel, UiController uiController, 
             object parameter = null)

@@ -14,10 +14,14 @@ namespace Core
     public class UiController : MonoBehaviour
     {
         [SerializeField] private GameObject _navigationBar;
+            
         private readonly Stack<Screen> _stack = new();
-        private ViewModelFactory _viewModelFactory;
-
-        public void Initialize(ViewModelFactory factory) => _viewModelFactory = factory;
+        private Dictionary<ScreenType, Screen> _screens = new();
+        
+        public void Initialize(Dictionary<ScreenType, Screen> screens)
+        {
+            _screens = screens;
+        }
 
         public async void OpenScreen(ScreenType type, IScreenParameter param = null, bool closeOtherScreens = false)
         {
@@ -30,15 +34,11 @@ namespace Core
                         CloseScreen();
                     }
                 }
-                
-                GameObject screenGo = DiContainer.Instance.ResolveNamed(type.ToString()) ?? 
-                                      throw new ArgumentNullException(nameof(screenGo), $"Screen {type} not found");
 
-                Screen screen = screenGo.GetComponent<Screen>() ??
-                                throw new InvalidOperationException($"No Screen component on {type}");
+                Screen screen = _screens[type];
 
                 await HandleScreenTransition(screen);
-                await InitializeScreenIfNeeded(screen, type, param);
+                UpdateScreenIfNeeded(screen, param);
                 await screen.OnShowAsync();
                 _stack.Push(screen);
                 _navigationBar?.SetActive(screen.ShowNavBar);
@@ -84,7 +84,7 @@ namespace Core
             next.gameObject.SetActive(true);
         }
 
-        private async Task InitializeScreenIfNeeded(Screen screen, ScreenType type, IScreenParameter parameter)
+        private void UpdateScreenIfNeeded(Screen screen, IScreenParameter parameter)
         {
             if (screen is IScreenWithViewModel vmScreen)
             {
@@ -94,11 +94,7 @@ namespace Core
                     {
                         updatableScreen.UpdateViewModelParameter(parameter);
                     }
-                    return;
                 }
-
-                var vm = _viewModelFactory.CreateForScreen(type, parameter);
-                await vmScreen.InitializeWithViewModel(vm, this, parameter);
             }
         }
     }

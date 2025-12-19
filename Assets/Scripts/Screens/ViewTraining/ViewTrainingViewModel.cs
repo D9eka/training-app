@@ -37,12 +37,10 @@ namespace Screens.ViewTraining
 
         public ViewTrainingViewModel(
             TrainingDataService trainingDataService,
-            IDataService<Exercise> exerciseDataService,
-            TrainingIdParameter param)
+            IDataService<Exercise> exerciseDataService)
         {
             _trainingDataService = trainingDataService;
             _exerciseDataService = exerciseDataService;
-            UpdateParameter(param);
 
             _trainingDataService.DataUpdated += _ => Load();
             Load();

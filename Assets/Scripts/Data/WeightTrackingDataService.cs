@@ -5,7 +5,7 @@ namespace Data
 {
     public class WeightTrackingDataService : BaseDataService<WeightTracking>
     {
-        public WeightTrackingDataService(List<WeightTracking> cache) : base(cache)
+        public WeightTrackingDataService(ISaveService saveService) : base(saveService.WeightsCache)
         {
         }
     }

@@ -5,7 +5,7 @@ namespace Data
 {
     public class EquipmentDataService : BaseDataService<Equipment>
     {
-        public EquipmentDataService(List<Equipment> cache) : base(cache)
+        public EquipmentDataService(ISaveService saveService) : base(saveService.EquipmentsCache)
         {
         }
     }

@@ -4,7 +4,7 @@ using Core;
 using Screens;
 using Screens.Factories.Parameters;
 using UnityEngine;
-using UnityEngine.UI;
+using Zenject;
 
 namespace NavigationTab
 {
@@ -27,6 +27,12 @@ namespace NavigationTab
 
         private NavigationTab CurrentTab => _tabs[_currentTabIndex];
 
+        [Inject]
+        public void Construct(UiController uiController)
+        {
+            _uiController = uiController;
+        }
+
         private void Start()
         {
             if (_tabs == null || _tabs.Length == 0)
@@ -44,15 +50,11 @@ namespace NavigationTab
                     throw new InvalidOperationException($"Duplicate tab key: {tab.Type}");
             }
 
-            _uiController = DiContainer.Instance.Resolve<UiController>()
-                ?? throw new InvalidOperationException("UiController not resolved");
-
             for (int i = 0; i < _tabs.Length; i++)
             {
                 int tabIndex = i;
                 _tabs[i].Button.onClick.RemoveAllListeners();
                 _tabs[i].Button.onClick.AddListener(() => OpenTab(tabIndex));
-                DiContainer.Instance.ResolveNamed(_tabs[i].Type.ToString()).SetActive(false);
             }
             
             OpenTab(_initialTabIndex);
@@ -71,8 +73,6 @@ namespace NavigationTab
 
                 _currentTabIndex = tabIndex;
                 CurrentTab.Button.SetActive(true);
-                foreach (NavigationTab tab in _tabs)
-                    DiContainer.Instance.ResolveNamed(tab.Type.ToString()).SetActive(tab == CurrentTab);
 
                 IScreenParameter param = CreateScreenParameter(CurrentTab.Type);
                 _uiController.OpenScreen(CurrentTab.Type, param, true);

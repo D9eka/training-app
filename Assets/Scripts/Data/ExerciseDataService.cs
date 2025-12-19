@@ -5,7 +5,7 @@ namespace Data
 {
     public class ExerciseDataService : BaseDataService<Exercise>
     {
-        public ExerciseDataService(List<Exercise> cache) : base(cache)
+        public ExerciseDataService(ISaveService saveService) : base(saveService.ExercisesCache)
         {
         }
     }

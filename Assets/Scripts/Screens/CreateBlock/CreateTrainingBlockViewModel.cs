@@ -37,13 +37,11 @@ namespace Screens.CreateBlock
 
         public CreateTrainingBlockViewModel(TrainingDataService trainingDataService, 
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService,
-            CreateTrainingBlockParameter param)
+            IDataService<Equipment> equipmentDataService)
         {
             _trainingDataService =  trainingDataService;
             _exerciseDataService = exerciseDataService;
             _equipmentDataService = equipmentDataService;
-            UpdateParameter(param);
             _trainingDataService.DataUpdated += TrainingDataServiceOnDataUpdated;
         }
 

@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 using Views.Components;
+using Zenject;
 
 namespace Screens.SelectExercise
 {
@@ -18,6 +19,12 @@ namespace Screens.SelectExercise
         [SerializeField] private Button _backButton;
         
         private ItemsGroup<ExerciseItem> _exerciseItemsGroup;
+        
+        [Inject]
+        public void Construct(SelectExerciseViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
 
         public override async Task InitializeAsync(SelectExerciseViewModel viewModel, UiController uiController, object parameter = null)
         {

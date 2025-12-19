@@ -36,13 +36,11 @@ namespace Screens.ViewExercise
         public event Action ExerciseChanged;
 
         public ViewExerciseViewModel(IDataService<Training> trainingDataService, 
-            IDataService<Exercise> exerciseDataService, IDataService<Equipment> equipmentDataService, 
-            ExerciseIdParameter param)
+            IDataService<Exercise> exerciseDataService, IDataService<Equipment> equipmentDataService)
         {
             _trainingDataService = trainingDataService;
             _exerciseDataService = exerciseDataService;
             _equipmentDataService = equipmentDataService;
-            UpdateParameter(param);
             _exerciseDataService.DataUpdated += _ => Load();
             Load();
         }

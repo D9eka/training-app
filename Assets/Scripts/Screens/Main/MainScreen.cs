@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 using Views.Components;
+using Zenject;
 
 namespace Screens.Main
 {
@@ -20,6 +21,12 @@ namespace Screens.Main
         [SerializeField] private AreaGraph _areaGraph;
         
         private ItemsGroup<TrainingItem> _trainingItemsGroup;
+        
+        [Inject]
+        public void Construct(MainViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
         
         public override async Task InitializeAsync(MainViewModel viewModel, UiController uiController, object parameter = null)
         {

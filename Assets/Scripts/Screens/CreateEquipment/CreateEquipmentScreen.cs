@@ -3,6 +3,7 @@ using Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Screens.CreateEquipment
 {
@@ -13,6 +14,12 @@ namespace Screens.CreateEquipment
         [SerializeField] private Toggle _hasWeight;
         [SerializeField] private Button _saveButton;
         [SerializeField] private Button _backButton;
+        
+        [Inject]
+        public void Construct(CreateEquipmentViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
 
         public override async Task InitializeAsync(CreateEquipmentViewModel viewModel, UiController uiController, 
             object parameter = null)

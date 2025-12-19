@@ -4,6 +4,7 @@ using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Screens.Timer
 {
@@ -24,6 +25,12 @@ namespace Screens.Timer
         [SerializeField] private Button _nextExerciseButton;
         [Space]
         [SerializeField] private Button _backButton;
+
+        [Inject]
+        public void Construct(TimerViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
 
         public override async Task InitializeAsync(TimerViewModel viewModel, UiController uiController, object parameter = null)
         {

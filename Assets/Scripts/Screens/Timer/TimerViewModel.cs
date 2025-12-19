@@ -5,6 +5,7 @@ using Data;
 using Models;
 using Screens.Factories.Parameters;
 using UnityEngine;
+using Zenject;
 
 namespace Screens.Timer
 {
@@ -32,12 +33,11 @@ namespace Screens.Timer
 
         public TimerViewModel(TrainingDataService trainingDataService,
             IDataService<Exercise> exerciseDataService,
-            IDataService<Equipment> equipmentDataService, UiController uiController, TimerParameter param)
+            IDataService<Equipment> equipmentDataService, UiController uiController)
         {
             _trainingDataService = trainingDataService;
             _timerScreenDataCreator = new TimerScreenDataCreator(exerciseDataService, equipmentDataService);
             _uiController = uiController;
-            UpdateParameter(param);
         }
 
         public void UpdateParameter(TimerParameter param)
@@ -59,11 +59,11 @@ namespace Screens.Timer
             SelectTimeScreen(0);
         }
 
-        public void Tick(float deltaTime)
+        public void Tick()
         {
             if (!_isTimerEnabled) return;
 
-            _secondsLeft -= deltaTime;
+            _secondsLeft -= Time.deltaTime;
             if (_secondsLeft <= 1)
             {
                 OnNextExerciseClicked();

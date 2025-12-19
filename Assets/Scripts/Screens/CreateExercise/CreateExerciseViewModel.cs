@@ -35,11 +35,10 @@ namespace Screens.CreateExercise
         public List<ExerciseEquipmentRef> RequiredEquipment { get; private set; } = new List<ExerciseEquipmentRef>();
 
         public CreateExerciseViewModel(IDataService<Exercise> exerciseDataService, 
-            IDataService<Equipment> equipmentDataService, ExerciseIdParameter param)
+            IDataService<Equipment> equipmentDataService)
         {
             _exerciseDataService =  exerciseDataService;
             _equipmentDataService = equipmentDataService;
-            UpdateParameter(param);
             _equipmentDataService.DataUpdated += EquipmentDataServiceOnDataUpdated;
         }
 

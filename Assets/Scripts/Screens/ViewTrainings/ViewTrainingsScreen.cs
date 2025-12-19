@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 using Views.Components;
+using Zenject;
 
 namespace Screens.ViewTrainings
 {
@@ -16,6 +17,12 @@ namespace Screens.ViewTrainings
         [SerializeField] private Button _createButton;
         
         private ItemsGroup<TrainingItem> _trainingItemsGroup;
+        
+        [Inject]
+        public void Construct(ViewTrainingsViewModel viewModel, UiController uiController)
+        {
+            InitializeAsync(viewModel, uiController);
+        }
 
         public override async Task InitializeAsync(ViewTrainingsViewModel viewModel, UiController uiController, 
             object parameter = null)
