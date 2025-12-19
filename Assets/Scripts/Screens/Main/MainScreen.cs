@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
 using Screens.Factories.Parameters;
-using Screens.ViewTrainings;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Views.Components;
 using Zenject;
 

@@ -5,7 +5,6 @@ using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Views.Components;
 using Zenject;
 

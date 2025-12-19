@@ -4,9 +4,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Screens;
 using Screens.Factories.Parameters;
-using Screens.ViewExercise;
-using Screens.ViewModels;
-using Utils;
 using Screen = Screens.Screen;
 
 namespace Core

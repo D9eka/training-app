@@ -7,7 +7,6 @@ using Screens.CreateBlock;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 
 namespace Views.Components
 {

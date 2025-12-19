@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core;
@@ -6,7 +5,6 @@ using Screens.Factories.Parameters;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Views.Components;
 using Zenject;
 
@@ -55,21 +53,21 @@ namespace Screens.CreateBlock
             _approachesInputField.onValueChanged.RemoveAllListeners();
             _approachesInputField.onValueChanged.AddListener(v => Vm.Approaches = ParseInt(v));
             
-            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            _setsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _setsInputField.onValueChanged.RemoveAllListeners();
             _setsInputField.onValueChanged.AddListener(v => Vm.Sets = ParseInt(v));
             
-            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            _restAfterApproachSecondsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterApproachSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterApproachSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterApproachSeconds = ParseInt(v));
             
-            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            _restAfterSetSecondsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterSetSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterSetSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterSetSeconds = ParseInt(v));
             
-            _approachesInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
+            _restAfterBlockSecondsInputField.contentType = TMP_InputField.ContentType.IntegerNumber;
             _restAfterBlockSecondsInputField.onValueChanged.RemoveAllListeners();
             _restAfterBlockSecondsInputField.onValueChanged.AddListener(v => 
                 Vm.RestAfterBlockSeconds = ParseInt(v));
@@ -141,7 +139,6 @@ namespace Screens.CreateBlock
         {
             Vm.Save();
             UIController.OpenScreen(ScreenType.SelectExercise, new SelectExerciseParameter(Vm.BlockId));
-            //BUG: Сбрасывается вес у существующих упражнений после добавления нового
         }
 
         private int ParseInt(string value)

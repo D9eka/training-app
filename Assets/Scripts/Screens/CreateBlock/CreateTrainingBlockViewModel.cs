@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Data;
 using Models;
 using Screens.Factories.Parameters;
-using Screens.ViewModels;
 
 namespace Screens.CreateBlock
 {

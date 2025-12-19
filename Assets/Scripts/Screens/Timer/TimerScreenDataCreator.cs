@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Data;
 using Models;
+using Screens.CreateSimpleTraining;
 using UnityEngine;
 
 namespace Screens.Timer
@@ -45,7 +46,7 @@ namespace Screens.Timer
                 for (int approach = 0; approach < trainingData.Approaches; approach++)
                 {
                     indexText = CreateIndexText(blockIndex, set, approach, 1);
-                    timeScreens.Add(CreateExerciseTimeScreen(trainingData.ExerciseDurationSeconds, indexText));
+                    timeScreens.Add(CreateExerciseTimeScreen(trainingData.ApproachDurationSeconds, indexText));
                     if (approach != trainingData.Approaches - 1)
                     {
                         timeScreens.Add(

@@ -245,6 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Core.GameInstaller
   _camera: {fileID: 519420031}
   _uiController: {fileID: 1903560599}
+  _canvas: {fileID: 1903560597}
 --- !u!114 &377775773
 MonoBehaviour:
   m_ObjectHideFlags: 0

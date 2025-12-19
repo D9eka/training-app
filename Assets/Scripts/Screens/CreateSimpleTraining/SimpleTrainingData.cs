@@ -1,23 +1,23 @@
-namespace Screens.Timer
+namespace Screens.CreateSimpleTraining
 {
     public class SimpleTrainingData
     {
-        public SimpleTrainingData(int exerciseDurationSeconds, int prepTimeSeconds, int approaches, int sets, 
-            int restAfterApproachSeconds, int restAfterSetSeconds)
+        public SimpleTrainingData(int prepTimeSeconds, int approachDurationSeconds, int restAfterApproachSeconds, 
+            int approaches, int sets, int restAfterSetSeconds)
         {
-            ExerciseDurationSeconds = exerciseDurationSeconds;
+            ApproachDurationSeconds = approachDurationSeconds;
             PrepTimeSeconds = prepTimeSeconds;
+            RestAfterApproachSeconds = restAfterApproachSeconds;
             Approaches = approaches;
             Sets = sets;
-            RestAfterApproachSeconds = restAfterApproachSeconds;
             RestAfterSetSeconds = restAfterSetSeconds;
         }
 
-        public int ExerciseDurationSeconds { get; private set; }
         public int PrepTimeSeconds { get; private set; }
+        public int ApproachDurationSeconds { get; private set; }
+        public int RestAfterApproachSeconds { get; private set; }
         public int Approaches { get; private set; }
         public int Sets { get; private set; }
-        public int RestAfterApproachSeconds { get; private set; }
         public int RestAfterSetSeconds { get; private set; }
     }
 }

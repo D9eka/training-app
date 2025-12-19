@@ -1,10 +1,10 @@
-using System;
 using Data;
 using Screens;
 using Screens.AddWeight;
 using Screens.CreateBlock;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;
+using Screens.CreateSimpleTraining;
 using Screens.CreateTraining;
 using Screens.Main;
 using Screens.SelectExercise;
@@ -58,9 +58,8 @@ namespace Core
         private void BindAllViewModels()
         {
             Container.BindInterfacesAndSelfTo<CreateTrainingBlockViewModel>().AsSingle();
-            Container.BindInterfacesAndSelfTo<CreateEquipmentViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<CreateExerciseViewModel>().AsSingle();
-            //Container.BindInterfacesAndSelfTo<CreateSimpleTrainingViewModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CreateSimpleTrainingViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<CreateTrainingViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<MainViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<SelectExerciseViewModel>().AsSingle();
@@ -71,6 +70,7 @@ namespace Core
             Container.BindInterfacesAndSelfTo<ViewTrainingViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<ViewTrainingsViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<WeightTrackerViewModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<CreateEquipmentViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<AddWeightViewModel>().AsSingle();
         }
     }

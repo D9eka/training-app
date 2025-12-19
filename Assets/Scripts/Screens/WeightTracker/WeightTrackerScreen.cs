@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Core;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Views.Components;
 using Zenject;
 

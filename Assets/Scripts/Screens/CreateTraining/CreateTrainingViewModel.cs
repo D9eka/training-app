@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Data;
 using Models;
-using Screens.CreateExercise;
 using Screens.Factories.Parameters;
-using Screens.ViewModels;
 
 namespace Screens.CreateTraining
 {

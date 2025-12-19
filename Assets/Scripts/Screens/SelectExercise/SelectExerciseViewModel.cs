@@ -5,7 +5,6 @@ using Data;
 using Models;
 using Screens.Factories.Parameters;
 using Screens.ViewExercises;
-using Screens.ViewModels;
 
 namespace Screens.SelectExercise
 {

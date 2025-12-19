@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using Core;
 using Screens.CreateTraining;
 using Screens.Factories.Parameters;
-using Screens.ViewExercise;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Views.Components;
 using Zenject;
 

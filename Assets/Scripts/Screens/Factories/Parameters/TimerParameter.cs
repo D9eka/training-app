@@ -1,4 +1,4 @@
-using Screens.Timer;
+using Screens.CreateSimpleTraining;
 
 namespace Screens.Factories.Parameters
 {

@@ -1,5 +1,4 @@
 using System;
-using Screens.ViewExercises;
 using Screens.ViewTrainings;
 using TMPro;
 using UnityEngine;

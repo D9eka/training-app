@@ -1,5 +1,4 @@
 using Models;
-using Views.Components;
 
 namespace Screens.WeightTracker
 {

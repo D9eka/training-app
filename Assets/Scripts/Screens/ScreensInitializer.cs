@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Core;
 using Screens.AddWeight;
 using Screens.CreateBlock;
 using Screens.CreateEquipment;
 using Screens.CreateExercise;
+using Screens.CreateSimpleTraining;
 using Screens.CreateTraining;
 using Screens.Main;
 using Screens.SelectExercise;
@@ -56,9 +56,8 @@ namespace Screens
         private void BindAllScreens()
         {
             BindScreen<CreateTrainingBlockScreen>(ScreenType.CreateBlock);
-            BindScreen<CreateEquipmentScreen>(ScreenType.CreateEquipment);
             BindScreen<CreateExerciseScreen>(ScreenType.CreateExercise);
-            //BindScreen<CreateSimpleTrainingScreen>(ScreenType.CreateSimpleTraining);
+            BindScreen<CreateSimpleTrainingScreen>(ScreenType.CreateSimpleTraining);
             BindScreen<CreateTrainingScreen>(ScreenType.CreateTraining);
             BindScreen<MainScreen>(ScreenType.Main);
             BindScreen<SelectExerciseScreen>(ScreenType.SelectExercise);
@@ -69,8 +68,8 @@ namespace Screens
             BindScreen<ViewTrainingScreen>(ScreenType.ViewTraining);
             BindScreen<ViewTrainingsScreen>(ScreenType.ViewTrainings);
             BindScreen<WeightTrackerScreen>(ScreenType.WeightTracker);
+            BindScreen<CreateEquipmentScreen>(ScreenType.CreateEquipment);
             BindScreen<AddWeightScreen>(ScreenType.AddWeight);
-            
             BindScreen<Screen>(ScreenType.ViewStats);
         }
 

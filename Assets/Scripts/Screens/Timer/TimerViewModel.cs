@@ -92,6 +92,7 @@ namespace Screens.Timer
             }
             else
             {
+                _isTimerEnabled = false;
                 _uiController.CloseScreen();
             }
         }
