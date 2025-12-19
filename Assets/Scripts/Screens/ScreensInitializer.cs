@@ -13,6 +13,7 @@ using Screens.StartTraining;
 using Screens.Timer;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
+using Screens.ViewStats;
 using Screens.ViewTraining;
 using Screens.ViewTrainings;
 using Screens.WeightTracker;
@@ -68,9 +69,9 @@ namespace Screens
             BindScreen<ViewTrainingScreen>(ScreenType.ViewTraining);
             BindScreen<ViewTrainingsScreen>(ScreenType.ViewTrainings);
             BindScreen<WeightTrackerScreen>(ScreenType.WeightTracker);
+            BindScreen<ViewStatsScreen>(ScreenType.ViewStats);
             BindScreen<CreateEquipmentScreen>(ScreenType.CreateEquipment);
             BindScreen<AddWeightScreen>(ScreenType.AddWeight);
-            BindScreen<Screen>(ScreenType.ViewStats);
         }
 
         private void BindScreen<TScreen>(ScreenType screenType)

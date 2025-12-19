@@ -6,21 +6,19 @@ using Models;
 using Screens.Factories.Parameters;
 using Screens.ViewTrainings;
 
-namespace Screens.Main
+namespace Screens.ViewStats
 {
-    public class MainViewModel : IUpdatableViewModel<IScreenParameter>
+    public class ViewStatsViewModel : IUpdatableViewModel<IScreenParameter>
     {
-        private const int LAST_TRAININGS_COUNT = 5;
-        
         private readonly TrainingDataService _trainingDataService;
         private readonly IDataService<WeightTracking> _weightTrackingDataService;
-
-        public IReadOnlyList<TrainingViewData> LastTrainings { get; private set; } = new List<TrainingViewData>();
+        
+        public IReadOnlyList<TrainingViewData> PreviousTrainings { get; private set; } = new List<TrainingViewData>();
         public IReadOnlyList<float> WeekWeights { get; private set; } = new List<float>();
 
         public Action DataUpdated;
         
-        public MainViewModel(TrainingDataService trainingService, 
+        public ViewStatsViewModel(TrainingDataService trainingService, 
             IDataService<WeightTracking> weightTrackingDataService)
         {
             _trainingDataService =  trainingService;
@@ -31,19 +29,17 @@ namespace Screens.Main
         
         public void UpdateParameter(IScreenParameter param)
         {
-            LastTrainings = GetLastTrainings();
+            PreviousTrainings = GetPreviousTrainings();
             WeekWeights = GetLastWeekWeights();
             
             DataUpdated?.Invoke();
         }
 
-        private List<TrainingViewData> GetLastTrainings()
+        private List<TrainingViewData> GetPreviousTrainings()
         {
-            int lastTrainingsCount = Math.Min(_trainingDataService.Cache.Count, LAST_TRAININGS_COUNT);
-            if (lastTrainingsCount == 0) return new List<TrainingViewData>();
+            if (_trainingDataService.Cache.Count == 0) return new List<TrainingViewData>();
             return _trainingDataService.Cache
                 .OrderByDescending(training => training.LastTime)
-                .Take(lastTrainingsCount)
                 .Select(training => new TrainingViewData(training))
                 .ToList();
         }

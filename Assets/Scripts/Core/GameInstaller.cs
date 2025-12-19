@@ -12,6 +12,7 @@ using Screens.StartTraining;
 using Screens.Timer;
 using Screens.ViewExercise;
 using Screens.ViewExercises;
+using Screens.ViewStats;
 using Screens.ViewTraining;
 using Screens.ViewTrainings;
 using Screens.WeightTracker;
@@ -70,6 +71,7 @@ namespace Core
             Container.BindInterfacesAndSelfTo<ViewTrainingViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<ViewTrainingsViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<WeightTrackerViewModel>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ViewStatsViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<CreateEquipmentViewModel>().AsSingle();
             Container.BindInterfacesAndSelfTo<AddWeightViewModel>().AsSingle();
         }
